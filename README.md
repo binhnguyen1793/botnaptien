@@ -1,50 +1,29 @@
-# Game Platform Project
 
-## 📌 Hướng dẫn cài đặt và chạy
+1.1. Cập Nhật Hệ Thống
+sudo apt update && sudo apt upgrade -y
 
-### 1️⃣ **Cài đặt Backend (Flask)**
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate  # (Windows dùng: venv\Scripts\activate)
-pip install -r requirements.txt
-python app.py
-```
-📌 **Backend chạy tại:** `http://127.0.0.1:5000/`
+1.2. Cài Đặt Python và pip
+sudo apt install python3 python3-pip -y
 
----
+1.3. Cài Đặt Google Chrome & ChromeDriver
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+sudo apt --fix-broken install -y
 
-### 2️⃣ **Chạy Frontend (HTML, CSS, JS)**
-Chỉ cần mở file `index.html` trong trình duyệt.
+CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+wget https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip
+sudo mv chromedriver /usr/bin/
+sudo chmod +x /usr/bin/chromedriver
 
-📌 **Trang chủ:** `index.html`
-📌 **Trang tài khoản:** `account.html`
-📌 **Trang game:** `game.html`
+1.4. Cài Đặt Selenium
+pip3 install selenium
 
----
+2.1. Tạo Thư Mục Chứa Script
+mkdir selenium_script && cd selenium_script
 
-### 3️⃣ **Cấu trúc thư mục**
-```
-project/
-├── backend/  # Flask API
-│   ├── app.py  # Xử lý tài khoản, số dư, nạp tiền, game
-│   ├── database.db  # SQLite database
-│   ├── requirements.txt  # Thư viện Python cần cài đặt
-│   ├── static/  # Chứa CSS, JS, Images
-│   ├── templates/  # HTML giao diện Flask
-│   ├── config.py  # Cấu hình API Binance
-│   ├── utils.py  # Hàm hỗ trợ backend
-│   ├── run.sh  # Script chạy nhanh
-│
-├── frontend/  # Giao diện HTML, CSS, JS
-│   ├── index.html  # Trang chủ
-│   ├── account.html  # Trang tài khoản
-│   ├── game.html  # Trang chơi game
-│   ├── login.html  # Đăng nhập
-│   ├── register.html  # Đăng ký
-│   ├── css/  # File CSS giao diện
-│   ├── js/  # File JS xử lý
-│   ├── images/  # Hình ảnh giao diện
-```
+2.2. Tạo File a.py
+Sử dụng nano a.py để tạo file và dán code vào.
 
-✅ **Bạn chỉ cần làm theo hướng dẫn là có thể chạy ngay!** 🚀
+2.3. Chạy Script với Tham Số
+python3 a.py 100000  # Thay số 100000 bằng số tiền cần nạp
