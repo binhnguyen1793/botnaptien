@@ -68,6 +68,55 @@ try:
     # Chờ trang load sau đăng nhập
     time.sleep(5)
 
+    # Xử lý pop-up "Cancel"
+    try:
+        cancel_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[@data-testid='hint-popup-guide-primary-btn' and (text()='Cancel' or text()='Hủy')]")
+        ))
+        cancel_button.click()
+        print("✅ Click vào 'Cancel' hoặc 'Hủy'!")
+    except:
+        print("⚠️ Không tìm thấy nút 'Cancel' hoặc 'Hủy'!")
+
+    # Xử lý pop-up "Later"
+    try:
+        later_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[@data-testid='hint-popup-guide-primary-btn' and (text()='Later' or text()='Lần Sau')]")
+        ))
+        later_button.click()
+        print("✅ Click vào 'Later' hoặc 'Lần Sau'!")
+    except:
+        print("⚠️ Không tìm thấy nút 'Later' hoặc 'Lần Sau'!")
+
+    # Nhập số tiền vào ô có `type="decimal"`
+    try:
+        amount_input = wait.until(EC.presence_of_element_located(
+            (By.XPATH, "//input[@type='decimal']")
+        ))
+        amount_input.clear()
+        amount_input.send_keys(AMOUNT)
+        print(f"✅ Nhập số tiền: {AMOUNT} VND")
+    except:
+        print("⚠️ Không tìm thấy ô nhập số tiền!")
+
+    # Click vào nút “Xác nhận nạp tiền”
+    try:
+        confirm_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[@data-testid='deposit-third-party-submit-btn']")
+        ))
+        confirm_button.click()
+        print("✅ Click 'Xác nhận nạp tiền'")
+    except:
+        print("⚠️ Không tìm thấy nút 'Xác nhận nạp tiền'!")
+
+    # Chờ tab mới mở ra và chuyển sang tab mới
+    time.sleep(3)
+    new_tab = driver.window_handles[-1]  # Lấy tab mới nhất
+    driver.switch_to.window(new_tab)
+    print("✅ Đã chuyển sang tab mới chứa mã QR!")
+
+    # Chụp ảnh toàn bộ màn hình của tab mới
+    time.sleep(5)  # Chờ trang load hoàn tất
     screenshot_path = "static/qr_code.png"
     driver.save_screenshot(screenshot_path)
     print("✅ Ảnh chụp toàn màn hình đã được lưu:", screenshot_path)
