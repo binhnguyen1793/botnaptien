@@ -1,31 +1,34 @@
-from flask import Flask, request, send_file
-from flask_cors import CORS  # NEW
+from flask import Flask, request, send_file, after_this_request
+from flask_cors import CORS
 import subprocess
 import os
 
 app = Flask(__name__)
-CORS(app)  # NEW: Cho phép gọi từ web bên ngoài
+CORS(app)
 
 @app.route("/run-bot", methods=["POST"])
 def run_bot():
-    price = request.form.get("price")
-    if not price:
-        return "Thiếu giá trị 'price'!", 400
-
+    price = request.form.get("price", "no-price")
     print(f"💰 Nhận yêu cầu chạy bot với giá: {price}")
-    result = subprocess.run(["python", "bot.py", price], capture_output=True, text=True)
 
+    result = subprocess.run(["python", "bot.py"], capture_output=True, text=True)
     print(result.stdout)
     print(result.stderr)
 
     image_path = os.path.join("static", "qr_code.png")
+
     if os.path.exists(image_path):
-        response = send_file(image_path, mimetype="image/png")
-        try:
-            os.remove(image_path)
-        except Exception as e:
-            print(f"⚠️ Không thể xoá ảnh: {e}")
-        return response
+        # ✅ Đánh dấu sẽ xóa sau khi gửi file
+        @after_this_request
+        def remove_file(response):
+            try:
+                os.remove(image_path)
+                print("🗑️ Đã xóa ảnh:", image_path)
+            except Exception as e:
+                print("❌ Lỗi xóa ảnh:", e)
+            return response
+
+        return send_file(image_path, mimetype="image/png")
     else:
         return "Không tìm thấy ảnh chụp!", 500
 
