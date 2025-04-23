@@ -1,6 +1,39 @@
-function enqueue_tour_scripts() {
-    if (is_singular('tour')) {
-        wp_enqueue_script('tour-js', get_template_directory_uri() . '/js/tour-interaction.js', [], null, true);
-    }
+.itinerary .day {
+  background: #fff;
+  padding: 15px 20px;
+  border: 1px solid #ddd;
+  border-left: 5px solid #f26522;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  transition: background 0.3s;
 }
-add_action('wp_enqueue_scripts', 'enqueue_tour_scripts');
+
+.itinerary .day:hover {
+  background: #fdf6ef;
+}
+
+.itinerary .day:after {
+  content: \"▼\";
+  font-size: 14px;
+  color: #888;
+  transition: transform 0.3s ease;
+}
+
+.itinerary .day.active:after {
+  content: \"▲\";
+  transform: rotate(180deg);
+}
+
+.itinerary .content {
+  display: none;
+  padding: 15px 20px;
+  background: #f9f9f9;
+  border-left: 3px solid orange;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
