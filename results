@@ -1,16 +1,62 @@
-<?php if ($bao_gom): ?>
-  <div class="service-item"><span>✔ Giá bao gồm</span><span class="arrow">▼</span></div>
-  <div class="service-content">
-    <ul class="service-list">
-      <?php
-        $bao_gom_lines = explode(PHP_EOL, trim($bao_gom));
-        foreach ($bao_gom_lines as $line) {
-            echo '<li>' . esc_html(trim($line)) . '</li>';
-        }
-      ?>
-    </ul>
-  </div>
-<?php endif; ?>
+<section id="hoidap">
+  <h2>📌 Quy định dịch vụ</h2>
+
+  <?php if ($bao_gom): ?>
+    <div class="service-item"><span>✔ Giá bao gồm</span><span class="arrow">▼</span></div>
+    <div class="service-content">
+      <ul class="service-list">
+        <?php
+          $lines = explode(PHP_EOL, trim($bao_gom));
+          foreach ($lines as $line) {
+              echo '<li>' . esc_html(trim($line)) . '</li>';
+          }
+        ?>
+      </ul>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($khong_bao_gom): ?>
+    <div class="service-item"><span>🚫 Giá không bao gồm</span><span class="arrow">▼</span></div>
+    <div class="service-content">
+      <ul class="service-list">
+        <?php
+          $lines = explode(PHP_EOL, trim($khong_bao_gom));
+          foreach ($lines as $line) {
+              echo '<li>' . esc_html(trim($line)) . '</li>';
+          }
+        ?>
+      </ul>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($chinh_sach): ?>
+    <div class="service-item"><span>❌ Quy định huỷ/đổi đặt tour</span><span class="arrow">▼</span></div>
+    <div class="service-content">
+      <ul class="service-list">
+        <?php
+          $lines = explode(PHP_EOL, trim($chinh_sach));
+          foreach ($lines as $line) {
+              echo '<li>' . esc_html(trim($line)) . '</li>';
+          }
+        ?>
+      </ul>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($luu_y): ?>
+    <div class="service-item"><span style="color:red;">⚠ Lưu ý *</span><span class="arrow">▼</span></div>
+    <div class="service-content">
+      <ul class="service-list">
+        <?php
+          $lines = explode(PHP_EOL, trim($luu_y));
+          foreach ($lines as $line) {
+              echo '<li>' . esc_html(trim($line)) . '</li>';
+          }
+        ?>
+      </ul>
+    </div>
+  <?php endif; ?>
+</section>
 
 .service-list {
   list-style: disc;
