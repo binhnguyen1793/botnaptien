@@ -1,29 +1,136 @@
-<?php if ($diem_noi_bat = get_field('diem_noi_bat')): ?>
-  <h2 id="gioithieu">📌 Điểm nổi bật</h2>
-  <ul class="highlight-list">
-    <?php
-      $lines = explode(PHP_EOL, trim($diem_noi_bat));
-      foreach ($lines as $line) {
-          echo '<li>✅ ' . esc_html(trim($line)) . '</li>';
-      }
-    ?>
-  </ul>
-<?php endif; ?>
+<section class="tour-top-header">
+  <div class="tour-top-grid">
+    <!-- Ảnh đại diện -->
+    <div class="tour-featured-img">
+      <?php if (has_post_thumbnail()): ?>
+        <?php the_post_thumbnail('large'); ?>
+      <?php endif; ?>
+    </div>
+
+    <!-- Thông tin tour -->
+    <div class="tour-info-box">
+      <p class="tour-duration"><span class="icon">⏰</span> <?php the_field('thoi_gian'); ?></p>
+      <p class="tour-location">
+        <span class="icon">📍</span> <strong>Khởi hành từ:</strong> <?php the_field('khoi_hanh_tu'); ?>
+      </p>
+      <p class="tour-route">
+        <span class="icon">🗺️</span> <strong>Lộ trình:</strong> <?php the_field('lo_trinh'); ?>
+      </p>
+      <?php if ($gia_km = get_field('gia_khuyenmai')): ?>
+        <p class="tour-price">
+          Giá từ: <del><?php echo number_format(get_field('gia_goc'), 0, ',', '.'); ?>đ</del>
+          <span><?php echo number_format($gia_km, 0, ',', '.'); ?>đ</span>
+        </p>
+      <?php endif; ?>
+
+      <!-- Ảnh đảm bảo 100% -->
+      <div class="tour-guarantee">
+        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/guarantee.png" alt="Đảm bảo 100%">
+      </div>
+
+      <!-- Button và xem lịch -->
+      <a href="#banggia" class="tour-schedule-btn">Xem lịch khởi hành</a>
+      <a href="#thanh-toan" class="tour-request-btn">Thanh toán</a>
+    </div>
+  </div>
+</section>
 
 
-.highlight-list {
-  list-style: none;
-  padding-left: 0;
+
+.tour-top-header {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
+}
+
+.tour-top-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+}
+
+.tour-featured-img {
+  flex: 1 1 55%;
+  max-width: 55%;
+}
+.tour-featured-img img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tour-info-box {
+  flex: 1 1 40%;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-info-box p {
   margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
 }
-.highlight-list li {
-  margin-bottom: 8px;
-  padding-left: 20px;
-  position: relative;
+
+.tour-info-box .tour-duration {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6600;
 }
-.highlight-list li::before {
-  content: '✅';
-  position: absolute;
-  left: 0;
-  top: 0;
+
+.tour-info-box .tour-price {
+  font-weight: bold;
+  font-size: 17px;
+  color: #e74c3c;
 }
+.tour-info-box .tour-price del {
+  color: #999;
+  margin-right: 8px;
+}
+
+.tour-request-btn,
+.tour-schedule-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.tour-request-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+.tour-request-btn:hover {
+  background: #c0392b;
+}
+
+.tour-schedule-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+.tour-schedule-btn:hover {
+  background: #e6e6e6;
+}
+
+.tour-guarantee img {
+  margin-top: 12px;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+.tour-info-box .icon {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
