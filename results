@@ -1,45 +1,29 @@
-<?php
-  $rating = get_field('danh_gia'); // Ví dụ: 9.2
-  $review_count = get_field('so_luot_danh_gia'); // Ví dụ: 3
-  if ($rating && $review_count):
-    $label = 'Rất tốt';
-    if ($rating >= 9) $label = 'Tuyệt vời';
-    elseif ($rating >= 8) $label = 'Rất tốt';
-    elseif ($rating >= 7) $label = 'Tốt';
-    elseif ($rating >= 5) $label = 'Trung bình';
-    else $label = 'Kém';
-?>
-  <div class="tour-rating-box">
-    <div class="score-box"><?php echo number_format($rating, 1); ?></div>
-    <span class="score-label"><?php echo $label; ?></span>
-    <span class="review-count">– <?php echo $review_count; ?> đánh giá</span>
-  </div>
-<?php endif; ?>
-
-
 .tour-rating-box {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 15px;
+  font-family: Arial, sans-serif;
 }
 
 .score-box {
-  background: #2ecc71;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
+  background-color: #2ecc71; /* màu nền xanh lá */
+  color: #fff;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 15px;
+  padding: 2px 10px;
+  border-radius: 6px;
+  min-width: 40px;
+  text-align: center;
 }
 
 .score-label {
+  font-size: 15px;
   font-weight: bold;
-  color: #27ae60;
-  font-size: 16px;
+  color: #27ae60; /* màu chữ xanh đậm */
 }
 
 .review-count {
-  color: #555;
-  font-size: 15px;
+  font-size: 14px;
+  color: #555; /* màu xám nhẹ */
 }
