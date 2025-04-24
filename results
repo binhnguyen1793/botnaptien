@@ -1,11 +1,16 @@
-<div style="background-color: #e1703a; padding: 10px 0;">
-  <div style="max-width: 1140px; margin: 0 auto; background-color: white; border: 1px solid #e1703a; border-radius: 5px; display: flex; align-items: center; padding: 10px 20px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="icon" style="width: 40px; height: 40px; margin-right: 15px;">
-    <div style="flex: 1;">
-      <p style="margin: 0; font-weight: bold;">Cơ hội giảm giá tới <span style="color: #e1703a;">50%</span></p>
-      <p style="margin: 0;">Hãy đăng ký ngay để nhận ưu đãi bí mật từ BestPrice nhé!</p>
-    </div>
-    <input type="email" placeholder="Nhập email của bạn" style="padding: 10px; border: none; background-color: #f3f3f3; border-radius: 5px; margin-right: 10px; width: 250px;">
-    <button style="background-color: #ffe9d6; color: #e1703a; font-weight: bold; padding: 10px 15px; border: none; border-radius: 5px;">Đăng ký ngay</button>
+<div style="border: 1px solid #e1703a; border-radius: 5px; display: flex; align-items: center; padding: 10px 20px; background-color: #ffffff; max-width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+  <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="icon" style="width: 40px; height: 40px; margin-right: 15px;">
+  
+  <div style="flex: 1;">
+    <p style="margin: 0; font-weight: bold; font-size: 16px;">
+      Cơ hội giảm giá tới <span style="color: #e1703a;">50%</span>
+    </p>
+    <p style="margin: 0; font-size: 14px;">Hãy đăng ký ngay để nhận ưu đãi bí mật từ BestPrice nhé!</p>
   </div>
+  
+  <input type="email" placeholder="Nhập email của bạn" style="padding: 10px; border: none; background-color: #f3f3f3; border-radius: 5px; margin-right: 10px; width: 250px;">
+  
+  <button style="background-color: #ffe9d6; color: #e1703a; font-weight: bold; padding: 10px 15px; border: none; border-radius: 5px;">
+    Đăng ký ngay
+  </button>
 </div>
