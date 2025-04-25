@@ -1,61 +1,117 @@
-<?php
-// === 1. Cập nhật shortcode tìm tour để lọc đúng theo taxonomy vung_mien cấp 3 ===
-function tour_search_results_shortcode() {
-    $diadiem = $_GET['diadiem'] ?? '';
-    $khoihanh = $_GET['khoihanh'] ?? '';
+function tour_search_form_shortcode() {
+    // Lấy cấp 2 từ taxonomy 'vung_mien'
+    $cap1_terms = get_terms([
+        'taxonomy' => 'vung_mien',
+        'hide_empty' => false,
+        'parent' => 0,
+    ]);
 
-    if (!$diadiem && !$khoihanh) {
-        return "<p>Vui lòng chọn thông tin tìm kiếm từ form phía trên.</p>";
-    }
-
-    $args = [
-        'post_type' => 'tour',
-        'posts_per_page' => -1,
-        'tax_query' => [],
-        'meta_query' => [
-            'relation' => 'AND',
-        ],
-    ];
-
-    if ($diadiem) {
-        $args['tax_query'][] = [
+    $cap2_terms = [];
+    foreach ($cap1_terms as $cap1) {
+        $childs = get_terms([
             'taxonomy' => 'vung_mien',
-            'field' => 'slug',
-            'terms' => $diadiem,
-        ];
+            'hide_empty' => false,
+            'parent' => $cap1->term_id,
+        ]);
+        $cap2_terms = array_merge($cap2_terms, $childs);
     }
 
-    if ($khoihanh) {
-        $args['meta_query'][] = [
-            'key' => 'khoihanhtu',
-            'value' => $khoihanh,
-            'compare' => 'LIKE',
-        ];
-    }
-
-    $query = new WP_Query($args);
     ob_start();
-
-    if ($query->have_posts()) {
-        echo '<div class="tour-results" style="max-width:1140px; margin:auto">';
-        while ($query->have_posts()) {
-            $query->the_post();
-            $img = get_field('anh_dai_dien_tour');
-            echo '<div class="tour-item" style="margin-bottom:30px; border-bottom:1px solid #eee; padding-bottom:20px;">';
-            echo '<h3 style="margin-bottom:10px;">' . get_the_title() . '</h3>';
-            if ($img) {
-                echo '<img src="' . esc_url($img['url']) . '" alt="' . esc_attr($img['alt']) . '" style="max-width:300px; display:block; margin-bottom:10px;">';
-            }
-            echo '<p>' . get_field('mo_ta_ngan') . '</p>';
-            echo '<a href="' . get_permalink() . '" style="color:#f26522; font-weight:bold;">Xem chi tiết</a>';
-            echo '</div>';
-        }
-        echo '</div>';
-        wp_reset_postdata();
-    } else {
-        echo '<p>Không tìm thấy tour phù hợp với tiêu chí đã chọn.</p>';
+    ?>
+    <style>
+    .tour-search-form {
+      background: #fff;
+      padding: 24px 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+      max-width: 1140px;
+      margin: 30px auto;
     }
 
+    .tour-search-form label {
+      font-weight: 500;
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .tour-search-form select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .tour-search-form button {
+      padding: 12px 24px;
+      background: #e67e22;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .tour-search-form button:hover {
+      background: #cf711f;
+    }
+
+    .tour-search-form > div {
+      flex: 1;
+      min-width: 200px;
+    }
+    </style>
+
+    <form method="get" action="/tim-tour" class="tour-search-form">
+        <div>
+            <label>Địa điểm:</label>
+            <select name="diadiem">
+                <option value="">--Chọn địa điểm--</option>
+                <?php foreach ($cap2_terms as $term): ?>
+                    <option value="<?php echo esc_attr($term->slug); ?>">
+                        <?php echo esc_html($term->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div>
+            <label>Khởi hành từ:</label>
+            <select name="khoihanh">
+                <option value="">--Chọn--</option>
+                <?php
+                $starts = get_posts([
+                    'post_type' => 'tour',
+                    'posts_per_page' => -1,
+                    'meta_key' => 'khoi_hanh_tu',
+                    'meta_value' => '',
+                    'meta_compare' => '!=',
+                    'fields' => 'ids'
+                ]);
+                $locations = [];
+                foreach ($starts as $id) {
+                    $val = get_field('khoi_hanh_tu', $id);
+                    if ($val && !in_array($val, $locations)) {
+                        $locations[] = $val;
+                    }
+                }
+                foreach ($locations as $item): ?>
+                    <option value="<?php echo esc_attr($item); ?>"><?php echo esc_html($item); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div style="flex: 0 0 auto;">
+            <button type="submit">Tìm ngay</button>
+        </div>
+    </form>
+    <?php
     return ob_get_clean();
 }
-add_shortcode('tour_search_results', 'tour_search_results_shortcode');
+add_shortcode('tour_search_form', 'tour_search_form_shortcode');
