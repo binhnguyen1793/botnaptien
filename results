@@ -62,3 +62,9 @@ function render_vung_mien_leaf_terms($atts) {
     return ob_get_clean();
 }
 add_shortcode('vungmien_leaf', 'render_vung_mien_leaf_terms');
+
+
+[vungmien_leaf parent_slug="du-lich-nuoc-ngoai" style="circle"]
+
+
+[vungmien_leaf parent_slug="du-lich-trong-nuoc" style="rectangle"]
