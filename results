@@ -2,12 +2,13 @@ function hotel_filter_form_shortcode() {
     ob_start();
     ?>
 
-    <form action="/tim-kiem-khach-san" method="get" style="background: #fff; padding: 20px; border-radius: 10px; display: flex; flex-wrap: wrap; gap: 20px;">
+    <div style="max-width: 1140px; margin: auto;">
+    <form action="/tim-kiem-khach-san" method="get" style="background: #fff; padding: 24px 32px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
 
         <!-- Địa điểm -->
-        <div style="flex: 1 1 200px;">
-            <label>Địa điểm</label><br>
-            <select name="location" style="width: 100%; padding: 8px;">
+        <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 14px; color: #888;">ĐỊA ĐIỂM</label>
+            <select name="location" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                 <option value="">Chọn tỉnh/thành</option>
                 <?php
                 $terms = get_terms([
@@ -26,30 +27,33 @@ function hotel_filter_form_shortcode() {
         </div>
 
         <!-- Nhận phòng -->
-        <div style="flex: 1 1 180px;">
-            <label>Nhận phòng</label><br>
-            <input type="date" name="checkin" style="width: 100%; padding: 8px;">
+        <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 14px; color: #888;">NHẬN PHÒNG</label>
+            <input type="date" name="checkin" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
         </div>
 
         <!-- Trả phòng -->
-        <div style="flex: 1 1 180px;">
-            <label>Trả phòng</label><br>
-            <input type="date" name="checkout" style="width: 100%; padding: 8px;">
+        <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 14px; color: #888;">TRẢ PHÒNG</label>
+            <input type="date" name="checkout" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
         </div>
 
         <!-- Hành khách -->
-        <div style="flex: 1 1 180px;">
-            <label>Hành khách</label><br>
-            <input type="number" name="adult" value="2" min="1" max="10" style="width: 60px;"> Người lớn
-            <input type="number" name="child" value="0" min="0" max="10" style="width: 60px;"> Trẻ em
-            <input type="number" name="baby" value="0" min="0" max="10" style="width: 60px;"> Em bé
+        <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 14px; color: #888;">HÀNH KHÁCH</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" name="adult" min="1" value="2" style="width: 60px; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" placeholder="Người lớn">
+                <input type="number" name="child" min="0" value="0" style="width: 60px; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" placeholder="Trẻ em">
+                <input type="number" name="baby" min="0" value="0" style="width: 60px; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" placeholder="Em bé">
+            </div>
         </div>
 
         <!-- Nút tìm -->
-        <div style="flex: 1 1 100px; align-self: flex-end;">
-            <button type="submit" style="padding: 12px 24px; background: #e1703a; color: white; border: none; border-radius: 6px;">Tìm ngay</button>
+        <div style="flex: 0 0 auto;">
+            <button type="submit" style="padding: 12px 24px; background-color: #e1703a; color: #fff; border: none; border-radius: 8px; font-weight: bold;">Tìm ngay</button>
         </div>
     </form>
+    </div>
 
     <?php
     return ob_get_clean();
