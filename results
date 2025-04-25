@@ -1,70 +1,37 @@
-function render_vung_mien_leaf_terms($atts) {
+function render_vungmien_menu_list() {
     ob_start();
 
-    $atts = shortcode_atts([
-        'parent_slug' => '',
-        'style' => 'circle', // circle | rectangle | image-overlay
-        'limit' => 8
-    ], $atts);
-
-    $parent_term = get_term_by('slug', $atts['parent_slug'], 'vung_mien');
-    if (!$parent_term) return 'Không tìm thấy vùng miền cha.';
-
-    $mid_terms = get_terms([
+    // Lấy tất cả term cấp 1 (cha)
+    $parent_terms = get_terms([
         'taxonomy' => 'vung_mien',
-        'parent' => $parent_term->term_id,
+        'parent' => 0,
         'hide_empty' => false,
     ]);
 
-    $final_terms = [];
-    foreach ($mid_terms as $mid) {
-        $sub_terms = get_terms([
+    echo '<div class="vungmien-menu" style="display: flex; flex-wrap: wrap; gap: 40px;">';
+
+    foreach ($parent_terms as $parent) {
+        // Lấy các term con cấp 2
+        $child_terms = get_terms([
             'taxonomy' => 'vung_mien',
-            'parent' => $mid->term_id,
+            'parent' => $parent->term_id,
             'hide_empty' => false,
         ]);
-        $final_terms = array_merge($final_terms, $sub_terms);
-    }
 
-    if (empty($final_terms)) return 'Không có dữ liệu.';
+        echo '<div style="min-width: 180px;">';
+        echo '<div style="font-weight: bold; margin-bottom: 8px;">' . esc_html($parent->name) . '</div>';
 
-    // Sắp xếp theo số lượng bài viết (count) giảm dần
-    usort($final_terms, function($a, $b) {
-        return $b->count - $a->count;
-    });
-
-    // Lấy đúng số lượng limit (ví dụ 8)
-    $final_terms = array_slice($final_terms, 0, $atts['limit']);
-
-    // Style hiển thị
-    $style = $atts['style'];
-
-    // Bắt đầu HTML
-    echo '<div class="vungmien-list" style="display: flex; flex-wrap: nowrap; gap: 16px; justify-content: center; overflow-x: auto;">';
-
-    foreach ($final_terms as $term) {
-        $thumbnail = get_field('thumbnail', $term);
-        $count = $term->count;
-        $link = get_term_link($term);
-
-        if ($style === 'circle') {
-            echo '
-            <a href="' . esc_url($link) . '" style="text-align:center; width:100px; flex: 0 0 auto; text-decoration: none; color:inherit;">
-              <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; margin: auto;">
-                <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
-              </div>
-              <strong style="font-size: 14px; display: block; margin-top: 5px;">' . esc_html($term->name) . '</strong>
-              <span style="font-size: 12px; color:#888;">' . $count . ' tour</span>
-            </a>';
+        foreach ($child_terms as $child) {
+            $link = get_term_link($child);
+            echo '<div style="margin-bottom: 4px;"><a href="' . esc_url($link) . '" style="text-decoration: none; color: #333;">' . esc_html($child->name) . '</a></div>';
         }
 
-        // Các style khác nếu dùng tiếp
-        elseif ($style === 'rectangle' || $style === 'image-overlay') {
-            // Không chỉnh lại ở đây vì bạn không dùng cho nước ngoài
-        }
+        echo '</div>';
     }
 
     echo '</div>';
     return ob_get_clean();
 }
-add_shortcode('vungmien_leaf', 'render_vung_mien_leaf_terms');
+add_shortcode('vungmien_menu', 'render_vungmien_menu_list');
+
+
