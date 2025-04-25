@@ -1,45 +1,64 @@
-function render_vungmien_menu_list_v3() {
+function render_vungmien_flat_menu() {
     ob_start();
 
-    // Lấy term cấp 1
-    $parent_terms = get_terms([
+    // 1. Term cấp 2 của "Tour trong nước"
+    $domestic = get_term_by('slug', 'du-lich-trong-nuoc', 'vung_mien');
+    $domestic_children = get_terms([
         'taxonomy' => 'vung_mien',
-        'parent' => 0,
+        'parent' => $domestic->term_id,
         'hide_empty' => false,
     ]);
 
-    echo '<div class="vungmien-menu" style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">';
+    // 2. Term cấp 3 của "Tour nước ngoài"
+    $international = get_term_by('slug', 'du-lich-nuoc-ngoai', 'vung_mien');
+    $level2 = get_terms([
+        'taxonomy' => 'vung_mien',
+        'parent' => $international->term_id,
+        'hide_empty' => false,
+    ]);
 
-    foreach ($parent_terms as $parent) {
-        // Lấy các term cấp 2 (con)
-        $level2_terms = get_terms([
+    $international_flat = [];
+    foreach ($level2 as $mid) {
+        $level3 = get_terms([
             'taxonomy' => 'vung_mien',
-            'parent' => $parent->term_id,
+            'parent' => $mid->term_id,
             'hide_empty' => false,
         ]);
+        $international_flat = array_merge($international_flat, $level3);
+    }
 
-        // Tạo 1 cột mới
-        echo '<div style="min-width: 200px;">';
-        echo '<div style="font-weight: bold; margin-bottom: 8px; font-size: 15px;">' . esc_html($parent->name) . '</div>';
+    // Chia international thành 4 cột đều nhau
+    $columns = array_chunk($international_flat, ceil(count($international_flat) / 4));
 
-        foreach ($level2_terms as $level2) {
-            // Lấy term cấp 3 (con của con)
-            $level3_terms = get_terms([
-                'taxonomy' => 'vung_mien',
-                'parent' => $level2->term_id,
-                'hide_empty' => false,
-            ]);
+    echo '<div class="vungmien-flat-menu" style="display: flex; gap: 40px;">';
 
-            foreach ($level3_terms as $term) {
-                $link = get_term_link($term);
-                echo '<div style="margin-bottom: 4px;"><a href="' . esc_url($link) . '" style="text-decoration: none; color: #333;">' . esc_html($term->name) . '</a></div>';
-            }
+    // Cột 1: Tour trong nước
+    echo '<div>';
+    echo '<div style="font-weight:bold; margin-bottom: 10px;">Tour trong nước</div>';
+    foreach ($domestic_children as $term) {
+        $link = get_term_link($term);
+        echo '<div style="margin-bottom: 6px;"><a href="' . esc_url($link) . '" style="color:#333; text-decoration:none;">' . esc_html($term->name) . '</a></div>';
+    }
+    echo '</div>';
+
+    // Cột 2–5: Tour nước ngoài
+    echo '<div style="flex: 1; display: flex; flex-wrap: wrap; gap: 40px;">';
+    foreach ($columns as $col) {
+        echo '<div>';
+        if ($col === reset($columns)) {
+            echo '<div style="font-weight:bold; margin-bottom: 10px;">Tour nước ngoài</div>';
+        } else {
+            echo '<div style="height: 24px;"></div>';
         }
-
+        foreach ($col as $term) {
+            $link = get_term_link($term);
+            echo '<div style="margin-bottom: 6px;"><a href="' . esc_url($link) . '" style="color:#333; text-decoration:none;">' . esc_html($term->name) . '</a></div>';
+        }
         echo '</div>';
     }
+    echo '</div>';
 
     echo '</div>';
     return ob_get_clean();
 }
-add_shortcode('vungmien_menu_v3', 'render_vungmien_menu_list_v3');
+add_shortcode('vungmien_flat_menu', 'render_vungmien_flat_menu');
