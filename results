@@ -1,64 +1,57 @@
-function render_vungmien_flat_menu() {
+function hotel_filter_form_shortcode() {
     ob_start();
+    ?>
 
-    // 1. Term cấp 2 của "Tour trong nước"
-    $domestic = get_term_by('slug', 'du-lich-trong-nuoc', 'vung_mien');
-    $domestic_children = get_terms([
-        'taxonomy' => 'vung_mien',
-        'parent' => $domestic->term_id,
-        'hide_empty' => false,
-    ]);
+    <form action="/tim-kiem-khach-san" method="get" style="background: #fff; padding: 20px; border-radius: 10px; display: flex; flex-wrap: wrap; gap: 20px;">
 
-    // 2. Term cấp 3 của "Tour nước ngoài"
-    $international = get_term_by('slug', 'du-lich-nuoc-ngoai', 'vung_mien');
-    $level2 = get_terms([
-        'taxonomy' => 'vung_mien',
-        'parent' => $international->term_id,
-        'hide_empty' => false,
-    ]);
+        <!-- Địa điểm -->
+        <div style="flex: 1 1 200px;">
+            <label>Địa điểm</label><br>
+            <select name="location" style="width: 100%; padding: 8px;">
+                <option value="">Chọn tỉnh/thành</option>
+                <?php
+                $terms = get_terms([
+                    'taxonomy' => 'vung_mien',
+                    'hide_empty' => false,
+                ]);
+                foreach ($terms as $term) {
+                    $parent = get_term($term->parent, 'vung_mien');
+                    $grandparent = $parent ? get_term($parent->parent, 'vung_mien') : null;
+                    if ($grandparent) {
+                        echo '<option value="' . esc_attr($term->slug) . '">' . esc_html($term->name) . '</option>';
+                    }
+                }
+                ?>
+            </select>
+        </div>
 
-    $international_flat = [];
-    foreach ($level2 as $mid) {
-        $level3 = get_terms([
-            'taxonomy' => 'vung_mien',
-            'parent' => $mid->term_id,
-            'hide_empty' => false,
-        ]);
-        $international_flat = array_merge($international_flat, $level3);
-    }
+        <!-- Nhận phòng -->
+        <div style="flex: 1 1 180px;">
+            <label>Nhận phòng</label><br>
+            <input type="date" name="checkin" style="width: 100%; padding: 8px;">
+        </div>
 
-    // Chia international thành 4 cột đều nhau
-    $columns = array_chunk($international_flat, ceil(count($international_flat) / 4));
+        <!-- Trả phòng -->
+        <div style="flex: 1 1 180px;">
+            <label>Trả phòng</label><br>
+            <input type="date" name="checkout" style="width: 100%; padding: 8px;">
+        </div>
 
-    echo '<div class="vungmien-flat-menu" style="display: flex; gap: 40px;">';
+        <!-- Hành khách -->
+        <div style="flex: 1 1 180px;">
+            <label>Hành khách</label><br>
+            <input type="number" name="adult" value="2" min="1" max="10" style="width: 60px;"> Người lớn
+            <input type="number" name="child" value="0" min="0" max="10" style="width: 60px;"> Trẻ em
+            <input type="number" name="baby" value="0" min="0" max="10" style="width: 60px;"> Em bé
+        </div>
 
-    // Cột 1: Tour trong nước
-    echo '<div>';
-    echo '<div style="font-weight:bold; margin-bottom: 10px;">Tour trong nước</div>';
-    foreach ($domestic_children as $term) {
-        $link = get_term_link($term);
-        echo '<div style="margin-bottom: 6px;"><a href="' . esc_url($link) . '" style="color:#333; text-decoration:none;">' . esc_html($term->name) . '</a></div>';
-    }
-    echo '</div>';
+        <!-- Nút tìm -->
+        <div style="flex: 1 1 100px; align-self: flex-end;">
+            <button type="submit" style="padding: 12px 24px; background: #e1703a; color: white; border: none; border-radius: 6px;">Tìm ngay</button>
+        </div>
+    </form>
 
-    // Cột 2–5: Tour nước ngoài
-    echo '<div style="flex: 1; display: flex; flex-wrap: wrap; gap: 40px;">';
-    foreach ($columns as $col) {
-        echo '<div>';
-        if ($col === reset($columns)) {
-            echo '<div style="font-weight:bold; margin-bottom: 10px;">Tour nước ngoài</div>';
-        } else {
-            echo '<div style="height: 24px;"></div>';
-        }
-        foreach ($col as $term) {
-            $link = get_term_link($term);
-            echo '<div style="margin-bottom: 6px;"><a href="' . esc_url($link) . '" style="color:#333; text-decoration:none;">' . esc_html($term->name) . '</a></div>';
-        }
-        echo '</div>';
-    }
-    echo '</div>';
-
-    echo '</div>';
+    <?php
     return ob_get_clean();
 }
-add_shortcode('vungmien_flat_menu', 'render_vungmien_flat_menu');
+add_shortcode('hotel_filter_form', 'hotel_filter_form_shortcode');
