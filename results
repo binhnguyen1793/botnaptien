@@ -1,27 +1,39 @@
-function render_vung_mien_showcase($atts) {
+function render_vung_mien_leaf_terms($atts) {
     ob_start();
 
     $atts = shortcode_atts([
         'parent_slug' => '',
-        'style' => 'circle' // hoặc 'rectangle'
+        'style' => 'circle'
     ], $atts);
 
     $parent_term = get_term_by('slug', $atts['parent_slug'], 'vung_mien');
-
     if (!$parent_term) return 'Không tìm thấy vùng miền cha.';
 
-    $terms = get_terms([
+    // Tìm các term con cấp 1
+    $mid_terms = get_terms([
         'taxonomy' => 'vung_mien',
         'parent' => $parent_term->term_id,
         'hide_empty' => false,
     ]);
 
-    if (empty($terms)) return 'Không có dữ liệu.';
+    $final_terms = [];
+
+    // Lặp qua từng mid_term để lấy con cấp 2
+    foreach ($mid_terms as $mid) {
+        $sub_terms = get_terms([
+            'taxonomy' => 'vung_mien',
+            'parent' => $mid->term_id,
+            'hide_empty' => false,
+        ]);
+        $final_terms = array_merge($final_terms, $sub_terms);
+    }
+
+    if (empty($final_terms)) return 'Không có dữ liệu.';
 
     echo '<div class="vungmien-list" style="display: flex; flex-wrap: wrap; gap: 20px;">';
 
-    foreach ($terms as $term) {
-        $thumbnail = get_field('thumbnail', $term); // ACF field: thumbnail cho term
+    foreach ($final_terms as $term) {
+        $thumbnail = get_field('thumbnail', $term); // Trường ACF bạn tạo
         $count = $term->count;
         $link = get_term_link($term);
 
@@ -49,4 +61,4 @@ function render_vung_mien_showcase($atts) {
     echo '</div>';
     return ob_get_clean();
 }
-add_shortcode('vungmien_list', 'render_vung_mien_showcase');
+add_shortcode('vungmien_leaf', 'render_vung_mien_leaf_terms');
