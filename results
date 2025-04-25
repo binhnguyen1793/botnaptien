@@ -3,13 +3,13 @@ function render_vung_mien_leaf_terms($atts) {
 
     $atts = shortcode_atts([
         'parent_slug' => '',
-        'style' => 'circle'
+        'style' => 'circle', // circle | rectangle | image-overlay
+        'limit' => 8
     ], $atts);
 
     $parent_term = get_term_by('slug', $atts['parent_slug'], 'vung_mien');
     if (!$parent_term) return 'Không tìm thấy vùng miền cha.';
 
-    // Tìm các term con cấp 1
     $mid_terms = get_terms([
         'taxonomy' => 'vung_mien',
         'parent' => $parent_term->term_id,
@@ -18,7 +18,6 @@ function render_vung_mien_leaf_terms($atts) {
 
     $final_terms = [];
 
-    // Lặp qua từng mid_term để lấy con cấp 2
     foreach ($mid_terms as $mid) {
         $sub_terms = get_terms([
             'taxonomy' => 'vung_mien',
@@ -29,30 +28,44 @@ function render_vung_mien_leaf_terms($atts) {
     }
 
     if (empty($final_terms)) return 'Không có dữ liệu.';
+    $final_terms = array_slice($final_terms, 0, $atts['limit']);
 
-    echo '<div class="vungmien-list" style="display: flex; flex-wrap: wrap; gap: 20px;">';
+    echo '<div class="vungmien-list" style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;">';
 
     foreach ($final_terms as $term) {
-        $thumbnail = get_field('thumbnail', $term); // Trường ACF bạn tạo
+        $thumbnail = get_field('thumbnail', $term);
         $count = $term->count;
         $link = get_term_link($term);
 
-        if ($atts['style'] === 'circle') {
+        if ($atts['style'] === 'image-overlay') {
+            echo '
+            <a href="' . esc_url($link) . '" style="position: relative; width: calc(25% - 12px); border-radius: 8px; overflow: hidden; text-decoration: none;">
+                <img src="' . esc_url($thumbnail) . '" style="width: 100%; height: 180px; object-fit: cover;">
+                <div style="position: absolute; bottom: 10px; left: 12px; color: white; font-weight: bold; font-size: 16px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                    ' . esc_html($term->name) . '<br>
+                    <span style="font-weight: normal; font-size: 13px;">' . $count . ' tour</span>
+                </div>
+            </a>';
+        }
+
+        elseif ($atts['style'] === 'rectangle') {
+            echo '
+            <a href="' . esc_url($link) . '" style="flex: 1 1 220px; max-width: 250px; text-decoration:none; color:inherit;">
+              <div style="width:100%; height:140px; border-radius: 10px; overflow: hidden; margin-bottom: 6px;">
+                <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="font-weight: bold;">' . esc_html($term->name) . '</div>
+              <div style="font-size: 13px; color: #888;">' . $count . ' tour</div>
+            </a>';
+        }
+
+        else {
             echo '
             <a href="' . esc_url($link) . '" style="text-align:center; width:120px; text-decoration: none; color:inherit;">
               <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; margin: auto;">
                 <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
               </div>
-              <strong>' . esc_html($term->name) . '</strong><br>
-              <span style="font-size: 12px;">' . $count . ' tour</span>
-            </a>';
-        } else {
-            echo '
-            <a href="' . esc_url($link) . '" style="width:200px; text-decoration:none; color:inherit;">
-              <div style="width:100%; height:120px; border-radius: 8px; overflow: hidden; margin-bottom: 5px;">
-                <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
-              </div>
-              <strong>' . esc_html($term->name) . '</strong><br>
+<strong>' . esc_html($term->name) . '</strong><br>
               <span style="font-size: 12px;">' . $count . ' tour</span>
             </a>';
         }
@@ -64,7 +77,4 @@ function render_vung_mien_leaf_terms($atts) {
 add_shortcode('vungmien_leaf', 'render_vung_mien_leaf_terms');
 
 
-[vungmien_leaf parent_slug="du-lich-nuoc-ngoai" style="circle"]
-
-
-[vungmien_leaf parent_slug="du-lich-trong-nuoc" style="rectangle"]
+[vungmien_leaf parent_slug="du-lich-trong-nuoc" style="image-overlay" limit="8"]
