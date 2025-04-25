@@ -1,13 +1,52 @@
-$promotion = get_field('promotion', $id);
-$promotion_html = '';
+function render_vung_mien_showcase($atts) {
+    ob_start();
 
-if (is_array($promotion)) {
-    foreach ($promotion as $item) {
-        $promotion_html .= '<div style="margin-bottom: 4px;">🎁 ' . esc_html($item) . '</div>';
+    $atts = shortcode_atts([
+        'parent_slug' => '',
+        'style' => 'circle' // hoặc 'rectangle'
+    ], $atts);
+
+    $parent_term = get_term_by('slug', $atts['parent_slug'], 'vung_mien');
+
+    if (!$parent_term) return 'Không tìm thấy vùng miền cha.';
+
+    $terms = get_terms([
+        'taxonomy' => 'vung_mien',
+        'parent' => $parent_term->term_id,
+        'hide_empty' => false,
+    ]);
+
+    if (empty($terms)) return 'Không có dữ liệu.';
+
+    echo '<div class="vungmien-list" style="display: flex; flex-wrap: wrap; gap: 20px;">';
+
+    foreach ($terms as $term) {
+        $thumbnail = get_field('thumbnail', $term); // ACF field: thumbnail cho term
+        $count = $term->count;
+        $link = get_term_link($term);
+
+        if ($atts['style'] === 'circle') {
+            echo '
+            <a href="' . esc_url($link) . '" style="text-align:center; width:120px; text-decoration: none; color:inherit;">
+              <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; margin: auto;">
+                <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <strong>' . esc_html($term->name) . '</strong><br>
+              <span style="font-size: 12px;">' . $count . ' tour</span>
+            </a>';
+        } else {
+            echo '
+            <a href="' . esc_url($link) . '" style="width:200px; text-decoration:none; color:inherit;">
+              <div style="width:100%; height:120px; border-radius: 8px; overflow: hidden; margin-bottom: 5px;">
+                <img src="' . esc_url($thumbnail) . '" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <strong>' . esc_html($term->name) . '</strong><br>
+              <span style="font-size: 12px;">' . $count . ' tour</span>
+            </a>';
+        }
     }
-} elseif (!empty($promotion)) {
-    $promotion_html = '<div>🎁 ' . esc_html($promotion) . '</div>';
+
+    echo '</div>';
+    return ob_get_clean();
 }
-
-
-' . ($promotion_html ? '<div style="margin-top:10px; background: #fce9d2; color:#e1703a; padding: 5px 10px; border-radius: 6px; font-size: 13px;">' . $promotion_html . '</div>' : '') . '
+add_shortcode('vungmien_list', 'render_vung_mien_showcase');
