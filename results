@@ -1,33 +1,29 @@
-<?php
-/**
- * Section: Chủ đề hấp dẫn khách sạn (taxonomy: chu_de_hotel)
- * Place this inside your archive page or home template where you want to show hotel themes.
- */
+function hotel_chu_de_hap_dan_shortcode() {
+    ob_start();
 
-$terms = get_terms([
-  'taxonomy' => 'chu_de_hotel',
-  'hide_empty' => false,
-]);
+    $terms = get_terms([
+        'taxonomy' => 'chu_de_hotel',
+        'hide_empty' => false,
+    ]);
 
-if (!empty($terms) && !is_wp_error($terms)) :
-?>
-<div style="max-width: 1140px; margin: 40px auto;">
-  <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">Khám phá các chủ đề hấp dẫn</h2>
-  <p style="margin-bottom: 24px; color: #666;">Xem ngay những chủ đề khách sạn hấp dẫn đang được nhiều du khách quan tâm nhất!</p>
-  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    <?php foreach ($terms as $term):
-      $image = get_field('anh_dai_dien', $term); // Trường ảnh đại diện ACF dạng Image
-      $link = get_term_link($term);
-    ?>
-    <a href="<?php echo esc_url($link); ?>" style="flex: 0 0 calc(25% - 12px); display: block; position: relative; border-radius: 12px; overflow: hidden;">
-      <?php if ($image): ?>
-        <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($term->name); ?>" style="width: 100%; height: 180px; object-fit: cover;">
-      <?php endif; ?>
-      <span style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: #fff; padding: 12px; font-weight: bold; text-align: center;">
-        <?php echo esc_html($term->name); ?>
-      </span>
-    </a>
-    <?php endforeach; ?>
-  </div>
-</div>
-<?php endif; ?>
+    if (!empty($terms) && !is_wp_error($terms)) {
+        echo '<div class="chu-de-carousel" style="display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px;">';
+
+        foreach ($terms as $term) {
+            $image = get_field('anh_dai_dien', 'chu_de_hotel_' . $term->term_id);
+            $link = get_term_link($term);
+
+            echo '<a href="' . esc_url($link) . '" class="chu-de-item" style="position:relative; flex: 0 0 280px; height:180px; border-radius:12px; overflow:hidden; scroll-snap-align: start; text-decoration:none;">';
+            if ($image) {
+                echo '<img src="' . esc_url($image) . '" style="width:100%; height:100%; object-fit:cover;" />';
+            }
+            echo '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:bold;background:rgba(0,0,0,0.3);text-align:center;">' . esc_html($term->name) . '</div>';
+            echo '</a>';
+        }
+
+        echo '</div>';
+    }
+
+    return ob_get_clean();
+}
+add_shortcode('chu_de_hotel', 'hotel_chu_de_hap_dan_shortcode');
