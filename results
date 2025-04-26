@@ -14,19 +14,19 @@ $noi_bat = get_field('noi_bat', $post_id);
 
 <div style="max-width:1140px;margin:auto;padding:24px;">
   <!-- Ảnh đại diện -->
-  <div style="display:flex;gap:16px;">
+  <div style="display:flex;gap:16px;align-items: flex-start;">
     <?php if (has_post_thumbnail()) : ?>
-      <div style="flex:1;">
+      <div style="flex:1;max-width:50%;">
         <?php the_post_thumbnail('full', ['style'=>'width:100%;border-radius:12px;']); ?>
       </div>
     <?php endif; ?>
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;">
       <h1><?php the_title(); ?></h1>
-      <div style="font-size:14px;">
-        <strong style="color:green;font-size:18px;"><?php echo $diem; ?></strong>
-        <span style="margin-left:8px;">Tuyệt vời - <?php echo $so_danh_gia; ?> đánh giá</span>
+      <div style="font-size:14px;display:flex;align-items:center;gap:10px;">
+        <span style="color:green;font-size:18px;font-weight:bold;"><?php echo esc_html($diem); ?></span>
+        <span>Tuyệt vời - <?php echo esc_html($so_danh_gia); ?> đánh giá</span>
       </div>
-      <div style="color:#e53935;font-size:20px;font-weight:bold;margin:8px 0;">
+      <div style="color:#e53935;font-size:20px;font-weight:bold;">
         <?php echo number_format($gia, 0, ',', '.'); ?>đ
       </div>
       <a href="#hang-phong" style="background:#e1703a;color:white;padding:12px 24px;border-radius:8px;text-align:center;max-width:200px;">Xem giá phòng</a>
@@ -46,7 +46,7 @@ $noi_bat = get_field('noi_bat', $post_id);
     <h2>Tiện ích khách sạn</h2>
     <?php if ($tien_ich): ?>
       <div style="columns:3;-webkit-columns:3;-moz-columns:3;max-height:150px;overflow:hidden;" id="list-tien-ich">
-        <ul style="padding-left:20px;">
+        <ul style="padding-left:20px;margin:0;">
         <?php foreach ($tien_ich as $ti): ?>
           <li><?php echo esc_html($ti); ?></li>
         <?php endforeach; ?>
@@ -69,9 +69,10 @@ $noi_bat = get_field('noi_bat', $post_id);
   <!-- Hạng phòng -->
   <div id="hang-phong">
     <h2>Danh sách phòng</h2>
-    <?php for ($i = 1; $i <= 4; $i++): ?>
-      <?php if (have_rows("phan_loai_phong_{$i}")): ?>
-<?php while (have_rows("phan_loai_phong_{$i}")) : the_row(); ?>
+    <?php $room_groups = ['phan_loai_phong', 'phan_loai_phong_1', 'phan_loai_phong_2', 'phan_loai_phong_3', 'phan_loai_phong_4'];
+    foreach ($room_groups as $group) {
+      if (have_rows($group)) {
+        while (have_rows($group)) { the_row(); ?>
           <div style="display:flex;gap:16px;margin-bottom:24px;">
             <div style="flex:0 0 200px;">
               <?php $img = get_sub_field('anh_phong'); if ($img): ?>
@@ -89,9 +90,10 @@ $noi_bat = get_field('noi_bat', $post_id);
               </p>
             </div>
           </div>
-        <?php endwhile; ?>
-      <?php endif; ?>
-    <?php endfor; ?>
+        <?php }
+      }
+    }
+    ?>
   </div>
 
   <!-- Nội dung bài viết -->
