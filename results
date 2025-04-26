@@ -1,101 +1,30 @@
-<?php
-/**
- * Template for single hotel post type: single-khach_san.php
- */
+<div style="margin-top: 40px;">
+  <h2>Đánh giá của Khách hàng</h2>
+  <div style="font-size: 18px; font-weight: bold; color: green;">9.2 <span style="color:#444; font-size:14px;">Tuyệt vời - 62 đánh giá</span></div>
+  <div style="margin: 12px 0 20px;"><a href="#" style="color:#e1703a;">Điểm chi tiết &raquo;</a></div>
 
-get_header();
-$post_id = get_the_ID();
-$gia = get_field('gia', $post_id);
-$diem = get_field('diem_danh_gia', $post_id);
-$so_danh_gia = get_field('so_danh_gia', $post_id);
-$tien_ich = get_field('tien_ich', $post_id);
-$noi_bat = get_field('noi_bat', $post_id);
-?>
+  <?php
+  $danh_gia = [
+    ['name' => 'Khánh An', 'score' => '9.4', 'content' => 'Dịch vụ ở đây rất tốt, nhân viên thân thiện, không gian sạch sẽ. Mình ấn tượng nhất là buffet sáng.'],
+    ['name' => 'Văn Khoa', 'score' => '9.4', 'content' => 'Hồ bơi đẹp và rộng. Phòng ốc hiện đại. Mình sẽ quay lại lần sau.'],
+    ['name' => 'Đức Đạt', 'score' => '9.2', 'content' => 'Gia đình mình đã có kỳ nghỉ tuyệt vời. Trẻ em rất thích khu vui chơi ở đây.'],
+    ['name' => 'Thảo Lan', 'score' => '9.2', 'content' => 'Nhân viên hỗ trợ nhiệt tình, bữa ăn ngon. Vị trí gần trung tâm nên rất tiện đi lại.'],
+    ['name' => 'Minh Huy', 'score' => '9.3', 'content' => 'Cảnh quan đẹp, phòng rộng rãi, view nhìn ra biển cực kỳ chill.'],
+    ['name' => 'Ngọc Hà', 'score' => '9.5', 'content' => 'Đi nghỉ dưỡng cùng bạn bè rất vui. Đặc biệt thích không gian nhà hàng và spa.'],
+    ['name' => 'Lê Dương', 'score' => '9.1', 'content' => 'Dịch vụ chuyên nghiệp, mình đánh giá cao sự chu đáo của nhân viên.'],
+    ['name' => 'Hoàng Tú', 'score' => '9.3', 'content' => 'Bữa sáng đa dạng món, phòng được dọn sạch mỗi ngày.'],
+    ['name' => 'Quỳnh Mai', 'score' => '9.0', 'content' => 'Vị trí tiện lợi, gần các điểm tham quan. Giá cả hợp lý.'],
+    ['name' => 'Anh Khoa', 'score' => '9.2', 'content' => 'Chất lượng tốt so với tầm giá. Rất đáng để trải nghiệm.'],
+  ];
 
-<div style="max-width:1140px;margin:auto;padding:24px;">
-  <!-- Ảnh đại diện -->
-  <div style="display:flex;gap:16px;align-items:flex-start;">
-    <?php if (has_post_thumbnail()) : ?>
-      <div style="flex:1;">
-        <?php the_post_thumbnail('full', ['style'=>'width:100%;border-radius:12px;']); ?>
-      </div>
-    <?php endif; ?>
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;">
-      <h1><?php the_title(); ?></h1>
-      <div style="font-size:14px;margin-bottom:0;">
-        <strong style="color:green;font-size:18px;"><?php echo $diem; ?></strong>
-        <span style="margin-left:8px;">Tuyệt vời - <?php echo $so_danh_gia; ?> đánh giá</span>
-      </div>
-      <div style="color:#e53935;font-size:20px;font-weight:bold;margin:0;">
-        <?php echo number_format($gia, 0, ',', '.'); ?>đ
-      </div>
-      <a href="#noi-dung" style="background:#e1703a;color:white;padding:12px 24px;border-radius:8px;text-align:center;max-width:200px;">Xem giá phòng</a>
-    </div>
-  </div>
-
-  <!-- Tabs chuyển mục -->
-  <ul style="display:flex;list-style:none;padding:0;margin:24px 0;gap:24px;border-bottom:2px solid #eee;">
-    <li><a href="#tien-ich">Tiện ích</a></li>
-    <li><a href="#noi-bat">Điểm nổi bật</a></li>
-    <li><a href="#noi-dung">Thông tin & Đánh giá</a></li>
-  </ul>
-
-  <!-- Tiện ích -->
-  <div id="tien-ich">
-    <h2>Tiện ích khách sạn</h2>
-    <?php if ($tien_ich): ?>
-      <div style="columns:3;-webkit-columns:3;-moz-columns:3;max-height:150px;overflow:hidden;" id="list-tien-ich">
-        <ul style="padding-left:20px;">
-        <?php foreach ($tien_ich as $ti): ?>
-          <li><?php echo esc_html($ti); ?></li>
-        <?php endforeach; ?>
-        </ul>
-      </div>
-      <button onclick="document.getElementById('list-tien-ich').style.maxHeight='none';this.style.display='none';" style="margin-top:10px;background:none;color:#e1703a;border:none;cursor:pointer;">Xem thêm</button>
-    <?php endif; ?>
-  </div>
-
-  <!-- Điểm nổi bật -->
-  <div id="noi-bat" style="background:#fff5e6;border-left:5px solid #ffc107;padding:16px;margin:24px 0;border-radius:8px;">
-    <h2 style="color:#e1703a;margin-top:0;">Điểm nổi bật <?php the_title(); ?></h2>
-    <ul style="padding-left:20px;">
-      <?php foreach (explode("\n", $noi_bat) as $line): ?>
-        <li><?php echo esc_html($line); ?></li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
-
-  <!-- Nội dung bài viết -->
-  <div id="noi-dung" style="margin-top:40px;">
-    <h2>Thông tin khách sạn</h2>
-    <?php the_content(); ?>
-
-    <?php
-    $args = ['post_type' => 'danh_gia',
-      'posts_per_page' => 5,
-      'meta_query' => [
-        [
-          'key' => 'khach_san_lien_quan',
-          'value' => $post_id,
-          'compare' => '='
-        ]
-      ]
-    ];
-    $reviews = new WP_Query($args);
-    if ($reviews->have_posts()) :
-    ?>
-      <div style="margin-top:40px;">
-        <h2>Đánh giá của Khách hàng</h2>
-        <?php while ($reviews->have_posts()) : $reviews->the_post(); ?>
-          <div style="margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:16px;">
-            <strong><?php the_title(); ?></strong> - <em><?php the_time('d/m/Y'); ?></em>
-            <div><?php the_content(); ?></div>
-          </div>
-        <?php endwhile; ?>
-        <?php wp_reset_postdata(); ?>
-      </div>
-    <?php endif; ?>
-  </div>
+  foreach ($danh_gia as $dg) {
+    echo '<div style="border-top:1px solid #eee;padding:16px 0;">';
+    echo '<div style="font-weight:bold;color:green;font-size:16px;">' . esc_html($dg['score']) . ' <span style="color:#555;">Tuyệt vời</span> - ' . esc_html($dg['name']) . '</div>';
+    echo '<p style="margin: 8px 0;">' . esc_html($dg['content']) . '</p>';
+    echo '</div>';
+  }
+  ?>
 </div>
 
-<?php get_footer(); ?>
+
+echo '<img src="LINK_ANH" style="width:100px;border-radius:8px;margin-top:10px;" />';
