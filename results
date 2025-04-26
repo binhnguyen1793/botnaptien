@@ -1,12 +1,38 @@
+<form onsubmit="return redirectToVungMien(event)">
+    <select name="diadiem" id="diadiem-select">
+        <option value="">--Chọn địa điểm--</option>
+        <?php
+        $terms = get_terms([
+            'taxonomy' => 'vung_mien',
+            'hide_empty' => false,
+        ]);
+        foreach ($terms as $term) {
+            $parent = get_term($term->parent, 'vung_mien');
+            $grandparent = $parent ? get_term($parent->parent, 'vung_mien') : null;
+            if ($grandparent) {
+                echo '<option value="' . esc_attr($term->slug) . '">' . esc_html($term->name) . '</option>';
+            }
+        }
+        ?>
+    </select>
+
+    <select name="khoihanh">
+        <option value="">--Chọn--</option>
+        <!-- các điểm khởi hành nếu cần -->
+    </select>
+
+    <button type="submit">Tìm ngay</button>
+</form>
+
 <script>
-function redirectToVungMien(event) {
-    event.preventDefault();
-    const diadiem = document.querySelector('select[name="diadiem"]').value;
-    if (diadiem) {
-        window.location.href = "/vung_mien/" + diadiem;
-    } else {
+function redirectToVungMien(e) {
+    e.preventDefault();
+    const slug = document.getElementById("diadiem-select").value;
+    if (!slug) {
         alert("Vui lòng chọn địa điểm.");
+        return false;
     }
+    window.location.href = "/vung_mien/" + slug + "/";
     return false;
 }
 </script>
