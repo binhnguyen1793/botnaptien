@@ -1,0 +1,29 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const buttons = document.querySelectorAll(".tour-request-btn");
+  buttons.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      const price = btn.getAttribute("data-price");
+
+      fetch("http://localhost:3000/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ price: price })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("Yêu cầu thanh toán đã gửi thành công!");
+        } else {
+          alert("Gửi thất bại, thử lại sau.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Không thể kết nối đến server.");
+      });
+    });
+  });
+});
+</script>
