@@ -1,146 +1,16 @@
-<?php
-/**
- * Template for taxonomy vung_mien with live filtering
- */
+function chu_de_khach_san_shortcode() {
+    $terms = get_terms([
+        'taxonomy' => 'chu_de_khach_san',
+        'hide_empty' => false,
+    ]);
 
-get_header();
-$term = get_queried_object();
-
-$paged = get_query_var('paged') ? get_query_var('paged') : 1;
-
-// Prepare meta_query
-$meta_query = [];
-
-// Khởi hành
-if (!empty($_GET['khoihanh']) && is_array($_GET['khoihanh'])) {
-    $meta_khoihanh = ['relation' => 'OR'];
-    foreach ($_GET['khoihanh'] as $kh) {
-        $meta_khoihanh[] = [
-            'key' => 'khoihanh',
-            'value' => sanitize_text_field($kh),
-            'compare' => '='
-        ];
+    ob_start();
+    echo '<div class="chu-de-wrap" style="display:flex; gap:16px;">';
+    foreach ($terms as $term) {
+        $link = get_term_link($term);
+        echo '<a href="' . esc_url($link) . '" class="chu-de-box" style="display:block; background:#f3f3f3; padding:16px; border-radius:8px;">' . esc_html($term->name) . '</a>';
     }
-    $meta_query[] = $meta_khoihanh;
+    echo '</div>';
+    return ob_get_clean();
 }
-
-// Thời gian
-if (!empty($_GET['thoi_gian']) && is_array($_GET['thoi_gian'])) {
-    $meta_tg = ['relation' => 'OR'];
-    foreach ($_GET['thoi_gian'] as $tg) {
-        $meta_tg[] = [
-            'key' => 'thoi_gian',
-            'value' => sanitize_text_field($tg),
-            'compare' => '='
-        ];
-    }
-    $meta_query[] = $meta_tg;
-}
-
-// Giá tour
-if (!empty($_GET['gia'])) {
-    $range = explode('-', sanitize_text_field($_GET['gia']));
-    if (count($range) === 2) {
-        $meta_query[] = [
-            'key' => 'gia_tour',
-            'value' => [(int)$range[0], (int)$range[1]],
-            'type' => 'NUMERIC',
-            'compare' => 'BETWEEN'
-        ];
-    }
-}
-
-$args = [
-    'post_type' => 'tour',
-    'posts_per_page' => 8,
-    'paged' => $paged,
-    'tax_query' => [[
-        'taxonomy' => 'vung_mien',
-        'field' => 'slug',
-        'terms' => $term->slug,
-    ]],
-    'meta_query' => $meta_query
-];
-
-$query = new WP_Query($args);
-
-// Get unique filter values
-$all_tours = get_posts([
-    'post_type' => 'tour',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-    'tax_query' => [[
-        'taxonomy' => 'vung_mien',
-        'field' => 'slug',
-        'terms' => $term->slug
-    ]]
-]);
-$khoihanh_values = [];
-$thoi_gian_values = [];
-foreach ($all_tours as $tour_id) {
-    $khoihanh_values[] = get_field('khoihanh', $tour_id);
-    $thoi_gian_values[] = get_field('thoi_gian', $tour_id);
-}
-$khoihanh_values = array_unique(array_filter($khoihanh_values));
-$thoi_gian_values = array_unique(array_filter($thoi_gian_values));
-?>
-
-<div class="container" style="max-width:1140px;margin:auto;display:flex;gap:24px;margin-top:30px">
-  <aside style="width:260px;">
-    <form method="get" id="filterForm">
-      <h3 style="margin-bottom:10px">Bộ lọc</h3>
-
-      <?php if ($khoihanh_values): ?>
-      <p><strong>Khởi hành:</strong></p>
-      <?php foreach ($khoihanh_values as $val): ?>
-        <label><input type="checkbox" name="khoihanh[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $_GET['khoihanh'] ?? []) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-      <?php endforeach; ?>
-      <?php endif; ?>
-
-      <?php if ($thoi_gian_values): ?>
-      <p style="margin-top:15px"><strong>Thời gian:</strong></p>
-      <?php foreach ($thoi_gian_values as $val): ?>
-<label><input type="checkbox" name="thoi_gian[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $_GET['thoi_gian'] ?? []) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-      <?php endforeach; ?>
-      <?php endif; ?>
-
-      <p style="margin-top:15px"><strong>Mức giá:</strong></p>
-      <select name="gia" onchange="document.getElementById('filterForm').submit()">
-        <option value="">-- Chọn --</option>
-        <option value="1000000-5000000" <?= ($_GET['gia'] ?? '') == '1000000-5000000' ? 'selected' : '' ?>>Từ 1 triệu đến 5 triệu</option>
-        <option value="5000000-10000000" <?= ($_GET['gia'] ?? '') == '5000000-10000000' ? 'selected' : '' ?>>Từ 5 triệu đến 10 triệu</option>
-        <option value="10000000-20000000" <?= ($_GET['gia'] ?? '') == '10000000-20000000' ? 'selected' : '' ?>>Từ 10 triệu đến 20 triệu</option>
-      </select>
-    </form>
-  </aside>
-
-  <main style="flex:1">
-    <h2>Kết quả tour ở <?= esc_html($term->name) ?></h2>
-    <?php if ($query->have_posts()): ?>
-      <?php while ($query->have_posts()): $query->the_post(); ?>
-        <div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:20px">
-          <a href="<?php the_permalink(); ?>">
-            <?php the_post_thumbnail('medium'); ?>
-            <h3><?php the_title(); ?></h3>
-            <p><strong>Khởi hành:</strong> <?php the_field('khoihanh'); ?> | <strong>Thời gian:</strong> <?php the_field('thoi_gian'); ?></p>
-            <p><strong>Giá:</strong> <?= number_format((int) get_field('gia_tour'), 0, ',', '.') ?> đ</p>
-          </a>
-        </div>
-      <?php endwhile; ?>
-
-      <div class="pagination">
-        <?php echo paginate_links(['total' => $query->max_num_pages]); ?>
-      </div>
-    <?php else: ?>
-      <p>Không tìm thấy tour nào.</p>
-    <?php endif; ?>
-  </main>
-</div>
-
-<script>
-  document.querySelectorAll('#filterForm input[type=checkbox]').forEach(cb => {
-    cb.addEventListener('change', () => document.getElementById('filterForm').submit());
-  });
-</script>
-
-<?php get_footer(); ?>
+add_shortcode('chu_de_khach_san', 'chu_de_khach_san_shortcode');
