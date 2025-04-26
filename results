@@ -1,6 +1,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
+    const form = document.getElementById("filter-form");
+    if (!form) return;
     const inputs = form.querySelectorAll("input[type=checkbox], select");
 
     inputs.forEach(input => {
@@ -10,3 +11,5 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+<form id="filter-form" method="get">
