@@ -1,117 +1,184 @@
-function tour_search_form_shortcode() {
-    // Lấy cấp 2 từ taxonomy 'vung_mien'
-    $cap1_terms = get_terms([
-        'taxonomy' => 'vung_mien',
-        'hide_empty' => false,
-        'parent' => 0,
-    ]);
-
-    $cap2_terms = [];
-    foreach ($cap1_terms as $cap1) {
-        $childs = get_terms([
-            'taxonomy' => 'vung_mien',
-            'hide_empty' => false,
-            'parent' => $cap1->term_id,
-        ]);
-        $cap2_terms = array_merge($cap2_terms, $childs);
-    }
-
+function hotel_filter_form_shortcode() {
     ob_start();
     ?>
+
     <style>
-    .tour-search-form {
-      background: #fff;
-      padding: 24px 32px;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: flex-end;
-      max-width: 1140px;
-      margin: 30px auto;
+    .hotel-search-wrapper {
+        max-width: 1140px;
+        margin: auto;
+        position: relative;
+        z-index: 10;
     }
-
-    .tour-search-form label {
-      font-weight: 500;
-      font-size: 14px;
-      color: #888;
-      margin-bottom: 6px;
-      display: block;
+    .hotel-search-form {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        align-items: flex-end;
+        position: relative;
     }
-
-    .tour-search-form select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    .hotel-search-form label {
+        font-weight: 500;
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 4px;
+        display: block;
     }
-
-    .tour-search-form button {
-      padding: 12px 24px;
-      background: #e67e22;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+    .hotel-search-form select,
+    .hotel-search-form input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
     }
-
-    .tour-search-form button:hover {
-      background: #cf711f;
+    .guest-summary {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
     }
-
-    .tour-search-form > div {
-      flex: 1;
-      min-width: 200px;
+    .guest-box {
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        top: 100%;
+        width: 260px;
+        margin-top: 5px;
+        z-index: 100;
+    }
+    .guest-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .guest-counter button {
+        background: #eee;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 50%;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .guest-counter span {
+        margin: 0 10px;
+        font-weight: bold;
+    }
+    .search-button button {
+        padding: 12px 24px;
+        background-color: #e1703a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
     }
     </style>
 
-    <form method="get" action="/tim-tour" class="tour-search-form">
-        <div>
-            <label>Địa điểm:</label>
-            <select name="diadiem">
-                <option value="">--Chọn địa điểm--</option>
-                <?php foreach ($cap2_terms as $term): ?>
-                    <option value="<?php echo esc_attr($term->slug); ?>">
-                        <?php echo esc_html($term->name); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+    <div class="hotel-search-wrapper">
+    <form action="/tim-kiem-khach-san" method="get" class="hotel-search-form">
 
+        <!-- Địa điểm -->
         <div>
-            <label>Khởi hành từ:</label>
-            <select name="khoihanh">
-                <option value="">--Chọn--</option>
+            <label>ĐỊA ĐIỂM</label>
+            <select name="location">
+                <option value="">Chọn tỉnh/thành</option>
                 <?php
-                $starts = get_posts([
-                    'post_type' => 'tour',
-                    'posts_per_page' => -1,
-                    'meta_key' => 'khoi_hanh_tu',
-                    'meta_value' => '',
-                    'meta_compare' => '!=',
-                    'fields' => 'ids'
+                $terms = get_terms([
+                    'taxonomy' => 'vung_mien',
+                    'hide_empty' => false,
                 ]);
-                $locations = [];
-                foreach ($starts as $id) {
-                    $val = get_field('khoi_hanh_tu', $id);
-                    if ($val && !in_array($val, $locations)) {
-                        $locations[] = $val;
+                foreach ($terms as $term) {
+                    $parent = get_term($term->parent, 'vung_mien');
+                    $grandparent = $parent ? get_term($parent->parent, 'vung_mien') : null;
+                    if ($grandparent) {
+                        echo '<option value="' . esc_attr($term->slug) . '">' . esc_html($term->name) . '</option>';
                     }
                 }
-                foreach ($locations as $item): ?>
-                    <option value="<?php echo esc_attr($item); ?>"><?php echo esc_html($item); ?></option>
-                <?php endforeach; ?>
+                ?>
             </select>
         </div>
 
-        <div style="flex: 0 0 auto;">
+        <!-- Nhận phòng -->
+        <div>
+            <label>NHẬN PHÒNG</label>
+            <input type="date" name="checkin">
+        </div>
+
+        <!-- Trả phòng -->
+        <div>
+            <label>TRẢ PHÒNG</label>
+            <input type="date" name="checkout">
+        </div>
+
+        <!-- Hành khách -->
+        <div style="position: relative;">
+            <label>HÀNH KHÁCH</label>
+            <div class="guest-summary" onclick="document.getElementById('guest-box').style.display = (document.getElementById('guest-box').style.display === 'block' ? 'none' : 'block')">
+                <span id="guest-summary-text">2 khách</span>
+            </div>
+            <div class="guest-box" id="guest-box">
+                <div class="guest-row">
+                    <span>Người lớn</span>
+                    <div class="guest-counter">
+                        <button type="button" onclick="updateGuest('adult', -1)">-</button>
+                        <span id="adult-count">2</span>
+                        <button type="button" onclick="updateGuest('adult', 1)">+</button>
+                    </div>
+                </div>
+                <div class="guest-row">
+                    <span>Trẻ em</span>
+                    <div class="guest-counter">
+                        <button type="button" onclick="updateGuest('child', -1)">-</button>
+                        <span id="child-count">0</span>
+                        <button type="button" onclick="updateGuest('child', 1)">+</button>
+                    </div>
+                </div>
+                <div class="guest-row">
+                    <span>Em bé</span>
+                    <div class="guest-counter">
+                        <button type="button" onclick="updateGuest('baby', -1)">-</button>
+                        <span id="baby-count">0</span>
+                        <button type="button" onclick="updateGuest('baby', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="adult" id="adult-input" value="2">
+            <input type="hidden" name="child" id="child-input" value="0">
+            <input type="hidden" name="baby" id="baby-input" value="0">
+        </div>
+
+        <!-- Nút tìm -->
+        <div class="search-button">
             <button type="submit">Tìm ngay</button>
         </div>
     </form>
+    </div>
+
+    <script>
+    function updateGuest(type, delta) {
+        const countId = type + '-count';
+        const inputId = type + '-input';
+        const el = document.getElementById(countId);
+        let val = parseInt(el.textContent) + delta;
+        if (val < 0) val = 0;
+        el.textContent = val;
+        document.getElementById(inputId).value = val;
+
+        const total = parseInt(document.getElementById('adult-count').textContent) +
+                      parseInt(document.getElementById('child-count').textContent);
+        document.getElementById('guest-summary-text').textContent = total + ' khách';
+    }
+    </script>
+
     <?php
     return ob_get_clean();
 }
-add_shortcode('tour_search_form', 'tour_search_form_shortcode');
+add_shortcode('hotel_filter_form', 'hotel_filter_form_shortcode');
