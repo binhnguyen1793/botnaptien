@@ -1,16 +1,108 @@
-function chu_de_khach_san_shortcode() {
-    $terms = get_terms([
-        'taxonomy' => 'chu_de_khach_san',
-        'hide_empty' => false,
-    ]);
+<?php
+/**
+ * Template for displaying single hotel post
+ */
+get_header();
 
-    ob_start();
-    echo '<div class="chu-de-wrap" style="display:flex; gap:16px;">';
-    foreach ($terms as $term) {
-        $link = get_term_link($term);
-        echo '<a href="' . esc_url($link) . '" class="chu-de-box" style="display:block; background:#f3f3f3; padding:16px; border-radius:8px;">' . esc_html($term->name) . '</a>';
-    }
-    echo '</div>';
-    return ob_get_clean();
-}
-add_shortcode('chu_de_khach_san', 'chu_de_khach_san_shortcode');
+while (have_posts()) : the_post();
+  $gia = get_field('gia');
+  $tien_ich = get_field('tien_ich');
+  $diem_noi_bat = get_field('diem_noi_bat');
+  $phong = get_field('phong'); // repeater
+  $anh_dai_dien = get_field('anh_dai_dien');
+  $gallery = get_field('gallery');
+  $diem_danh_gia = get_field('diem_danh_gia');
+  $so_danh_gia = get_field('so_danh_gia');
+?>
+
+<div class="hotel-container" style="max-width:1140px;margin:auto;">
+  <!-- Section 1: Hình ảnh khách sạn -->
+  <div class="hotel-gallery" style="display:flex;gap:10px;">
+    <div style="flex:2;">
+      <?php if ($anh_dai_dien) echo wp_get_attachment_image($anh_dai_dien, 'large', false, ['style'=>'width:100%;border-radius:8px']); ?>
+    </div>
+    <div style="flex:2;display:flex;flex-wrap:wrap;gap:10px;">
+      <?php if ($gallery): foreach ($gallery as $img): ?>
+        <div style="flex:1 1 48%">
+          <?php echo wp_get_attachment_image($img, 'medium', false, ['style'=>'width:100%;border-radius:8px']); ?>
+        </div>
+      <?php endforeach; endif; ?>
+    </div>
+  </div>
+
+  <!-- Section 2: Thông tin chính + Điểm đánh giá -->
+  <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <h1 style="margin-bottom:5px"><?php the_title(); ?></h1>
+      <div style="color:#999;font-size:14px;">Địa chỉ: <?php echo get_field('dia_chi'); ?></div>
+    </div>
+    <div style="text-align:right">
+      <?php if ($diem_danh_gia): ?>
+        <div style="font-size:20px;background:#28a745;color:#fff;padding:4px 12px;border-radius:6px;display:inline-block;">
+          <?php echo esc_html($diem_danh_gia); ?>
+        </div>
+        <div style="color:#888; font-size:14px; margin-top:5px;">
+          Tuyệt vời - <?php echo esc_html($so_danh_gia); ?> đánh giá
+        </div>
+      <?php endif; ?>
+      <div style="color:red; font-size:20px; font-weight:bold; margin-top:5px;">
+        <?php echo number_format($gia, 0, ',', '.') . 'đ'; ?>
+      </div>
+      <button style="margin-top:10px;padding:10px 20px;background:#e1703a;color:white;border:none;border-radius:6px;font-weight:bold;">Xem giá phòng</button>
+    </div>
+  </div>
+
+  <!-- Section 3: Tiện ích + Điểm nổi bật -->
+  <div style="margin-top:30px;display:flex;gap:20px;">
+    <div style="flex:1;">
+      <h3>Tiện ích khách sạn</h3>
+      <ul style="list-style:none;padding:0;columns:2;">
+        <?php if ($tien_ich): foreach ($tien_ich as $item): ?>
+          <li style="margin-bottom:8px;"><?php echo esc_html($item); ?></li>
+        <?php endforeach; endif; ?>
+      </ul>
+    </div>
+    <div style="flex:1;">
+      <h3>Điểm nổi bật <?php the_title(); ?></h3>
+      <ul style="padding-left: 18px;">
+        <?php if ($diem_noi_bat): $items = explode("\n", $diem_noi_bat); foreach ($items as $line): ?>
+          <li><?php echo esc_html(trim($line)); ?></li>
+        <?php endforeach; endif; ?>
+</ul>
+    </div>
+  </div>
+
+  <!-- Section 4: Danh sách phòng -->
+  <?php if ($phong): ?>
+  <div style="margin-top:30px">
+    <h3>Hạng phòng</h3>
+    <div style="display:flex;flex-direction:column;gap:24px;">
+      <?php foreach ($phong as $p): ?>
+        <div style="border:1px solid #ddd;padding:16px;border-radius:8px;display:flex;gap:20px">
+          <div style="flex:0 0 200px;">
+            <?php if ($p['anh_phong']) echo wp_get_attachment_image($p['anh_phong'], 'medium', false, ['style'=>'border-radius:6px;width:100%;']); ?>
+          </div>
+          <div style="flex:1">
+            <h4 style="margin-top:0"><?php echo esc_html($p['ten_phong']); ?></h4>
+            <p><strong>Diện tích:</strong> <?php echo esc_html($p['dien_tich']); ?> | <strong>Giường:</strong> <?php echo esc_html($p['giuong']); ?> | <strong>Hướng:</strong> <?php echo esc_html($p['huong']); ?></p>
+            <p><strong>Giá:</strong> <?php echo number_format($p['gia_phong'], 0, ',', '.'); ?> đ</p>
+            <p><strong>Ăn sáng:</strong> <?php echo esc_html($p['an_sang']); ?> | <strong>Ăn 3 bữa:</strong> <?php echo esc_html($p['an_3_bua']); ?></p>
+            <p><strong>Số người:</strong> <?php echo esc_html($p['so_nguoi']); ?></p>
+            <button style="margin-top:10px;padding:8px 16px;background:#e1703a;color:white;border:none;border-radius:6px;font-weight:bold;">Liên hệ nhận giá tốt</button>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <!-- Section 5: Nội dung bài viết -->
+  <div style="margin-top:40px">
+    <h3>Đánh giá của Khách hàng</h3>
+    <div style="line-height:1.8;">
+      <?php the_content(); ?>
+    </div>
+  </div>
+</div>
+
+<?php endwhile; get_footer(); ?>
