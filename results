@@ -1,39 +1,163 @@
-<select name="diadiem">
-  <option value="">--Chọn địa điểm--</option>
-  <?php
-  $terms = get_terms([
-      'taxonomy' => 'vung_mien',
-      'hide_empty' => false,
-    ]);
+<?php
+get_header();
 
-  foreach ($terms as $term) {
-      // Tạo slug phân cấp đầy đủ
-      $slug_parts = [];
-      $current = $term;
-      while ($current && $current->parent != 0) {
-          array_unshift($slug_parts, $current->slug);
-          $current = get_term($current->parent, 'vung_mien');
-      }
-      if ($current) {
-          array_unshift($slug_parts, $current->slug);
-      }
-      $full_slug = implode('/', $slug_parts);
+$current_term = get_queried_object();
 
-      echo '<option value="' . esc_attr($term->slug) . '" data-full-slug="' . esc_attr($full_slug) . '">' . esc_html($term->name) . '</option>';
-  }
-  ?>
-</select>
+// Lấy danh sách tour theo taxonomy
+$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+$args = [
+    'post_type' => 'tour',
+    'posts_per_page' => 8,
+    'paged' => $paged,
+    'tax_query' => [
+        [
+            'taxonomy' => 'vung_mien',
+            'field' => 'term_id',
+            'terms' => $current_term->term_id,
+            'include_children' => true,
+        ],
+    ],
+];
 
+// Filter
+if (!empty($_GET['khoihanh'])) {
+    $args['meta_query'][] = [
+        'key' => 'khoihanh',
+        'value' => sanitize_text_field($_GET['khoihanh']),
+        'compare' => '=',
+    ];
+}
+if (!empty($_GET['thoi_gian'])) {
+    $args['meta_query'][] = [
+        'key' => 'thoi_gian',
+        'value' => sanitize_text_field($_GET['thoi_gian']),
+        'compare' => '=',
+    ];
+}
+if (!empty($_GET['gia_khoang'])) {
+    $price_range = explode('-', sanitize_text_field($_GET['gia_khoang']));
+    if (count($price_range) == 2) {
+        $args['meta_query'][] = [
+            'key' => 'gia_tour',
+            'value' => [$price_range[0], $price_range[1]],
+            'type' => 'NUMERIC',
+            'compare' => 'BETWEEN'
+        ];
+    }
+}
 
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('.tour-search-form');
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const select = form.querySelector('[name="diadiem"]');
-        const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
+$query = new WP_Query($args);
 
-        if (slug) {
-            window.location.href = '/travelweb/vung_mien/' + slug + '/';
-        }
-    });
-});
+// Lấy danh sách khởi hành
+$khoihanh_list = get_posts([
+    'post_type' => 'tour',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'tax_query' => [
+        [
+            'taxonomy' => 'vung_mien',
+            'field' => 'term_id',
+            'terms' => $current_term->term_id,
+            'include_children' => true,
+        ],
+    ],
+]);
+$khoihanh_values = [];
+$thoi_gian_values = [];
+foreach ($khoihanh_list as $post_id) {
+    $kh = get_post_meta($post_id, 'khoihanh', true);
+    $tg = get_post_meta($post_id, 'thoi_gian', true);
+    if ($kh) $khoihanh_values[] = $kh;
+    if ($tg) $thoi_gian_values[] = $tg;
+}
+$khoihanh_values = array_unique($khoihanh_values);
+$thoi_gian_values = array_unique($thoi_gian_values);
+
+// Lấy các điểm đến nếu term này còn term con
+$child_terms = get_terms([
+    'taxonomy' => 'vung_mien',
+    'parent' => $current_term->term_id,
+    'hide_empty' => false,
+]);
+
+?>
+
+<div class="container" style="display:flex; gap:30px; margin-top: 30px;">
+    <div style="width:300px;">
+        <form method="get" action="">
+            <h3>Bộ lọc</h3>
+            <?php if ($khoihanh_values) : ?>
+            <p>Khởi hành từ:</p>
+            <select name="khoihanh">
+                <option value="">-- Chọn --</option>
+                <?php foreach ($khoihanh_values as $kh) : ?>
+                    <option value="<?php echo esc_attr($kh); ?>" <?php selected($_GET['khoihanh'] ?? '', $kh); ?>><?php echo esc_html($kh); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+
+            <?php if ($thoi_gian_values) : ?>
+            <p>Thời gian combo:</p>
+            <select name="thoi_gian">
+                <option value="">-- Chọn --</option>
+<?php foreach ($thoi_gian_values as $tg) : ?>
+                    <option value="<?php echo esc_attr($tg); ?>" <?php selected($_GET['thoi_gian'] ?? '', $tg); ?>><?php echo esc_html($tg); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+
+            <p>Mức giá trong khoảng:</p>
+            <select name="gia_khoang">
+                <option value="">-- Chọn --</option>
+                <option value="1000000-5000000">Từ 1 triệu đến 5 triệu</option>
+                <option value="5000000-10000000">Từ 5 triệu đến 10 triệu</option>
+                <option value="10000000-20000000">Từ 10 triệu đến 20 triệu</option>
+                <option value="20000000-30000000">Từ 20 triệu đến 30 triệu</option>
+                <option value="30000000-999999999">Trên 30 triệu</option>
+            </select>
+
+            <?php if ($child_terms) : ?>
+            <p>Điểm đến:</p>
+            <select name="diemden">
+                <option value="">-- Chọn --</option>
+                <?php foreach ($child_terms as $child) : ?>
+                    <option value="<?php echo esc_attr($child->slug); ?>"><?php echo esc_html($child->name); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+
+            <p><button type="submit" style="margin-top:10px; background: #e1703a; color:white; border:none; padding:8px 16px; border-radius:5px;">Lọc</button></p>
+        </form>
+    </div>
+
+    <div style="flex:1;">
+        <h2>Kết quả tour ở <?php echo esc_html($current_term->name); ?></h2>
+
+        <?php if ($query->have_posts()) : ?>
+            <?php while ($query->have_posts()) : $query->the_post(); ?>
+                <div style="margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #eee;">
+                    <a href="<?php the_permalink(); ?>">
+                        <?php the_post_thumbnail('medium'); ?>
+                        <h3><?php the_title(); ?></h3>
+                        <p>Khởi hành: <?php echo esc_html(get_post_meta(get_the_ID(), 'khoihanh', true)); ?> | Thời gian: <?php echo esc_html(get_post_meta(get_the_ID(), 'thoi_gian', true)); ?></p>
+                        <p>Giá: <?php echo number_format(get_post_meta(get_the_ID(), 'gia_tour', true), 0, ',', '.'); ?> đ</p>
+                    </a>
+                </div>
+            <?php endwhile; ?>
+            <div class="pagination">
+                <?php
+                echo paginate_links([
+                    'total' => $query->max_num_pages,
+                ]);
+                ?>
+            </div>
+        <?php else : ?>
+            <p>Không tìm thấy tour nào.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+wp_reset_postdata();
+get_footer();
+?>
