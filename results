@@ -1,191 +1,173 @@
-function hotel_filter_form_shortcode() {
-    ob_start();
-    ?>
+<?php
+/**
+ * Template for taxonomy vung_mien (results page with filters)
+ */
 
-    <style>
-    .hotel-search-wrapper {
-        max-width: 1140px;
-        margin: auto;
-        position: relative;
-        z-index: 10;
-    }
-    .hotel-search-form {
-        background: #fff;
-        padding: 24px 32px;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-    .hotel-search-row {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-    .hotel-search-form label {
-        font-weight: 500;
-        font-size: 14px;
-        color: #888;
-        margin-bottom: 4px;
-        display: block;
-    }
-    .hotel-search-form select,
-    .hotel-search-form input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-    }
-    .guest-summary {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    .guest-box {
-        position: absolute;
-        background: white;
-        border: 1px solid #ddd;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        padding: 15px;
-        border-radius: 10px;
-        display: none;
-        top: 100%;
-        width: 260px;
-        margin-top: 5px;
-        z-index: 100;
-    }
-    .guest-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .guest-counter button {
-        background: #eee;
-        border: none;
-        padding: 4px 10px;
-        border-radius: 50%;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .guest-counter span {
-        margin: 0 10px;
-        font-weight: bold;
-    }
-    .search-button button {
-        padding: 12px 24px;
-        background-color: #e1703a;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    </style>
+get_header();
+$term = get_queried_object();
 
-    <div class="hotel-search-wrapper">
-    <form action="/tim-kiem-khach-san" method="get" class="hotel-search-form">
+// Get filter values from URL
+$khoi_hanh_tu = isset($_GET['khoi_hanh_tu']) ? sanitize_text_field($_GET['khoi_hanh_tu']) : '';
+$thoi_gian = isset($_GET['thoi_gian']) ? sanitize_text_field($_GET['thoi_gian']) : '';
+$loai_combo = isset($_GET['loai_combo']) ? sanitize_text_field($_GET['loai_combo']) : '';
+$muc_gia = isset($_GET['muc_gia']) ? sanitize_text_field($_GET['muc_gia']) : '';
+$diem_den = isset($_GET['diem_den']) ? sanitize_text_field($_GET['diem_den']) : '';
 
-        <!-- Địa điểm -->
-        <div>
-            <label>ĐỊA ĐIỂM</label>
-            <select name="location">
-                <option value="">Chọn tỉnh/thành</option>
-                <?php
-                $terms = get_terms([
-                    'taxonomy' => 'vung_mien',
-                    'hide_empty' => false,
-                ]);
-                foreach ($terms as $term) {
-                    $parent = get_term($term->parent, 'vung_mien');
-                    $grandparent = $parent ? get_term($parent->parent, 'vung_mien') : null;
-                    if ($grandparent) {
-                        echo '<option value="' . esc_attr($term->slug) . '">' . esc_html($term->name) . '</option>';
-                    }
-                }
-                ?>
-            </select>
-        </div>
+$paged = get_query_var('paged') ? get_query_var('paged') : 1;
 
-        <!-- Hàng dưới: ngày + khách + nút -->
-        <div class="hotel-search-row">
-            <!-- Nhận phòng -->
-            <div style="flex: 1; min-width: 200px;">
-                <label>NHẬN PHÒNG</label>
-                <input type="date" name="checkin">
-            </div>
+$args = [
+    'post_type' => 'tour',
+    'posts_per_page' => 10,
+    'paged' => $paged,
+    'tax_query' => [[
+        'taxonomy' => 'vung_mien',
+        'field'    => 'slug',
+        'terms'    => $term->slug,
+    ]],
+    'meta_query' => [],
+];
 
-            <!-- Trả phòng -->
-            <div style="flex: 1; min-width: 200px;">
-                <label>TRẢ PHÒNG</label>
-                <input type="date" name="checkout">
-            </div>
-
-            <!-- Hành khách -->
-            <div style="flex: 1; min-width: 200px; position: relative;">
-                <label>HÀNH KHÁCH</label>
-                <div class="guest-summary" onclick="document.getElementById('guest-box').style.display = (document.getElementById('guest-box').style.display === 'block' ? 'none' : 'block')">
-                    <span id="guest-summary-text">2 khách</span>
-                </div>
-                <div class="guest-box" id="guest-box">
-                    <div class="guest-row">
-                        <span>Người lớn</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('adult', -1)">-</button>
-                            <span id="adult-count">2</span>
-                            <button type="button" onclick="updateGuest('adult', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="guest-row">
-                        <span>Trẻ em</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('child', -1)">-</button>
-                            <span id="child-count">0</span>
-                            <button type="button" onclick="updateGuest('child', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="guest-row">
-                        <span>Em bé</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('baby', -1)">-</button>
-                            <span id="baby-count">0</span>
-                            <button type="button" onclick="updateGuest('baby', 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-                <input type="hidden" name="adult" id="adult-input" value="2">
-                <input type="hidden" name="child" id="child-input" value="0">
-                <input type="hidden" name="baby" id="baby-input" value="0">
-            </div>
-
-            <!-- Nút tìm -->
-            <div class="search-button" style="flex: 0 0 auto;">
-                <button type="submit">Tìm ngay</button>
-            </div>
-        </div>
-
-    </form>
-    </div>
-
-    <script>
-    function updateGuest(type, delta) {
-        const countId = type + '-count';
-        const inputId = type + '-input';
-        const el = document.getElementById(countId);
-        let val = parseInt(el.textContent) + delta;
-        if (val < 0) val = 0;
-        el.textContent = val;
-        document.getElementById(inputId).value = val;
-
-        const total = parseInt(document.getElementById('adult-count').textContent) +
-                      parseInt(document.getElementById('child-count').textContent);
-        document.getElementById('guest-summary-text').textContent = total + ' khách';
-    }
-    </script>
-
-    <?php
-    return ob_get_clean();
+if ($khoi_hanh_tu) {
+    $args['meta_query'][] = [
+        'key' => 'khoi_hanh_tu',
+        'value' => $khoi_hanh_tu,
+        'compare' => 'LIKE'
+    ];
 }
-add_shortcode('hotel_filter_form', 'hotel_filter_form_shortcode');
+if ($thoi_gian) {
+    $args['meta_query'][] = [
+        'key' => 'thoi_gian',
+        'value' => $thoi_gian,
+        'compare' => 'LIKE'
+    ];
+}
+if ($loai_combo) {
+    $args['meta_query'][] = [
+        'key' => 'loai_combo',
+        'value' => $loai_combo,
+        'compare' => 'LIKE'
+    ];
+}
+if ($diem_den) {
+    $args['meta_query'][] = [
+        'key' => 'diem_den',
+        'value' => $diem_den,
+        'compare' => 'LIKE'
+    ];
+}
+if ($muc_gia === '1-5') {
+    $args['meta_query'][] = [
+        'key' => 'gia_khuyenmai',
+        'value' => [1000000, 5000000],
+        'type' => 'NUMERIC',
+        'compare' => 'BETWEEN'
+    ];
+} elseif ($muc_gia === '5-10') {
+    $args['meta_query'][] = [
+        'key' => 'gia_khuyenmai',
+        'value' => [5000000, 10000000],
+        'type' => 'NUMERIC',
+        'compare' => 'BETWEEN'
+    ];
+} elseif ($muc_gia === '10-15') {
+    $args['meta_query'][] = [
+        'key' => 'gia_khuyenmai',
+        'value' => [10000000, 15000000],
+        'type' => 'NUMERIC',
+        'compare' => 'BETWEEN'
+    ];
+}
+
+$query = new WP_Query($args);
+?>
+
+<div style="max-width: 1140px; margin: auto; display: flex; gap: 24px; margin-top: 32px;">
+  <!-- Sidebar Filter -->
+  <aside style="width: 250px;">
+    <form method="get">
+      <h3>Bộ lọc</h3>
+
+      <label>Khởi hành từ:</label><br>
+      <select name="khoi_hanh_tu" style="width: 100%; padding: 6px;">
+        <option value="">-- Chọn --</option>
+        <option value="ha-noi" <?php selected($khoi_hanh_tu, 'ha-noi'); ?>>Hà Nội</option>
+        <option value="ho-chi-minh" <?php selected($khoi_hanh_tu, 'ho-chi-minh'); ?>>Hồ Chí Minh</option>
+      </select>
+
+      <label>Thời gian combo:</label><br>
+      <select name="thoi_gian" style="width: 100%; padding: 6px;">
+        <option value="">-- Chọn --</option>
+        <option value="2n1d">2 ngày 1 đêm</option>
+        <option value="3n2d">3 ngày 2 đêm</option>
+        <option value="4n3d">4 ngày 3 đêm</option>
+        <option value="5n4d">5 ngày 4 đêm</option>
+        <option value="6n5d">6 ngày 5 đêm</option>
+      </select>
+
+      <label>Loại combo:</label><br>
+      <select name="loai_combo" style="width: 100%; padding: 6px;">
+        <option value="">-- Chọn --</option>
+        <option value="maybay-khachsan">Vé máy bay + khách sạn</option>
+        <option value="tour-tron-goi">Tour trọn gói</option>
+      </select>
+
+      <label>Mức giá trong khoảng:</label><br>
+      <select name="muc_gia" style="width: 100%; padding: 6px;">
+        <option value="">-- Chọn --</option>
+        <option value="1-5" <?php selected($muc_gia, '1-5'); ?>>Từ 1 triệu đến 5 triệu</option>
+        <option value="5-10" <?php selected($muc_gia, '5-10'); ?>>Từ 5 triệu đến 10 triệu</option>
+        <option value="10-15" <?php selected($muc_gia, '10-15'); ?>>Từ 10 triệu đến 15 triệu</option>
+      </select>
+
+      <label>Điểm đến:</label><br>
+      <select name="diem_den" style="width: 100%; padding: 6px;">
+        <option value="">-- Chọn --</option>
+        <option value="ham-rong" <?php selected($diem_den, 'ham-rong'); ?>>Hàm Rồng</option>
+        <option value="ban-cat-cat" <?php selected($diem_den, 'ban-cat-cat'); ?>>Bản Cát Cát</option>
+        <option value="cong-troi-sapa" <?php selected($diem_den, 'cong-troi-sapa'); ?>>Cổng Trời Sapa</option>
+        <option value="fansipan" <?php selected($diem_den, 'fansipan'); ?>>Đình Fansipan</option>
+      </select>
+
+      <button type="submit" style="margin-top: 10px; padding: 8px 16px; background: #e1703a; color: white; border: none; border-radius: 6px; cursor: pointer;">Lọc</button>
+    </form>
+  </aside>
+
+  <!-- Main Content -->
+  <main style="flex: 1;">
+    <h1>Kết quả tour ở <?php echo esc_html($term->name); ?></h1>
+
+    <?php if ($query->have_posts()): ?>
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <?php while ($query->have_posts()): $query->the_post(); ?>
+          <div style="border: 1px solid #eee; padding: 16px; border-radius: 8px; display: flex; gap: 16px;">
+            <div style="flex: 0 0 200px;">
+              <?php if (has_post_thumbnail()): ?>
+                <?php the_post_thumbnail('medium', ['style' => 'border-radius: 8px;']); ?>
+              <?php endif; ?>
+            </div>
+            <div style="flex: 1;">
+              <h3 style="margin: 0;"><a href="<?php the_permalink(); ?>" style="color: #333; text-decoration: none;"><?php the_title(); ?></a></h3>
+              <p><strong>Khởi hành:</strong> <?php the_field('khoi_hanh_tu'); ?> | <strong>Thời gian:</strong> <?php the_field('thoi_gian'); ?></p>
+              <p><strong>Giá:</strong> <?php the_field('gia_khuyenmai') ? number_format(get_field('gia_khuyenmai'), 0, ',', '.') . ' đ' : 'Liên hệ'; ?></p>
+              <a href="<?php the_permalink(); ?>" style="color: #e1703a; font-weight: bold;">Xem chi tiết &raquo;</a>
+            </div>
+          </div>
+        <?php endwhile; ?>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <?php
+        echo paginate_links([
+          'total' => $query->max_num_pages
+        ]);
+        ?>
+      </div>
+
+    <?php else: ?>
+      <p>Không tìm thấy tour phù hợp.</p>
+    <?php endif; ?>
+    <?php wp_reset_postdata(); ?>
+  </main>
+</div>
+
+<?php get_footer(); ?>
