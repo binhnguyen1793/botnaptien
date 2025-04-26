@@ -14,11 +14,14 @@ function hotel_filter_form_shortcode() {
         padding: 24px 32px;
         border-radius: 12px;
         box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 16px;
-        align-items: flex-end;
-        position: relative;
+    }
+    .hotel-search-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
     }
     .hotel-search-form label {
         font-weight: 500;
@@ -106,59 +109,63 @@ function hotel_filter_form_shortcode() {
             </select>
         </div>
 
-        <!-- Nhận phòng -->
-        <div>
-            <label>NHẬN PHÒNG</label>
-            <input type="date" name="checkin">
-        </div>
-
-        <!-- Trả phòng -->
-        <div>
-            <label>TRẢ PHÒNG</label>
-            <input type="date" name="checkout">
-        </div>
-
-        <!-- Hành khách -->
-        <div style="position: relative;">
-            <label>HÀNH KHÁCH</label>
-            <div class="guest-summary" onclick="document.getElementById('guest-box').style.display = (document.getElementById('guest-box').style.display === 'block' ? 'none' : 'block')">
-                <span id="guest-summary-text">2 khách</span>
+        <!-- Hàng dưới: ngày + khách + nút -->
+        <div class="hotel-search-row">
+            <!-- Nhận phòng -->
+            <div style="flex: 1; min-width: 200px;">
+                <label>NHẬN PHÒNG</label>
+                <input type="date" name="checkin">
             </div>
-            <div class="guest-box" id="guest-box">
-                <div class="guest-row">
-                    <span>Người lớn</span>
-                    <div class="guest-counter">
-                        <button type="button" onclick="updateGuest('adult', -1)">-</button>
-                        <span id="adult-count">2</span>
-                        <button type="button" onclick="updateGuest('adult', 1)">+</button>
-                    </div>
-                </div>
-                <div class="guest-row">
-                    <span>Trẻ em</span>
-                    <div class="guest-counter">
-                        <button type="button" onclick="updateGuest('child', -1)">-</button>
-                        <span id="child-count">0</span>
-                        <button type="button" onclick="updateGuest('child', 1)">+</button>
-                    </div>
-                </div>
-                <div class="guest-row">
-                    <span>Em bé</span>
-                    <div class="guest-counter">
-                        <button type="button" onclick="updateGuest('baby', -1)">-</button>
-                        <span id="baby-count">0</span>
-                        <button type="button" onclick="updateGuest('baby', 1)">+</button>
-                    </div>
-                </div>
+
+            <!-- Trả phòng -->
+            <div style="flex: 1; min-width: 200px;">
+                <label>TRẢ PHÒNG</label>
+                <input type="date" name="checkout">
             </div>
-            <input type="hidden" name="adult" id="adult-input" value="2">
-            <input type="hidden" name="child" id="child-input" value="0">
-            <input type="hidden" name="baby" id="baby-input" value="0">
+
+            <!-- Hành khách -->
+            <div style="flex: 1; min-width: 200px; position: relative;">
+                <label>HÀNH KHÁCH</label>
+                <div class="guest-summary" onclick="document.getElementById('guest-box').style.display = (document.getElementById('guest-box').style.display === 'block' ? 'none' : 'block')">
+                    <span id="guest-summary-text">2 khách</span>
+                </div>
+                <div class="guest-box" id="guest-box">
+                    <div class="guest-row">
+                        <span>Người lớn</span>
+                        <div class="guest-counter">
+                            <button type="button" onclick="updateGuest('adult', -1)">-</button>
+                            <span id="adult-count">2</span>
+                            <button type="button" onclick="updateGuest('adult', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="guest-row">
+                        <span>Trẻ em</span>
+                        <div class="guest-counter">
+                            <button type="button" onclick="updateGuest('child', -1)">-</button>
+                            <span id="child-count">0</span>
+                            <button type="button" onclick="updateGuest('child', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="guest-row">
+                        <span>Em bé</span>
+                        <div class="guest-counter">
+                            <button type="button" onclick="updateGuest('baby', -1)">-</button>
+                            <span id="baby-count">0</span>
+                            <button type="button" onclick="updateGuest('baby', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="adult" id="adult-input" value="2">
+                <input type="hidden" name="child" id="child-input" value="0">
+                <input type="hidden" name="baby" id="baby-input" value="0">
+            </div>
+
+            <!-- Nút tìm -->
+            <div class="search-button" style="flex: 0 0 auto;">
+                <button type="submit">Tìm ngay</button>
+            </div>
         </div>
 
-        <!-- Nút tìm -->
-        <div class="search-button">
-            <button type="submit">Tìm ngay</button>
-        </div>
     </form>
     </div>
 
