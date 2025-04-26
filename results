@@ -1,29 +1,69 @@
-function hotel_chu_de_hap_dan_shortcode() {
+function enqueue_swiper_assets() {
+    // Swiper CSS
+    wp_enqueue_style('swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
+
+    // Swiper JS
+    wp_enqueue_script('swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_swiper_assets');
+
+function chu_de_hotel_carousel_shortcode() {
     ob_start();
 
-    $terms = get_terms([
+    $terms = get_terms(array(
         'taxonomy' => 'chu_de_hotel',
         'hide_empty' => false,
-    ]);
+    ));
 
-    if (!empty($terms) && !is_wp_error($terms)) {
-        echo '<div class="chu-de-carousel" style="display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px;">';
+    if (!empty($terms) && !is_wp_error($terms)) :
+        ?>
+        <div class="swiper-container chu-de-hotel-carousel">
+            <div class="swiper-wrapper">
+                <?php foreach ($terms as $term) :
+                    $image = get_field('anh_dai_dien', 'chu_de_hotel_' . $term->term_id);
+                    $link = get_term_link($term);
+                    ?>
+                    <div class="swiper-slide">
+                        <a href="<?php echo esc_url($link); ?>" style="display:block; position:relative; border-radius:12px; overflow:hidden;">
+                            <?php if ($image): ?>
+                                <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($term->name); ?>" style="width:100%; height:180px; object-fit:cover;">
+                            <?php endif; ?>
+                            <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.5); color:#fff; padding:12px; font-weight:bold; text-align:center;">
+                                <?php echo esc_html($term->name); ?>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <!-- Nút điều hướng -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
 
-        foreach ($terms as $term) {
-            $image = get_field('anh_dai_dien', 'chu_de_hotel_' . $term->term_id);
-            $link = get_term_link($term);
-
-            echo '<a href="' . esc_url($link) . '" class="chu-de-item" style="position:relative; flex: 0 0 280px; height:180px; border-radius:12px; overflow:hidden; scroll-snap-align: start; text-decoration:none;">';
-            if ($image) {
-                echo '<img src="' . esc_url($image) . '" style="width:100%; height:100%; object-fit:cover;" />';
-            }
-            echo '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:bold;background:rgba(0,0,0,0.3);text-align:center;">' . esc_html($term->name) . '</div>';
-            echo '</a>';
-        }
-
-        echo '</div>';
-    }
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new Swiper('.chu-de-hotel-carousel', {
+                slidesPerView: 3,
+                spaceBetween: 20,
+                loop: true,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    480: {
+                        slidesPerView: 1,
+                    }
+                }
+            });
+        });
+        </script>
+        <?php
+    endif;
 
     return ob_get_clean();
 }
-add_shortcode('chu_de_hotel', 'hotel_chu_de_hap_dan_shortcode');
+add_shortcode('chu_de_hotel_carousel', 'chu_de_hotel_carousel_shortcode');
