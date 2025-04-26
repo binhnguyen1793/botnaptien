@@ -1,0 +1,81 @@
+function hotel_vungmien_top6_shortcode() {
+    ob_start();
+
+    // Lấy các term vung_mien có nhiều khách sạn nhất
+    $terms = get_terms([
+        'taxonomy' => 'vung_mien',
+        'hide_empty' => false,
+    ]);
+
+    $terms_data = [];
+
+    foreach ($terms as $term) {
+        $query = new WP_Query([
+            'post_type' => 'hotel',
+            'posts_per_page' => -1,
+            'tax_query' => [[
+                'taxonomy' => 'vung_mien',
+                'field' => 'term_id',
+                'terms' => $term->term_id,
+                'include_children' => false,
+            ]]
+        ]);
+        $hotel_count = $query->found_posts;
+        wp_reset_postdata();
+
+        if ($hotel_count > 0) {
+            $terms_data[] = [
+                'term' => $term,
+                'count' => $hotel_count
+            ];
+        }
+    }
+
+    // Sắp xếp giảm dần theo số lượng
+    usort($terms_data, function($a, $b) {
+        return $b['count'] - $a['count'];
+    });
+
+    // Lấy 6 cái đầu tiên
+    $top_terms = array_slice($terms_data, 0, 6);
+
+    if (empty($top_terms)) {
+        return 'Không tìm thấy vùng miền nào.';
+    }
+
+    ?>
+    <div style="max-width:1140px;margin:auto;padding:24px;">
+      <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+        <!-- Bên trái -->
+        <div style="flex:0 0 300px;">
+          <h2 style="margin-top:0;">Điểm đến trong nước nổi bật</h2>
+          <p>Cơ hội đặt phòng khách sạn tại những điểm đến được lựa chọn nhiều nhất. Khám phá ngay!</p>
+          <a href="/khach-san" style="display:inline-block;margin-top:16px;padding:10px 20px;border:1px solid #007bff;border-radius:8px;color:#007bff;text-decoration:none;">Xem khách sạn toàn quốc &raquo;</a>
+        </div>
+
+        <!-- Bên phải -->
+        <div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;">
+          <?php foreach ($top_terms as $item):
+            $term = $item['term'];
+            $hotel_count = $item['count'];
+            $image_url = get_field('thumbnail', 'vung_mien_' . $term->term_id);
+            if (!$image_url) {
+                $image_url = 'https://via.placeholder.com/300x200?text=' . urlencode($term->name);
+            }
+            $link = get_term_link($term);
+          ?>
+            <a href="<?php echo esc_url($link); ?>" style="position:relative;display:block;height:150px;border-radius:12px;overflow:hidden;background:url('<?php echo esc_url($image_url); ?>') center/cover no-repeat;text-decoration:none;color:white;">
+              <div style="background:rgba(0,0,0,0.4);position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                <div style="font-weight:bold;font-size:18px;"><?php echo esc_html($term->name); ?></div>
+                <div style="font-size:14px;"><?php echo esc_html($hotel_count); ?> khách sạn</div>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+    <?php
+
+    return ob_get_clean();
+}
+add_shortcode('hotel_vungmien_top6', 'hotel_vungmien_top6_shortcode');
