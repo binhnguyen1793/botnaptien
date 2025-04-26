@@ -1,17 +1,39 @@
+<select name="diadiem">
+  <option value="">--Chọn địa điểm--</option>
+  <?php
+  $terms = get_terms([
+      'taxonomy' => 'vung_mien',
+      'hide_empty' => false,
+    ]);
+
+  foreach ($terms as $term) {
+      // Tạo slug phân cấp đầy đủ
+      $slug_parts = [];
+      $current = $term;
+      while ($current && $current->parent != 0) {
+          array_unshift($slug_parts, $current->slug);
+          $current = get_term($current->parent, 'vung_mien');
+      }
+      if ($current) {
+          array_unshift($slug_parts, $current->slug);
+      }
+      $full_slug = implode('/', $slug_parts);
+
+      echo '<option value="' . esc_attr($term->slug) . '" data-full-slug="' . esc_attr($full_slug) . '">' . esc_html($term->name) . '</option>';
+  }
+  ?>
+</select>
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('.tour-search-form');
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         const select = form.querySelector('[name="diadiem"]');
         const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
-        const khoihanh = form.querySelector('[name="khoihanh"]').value;
 
         if (slug) {
-            let url = '/travelweb/vung_mien/' + slug;
-            if (khoihanh) {
-                url += '?khoihanh=' + encodeURIComponent(khoihanh);
-            }
-            window.location.href = url;
+            window.location.href = '/travelweb/vung_mien/' + slug + '/';
         }
     });
 });
