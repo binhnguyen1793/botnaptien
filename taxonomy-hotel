@@ -1,205 +1,24 @@
-<?php
-// hotel filter
-function hotel_filter_form_shortcode() {
-    ob_start();
-    ?>
+<script>
+function updateGuest(type, delta) {
+    const countId = type + '-count';
+    const inputId = type + '-input';
+    const el = document.getElementById(countId);
+    let val = parseInt(el.textContent) + delta;
+    if (val < 0) val = 0;
+    el.textContent = val;
+    document.getElementById(inputId).value = val;
 
-    <style>
-    .hotel-search-wrapper {
-        max-width: 1140px;
-        margin-top: -100px;
-        position: relative;
-        z-index: 99;
-    }
-    .hotel-search-form {
-        background: #fff;
-        padding: 24px 32px;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-    .hotel-search-row {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-    .hotel-search-form label {
-        font-weight: 500;
-        font-size: 14px;
-        color: #888;
-        margin-bottom: 4px;
-        display: block;
-    }
-    .hotel-search-form select,
-    .hotel-search-form input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-    }
-    .guest-summary {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    .guest-box {
-        position: absolute;
-        background: white;
-        border: 1px solid #ddd;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        padding: 15px;
-        border-radius: 10px;
-        display: none;
-        top: 100%;
-        width: 260px;
-        margin-top: 5px;
-        z-index: 100;
-    }
-    .guest-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .guest-counter button {
-        background: #eee;
-        border: none;
-        padding: 4px 10px;
-        border-radius: 50%;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .guest-counter span {
-        margin: 0 10px;
-        font-weight: bold;
-    }
-    .search-button button {
-        padding: 12px 24px;
-        background-color: #e1703a;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    </style>
-
-    <div class="hotel-search-wrapper">
-    <form action="" method="get" class="hotel-search-form" onsubmit="return redirectToLocation(event)">
-
-        <!-- Địa điểm -->
-        <div>
-            <label>ĐỊA ĐIỂM</label>
-            <select name="location" id="location-select">
-                <option value="">Chọn tỉnh/thành</option>
-                <?php
-                $terms = get_terms([
-                    'taxonomy' => 'vung_mien_hotel',
-                    'hide_empty' => false,
-                ]);
-                foreach ($terms as $term) {
-                    $parent = get_term($term->parent, 'vung_mien_hotel');
-                    $grandparent = $parent ? get_term($parent->parent, 'vung_mien_hotel') : null;
-                    if ($grandparent) {
-                        echo '<option value="' . esc_attr($term->slug) . '">' . esc_html($term->name) . '</option>';
-                    }
-                }
-                ?>
-            </select>
-        </div>
-
-        <!-- Hàng dưới: ngày + khách + nút -->
-        <div class="hotel-search-row">
-            <!-- Nhận phòng -->
-            <div style="flex: 1; min-width: 200px;">
-                <label>NHẬN PHÒNG</label>
-                <input type="date" name="checkin">
-            </div>
-
-            <!-- Trả phòng -->
-            <div style="flex: 1; min-width: 200px;">
-                <label>TRẢ PHÒNG</label>
-                <input type="date" name="checkout">
-            </div>
-
-            <!-- Hành khách -->
-            <div style="flex: 1; min-width: 200px; position: relative;">
-                <label>HÀNH KHÁCH</label>
-                <div class="guest-summary" onclick="document.getElementById('guest-box').style.display = (document.getElementById('guest-box').style.display === 'block' ? 'none' : 'block')">
-                    <span id="guest-summary-text">2 khách</span>
-                </div>
-                <div class="guest-box" id="guest-box">
-                    <div class="guest-row">
-                        <span>Người lớn</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('adult', -1)">-</button>
-                            <span id="adult-count">2</span>
-                            <button type="button" onclick="updateGuest('adult', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="guest-row">
-                        <span>Trẻ em</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('child', -1)">-</button>
-                            <span id="child-count">0</span>
-                            <button type="button" onclick="updateGuest('child', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="guest-row">
-                        <span>Em bé</span>
-                        <div class="guest-counter">
-                            <button type="button" onclick="updateGuest('baby', -1)">-</button>
-                            <span id="baby-count">0</span>
-                            <button type="button" onclick="updateGuest('baby', 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-                <input type="hidden" name="adult" id="adult-input" value="2">
-                <input type="hidden" name="child" id="child-input" value="0">
-                <input type="hidden" name="baby" id="baby-input" value="0">
-            </div>
-
-            <!-- Nút tìm -->
-            <div class="search-button" style="flex: 0 0 auto;">
-                <button type="submit">Tìm ngay</button>
-            </div>
-        </div>
-
-    </form>
-    </div>
-
-    <script>
-    function updateGuest(type, delta) {
-        const countId = type + '-count';
-        const inputId = type + '-input';
-        const el = document.getElementById(countId);
-        let val = parseInt(el.textContent) + delta;
-        if (val < 0) val = 0;
-        el.textContent = val;
-        document.getElementById(inputId).value = val;
-
-        const total = parseInt(document.getElementById('adult-count').textContent) +
-                      parseInt(document.getElementById('child-count').textContent);
-        document.getElementById('guest-summary-text').textContent = total + ' khách';
-    }
-
-    function redirectToLocation(event) {
-        event.preventDefault();
-        const select = document.getElementById('location-select');
-        const slug = select.value;
-        if (slug) {
-            window.location.href = '/vung_mien_hotel/' + slug + '/';
-        } else {
-            alert('Vui lòng chọn địa điểm');
-        }
-        return false;
-    }
-    </script>
-
-    <?php
-    return ob_get_clean();
+    const total = parseInt(document.getElementById('adult-count').textContent) +
+                  parseInt(document.getElementById('child-count').textContent);
+    document.getElementById('guest-summary-text').textContent = total + ' khách';
 }
-add_shortcode('hotel_filter_form', 'hotel_filter_form_shortcode');
+
+function redirectToHotelTaxonomy() {
+    const location = document.querySelector('select[name="location"]').value;
+    if (location) {
+        window.location.href = '/travelweb/vung_mien_hotel/' + location + '/';
+        return false; // ngăn form gửi đi mặc định
+    }
+    return true;
+}
+</script>
