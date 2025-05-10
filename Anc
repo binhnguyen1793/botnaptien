@@ -1,2 +1,18 @@
-define('WP_HOME', 'https://committee-begins-brook-member.trycloudflare.com/dashboard');
-define('WP_SITEURL', 'https://committee-begins-brook-member.trycloudflare.com/dashboard');
+<?php if (function_exists('bcn_display')) { ?>
+  <nav class="breadcrumb">
+    <?php bcn_display(); ?>
+  </nav>
+<?php } ?>
+
+
+.breadcrumb {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+.breadcrumb a {
+  color: #555;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
