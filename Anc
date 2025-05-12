@@ -2,77 +2,125 @@ function form_thanh_toan_shortcode() {
     ob_start();
     $gia_tour = isset($_GET['price']) ? intval($_GET['price']) : 0;
     ?>
-    <form id="payment-form" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:800px;margin:auto">
+    <style>
+    .form-tour-wrapper {
+        max-width: 800px;
+        margin: auto;
+        font-family: Arial, sans-serif;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    .form-grid label {
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+    }
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+    .form-grid textarea {
+        resize: vertical;
+    }
+    .form-grid .full-row {
+        grid-column: 1 / -1;
+    }
+    .form-submit {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .form-submit button {
+        padding: 12px 40px;
+        background: #660000;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    </style>
 
-        <p style="grid-column:1/-1;font-weight:bold;">Giá tour: 
-            <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong>
-        </p>
+    <div class="form-tour-wrapper">
+        <form id="payment-form">
+            <div class="form-grid">
+                <p class="full-row" style="font-weight:bold;">
+                    Giá tour: <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong>
+                </p>
 
-        <label>Ngày khởi hành:
-            <input type="date" name="ngay_khoi_hanh" style="width:100%;padding:10px">
-        </label>
+                <label>Ngày khởi hành:
+                    <input type="date" name="ngay_khoi_hanh">
+                </label>
 
-        <label>Điểm khởi hành:
-            <select name="diem_khoi_hanh" style="width:100%;padding:10px">
-                <option value="Hà Nội">Hà Nội</option>
-                <option value="TP HCM">TP HCM</option>
-                <option value="Đà Nẵng">Đà Nẵng</option>
-            </select>
-        </label>
+                <label>Điểm khởi hành:
+                    <select name="diem_khoi_hanh">
+                        <option value="Hà Nội">Hà Nội</option>
+                        <option value="TP HCM">TP HCM</option>
+                        <option value="Đà Nẵng">Đà Nẵng</option>
+                    </select>
+                </label>
 
-        <label>Người lớn:
-            <select name="nguoi_lon" style="width:100%;padding:10px">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-            </select>
-        </label>
+                <label>Người lớn:
+                    <select name="nguoi_lon">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </label>
 
-        <label>Trẻ em (2-12):
-            <select name="tre_em" style="width:100%;padding:10px">
-                <option value="0">0</option>
-                <option value="1">1</option>
-            </select>
-        </label>
+                <label>Trẻ em (2-12):
+                    <select name="tre_em">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                    </select>
+                </label>
 
-        <label>Em bé (<2):
-            <select name="em_be" style="width:100%;padding:10px">
-                <option value="0">0</option>
-                <option value="1">1</option>
-            </select>
-        </label>
+                <label>Em bé (<2):
+                    <select name="em_be">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                    </select>
+                </label>
 
-        <label>Quý danh:
-            <select name="quy_danh" style="width:100%;padding:10px">
-                <option value="Ông">Ông</option>
-                <option value="Bà">Bà</option>
-            </select>
-        </label>
+                <label>Quý danh:
+                    <select name="quy_danh">
+                        <option value="Ông">Ông</option>
+                        <option value="Bà">Bà</option>
+                    </select>
+                </label>
 
-        <label>Họ tên: (*) 
-            <input type="text" id="user-name" placeholder="Họ tên của bạn" required style="width:100%;padding:10px">
-        </label>
+                <label>Họ tên: (*) 
+                    <input type="text" id="user-name" placeholder="Họ tên của bạn" required>
+                </label>
 
-        <label>Email: (*) 
-            <input type="email" id="user-email" placeholder="Email" required style="width:100%;padding:10px">
-        </label>
+                <label>Email: (*) 
+                    <input type="email" id="user-email" placeholder="Email" required>
+                </label>
 
-        <label>Số điện thoại:
-            <input type="tel" id="sdt" placeholder="SĐT" style="width:100%;padding:10px">
-        </label>
+                <label>Số điện thoại:
+                    <input type="tel" id="sdt" placeholder="SĐT">
+                </label>
 
-        <label style="grid-column:1/-1;">Yêu cầu đặc biệt:
-            <textarea name="yeu_cau_dac_biet" rows="3" style="width:100%;padding:10px"></textarea>
-        </label>
+                <label class="full-row">Yêu cầu đặc biệt:
+                    <textarea name="yeu_cau_dac_biet" rows="3"></textarea>
+                </label>
 
-        <div id="qr-popup" style="grid-column:1/-1;text-align:center;margin-top:20px;"></div>
+                <div id="qr-popup" class="full-row" style="text-align:center;"></div>
+            </div>
 
-        <div style="grid-column:1/-1;text-align:center;margin-top:20px;">
-            <button type="button" onclick="submitPayment()" style="padding:12px 40px;background:#660000;color:#fff;border:none;border-radius:6px;font-size:16px;">
-                Xác nhận thanh toán
-            </button>
-        </div>
-    </form>
+            <div class="form-submit">
+                <button type="button" onclick="submitPayment()">Xác nhận thanh toán</button>
+            </div>
+        </form>
+    </div>
 
     <script>
     function submitPayment() {
