@@ -1,37 +1,55 @@
-@media (max-width: 768px) {
-  .top-banner {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+<form class="custom-payment-form">
+  <label>Ngày khởi hành:
+    <input type="date" name="ngay_khoi_hanh" required>
+  </label>
 
-  .banner-left {
-    flex-direction: column;
-    align-items: center;
-    margin-right: 0;
-    margin-bottom: 15px;
-  }
+  <label>Điểm khởi hành:
+    <select name="diem_khoi_hanh">
+      <option value="Hà Nội">Hà Nội</option>
+      <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+      <option value="Đà Nẵng">Đà Nẵng</option>
+    </select>
+  </label>
 
-  .banner-text {
-    text-align: center;
-  }
+  <label>Người lớn:
+    <select name="nguoi_lon">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <!-- ... -->
+    </select>
+  </label>
 
-  .vertical-divider {
-    display: none;
-  }
+  <label>Trẻ em (2-12):
+    <select name="tre_em">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <!-- ... -->
+    </select>
+  </label>
 
-  .banner-icons {
-    display: flex;
-    flex-direction: row; /* GIỮ NGANG */
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  <label>Em bé (<2):
+    <select name="em_be">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <!-- ... -->
+    </select>
+  </label>
 
-  .icon-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90px;
-  }
-}
+  <label>Quý danh:
+    <select name="quy_danh">
+      <option value="Ông">Ông</option>
+      <option value="Bà">Bà</option>
+    </select>
+  </label>
+
+  <label>Họ tên: (*) <input type="text" name="ho_ten" required></label>
+  <label>Email: (*) <input type="email" name="email" required></label>
+  <label>Số điện thoại: <input type="tel" name="so_dien_thoai"></label>
+
+  <label>Yêu cầu đặc biệt:
+    <textarea name="yeu_cau_dac_biet" rows="3"></textarea>
+  </label>
+
+  <button type="submit">Gửi yêu cầu</button>
+</form>
