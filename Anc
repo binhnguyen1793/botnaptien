@@ -1,65 +1,115 @@
-<h2 style="margin-top:0">Xác nhận thanh toán</h2>
-<p>Giá tour: <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong></p>
+function form_thanh_toan_shortcode() {
+    ob_start();
+    $gia_tour = isset($_GET['price']) ? intval($_GET['price']) : 0;
+    ?>
+    <form id="payment-form" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:800px;margin:auto">
 
-<label>Ngày khởi hành:
-  <input type="date" name="ngay_khoi_hanh" style="width:100%;margin-bottom:10px;padding:10px">
-</label>
+        <p style="grid-column:1/-1;font-weight:bold;">Giá tour: 
+            <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong>
+        </p>
 
-<label>Điểm khởi hành:
-  <select name="diem_khoi_hanh" style="width:100%;margin-bottom:10px;padding:10px">
-    <option value="Hà Nội">Hà Nội</option>
-    <option value="TP HCM">TP HCM</option>
-    <option value="Đà Nẵng">Đà Nẵng</option>
-  </select>
-</label>
+        <label>Ngày khởi hành:
+            <input type="date" name="ngay_khoi_hanh" style="width:100%;padding:10px">
+        </label>
 
-<label>Người lớn:
-  <select name="nguoi_lon" style="width:100%;margin-bottom:10px;padding:10px">
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-  </select>
-</label>
+        <label>Điểm khởi hành:
+            <select name="diem_khoi_hanh" style="width:100%;padding:10px">
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="TP HCM">TP HCM</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+            </select>
+        </label>
 
-<label>Trẻ em (2-12):
-  <select name="tre_em" style="width:100%;margin-bottom:10px;padding:10px">
-    <option value="0">0</option>
-    <option value="1">1</option>
-  </select>
-</label>
+        <label>Người lớn:
+            <select name="nguoi_lon" style="width:100%;padding:10px">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </label>
 
-<label>Em bé (<2):
-  <select name="em_be" style="width:100%;margin-bottom:10px;padding:10px">
-    <option value="0">0</option>
-    <option value="1">1</option>
-  </select>
-</label>
+        <label>Trẻ em (2-12):
+            <select name="tre_em" style="width:100%;padding:10px">
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
+        </label>
 
-<label>Quý danh:
-  <select name="quy_danh" style="width:100%;margin-bottom:10px;padding:10px">
-    <option value="Ông">Ông</option>
-    <option value="Bà">Bà</option>
-  </select>
-</label>
+        <label>Em bé (<2):
+            <select name="em_be" style="width:100%;padding:10px">
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
+        </label>
 
-<label>Họ tên: (*)
-  <input type="text" name="user-name" id="user-name" placeholder="Họ tên của bạn" required style="width:100%;margin-bottom:10px;padding:10px">
-</label>
+        <label>Quý danh:
+            <select name="quy_danh" style="width:100%;padding:10px">
+                <option value="Ông">Ông</option>
+                <option value="Bà">Bà</option>
+            </select>
+        </label>
 
-<label>Email: (*)
-  <input type="email" name="user-email" id="user-email" placeholder="Email" required style="width:100%;margin-bottom:10px;padding:10px">
-</label>
+        <label>Họ tên: (*) 
+            <input type="text" id="user-name" placeholder="Họ tên của bạn" required style="width:100%;padding:10px">
+        </label>
 
-<label>Số điện thoại:
-  <input type="tel" name="sdt" id="sdt" placeholder="SĐT" style="width:100%;margin-bottom:10px;padding:10px">
-</label>
+        <label>Email: (*) 
+            <input type="email" id="user-email" placeholder="Email" required style="width:100%;padding:10px">
+        </label>
 
-<div id="qr-popup" style="margin-top:20px;"></div>
+        <label>Số điện thoại:
+            <input type="tel" id="sdt" placeholder="SĐT" style="width:100%;padding:10px">
+        </label>
 
-<label>Yêu cầu đặc biệt:
-  <textarea name="yeu_cau_dac_biet" rows="3" style="width:100%;margin-bottom:10px;padding:10px"></textarea>
-</label>
+        <label style="grid-column:1/-1;">Yêu cầu đặc biệt:
+            <textarea name="yeu_cau_dac_biet" rows="3" style="width:100%;padding:10px"></textarea>
+        </label>
 
-<button onclick="submitPayment()" style="padding:10px 24px;background:#e1703a;color:#fff;border:none;border-radius:6px;">
-  Xác nhận thanh toán
-</button>
+        <div id="qr-popup" style="grid-column:1/-1;text-align:center;margin-top:20px;"></div>
+
+        <div style="grid-column:1/-1;text-align:center;margin-top:20px;">
+            <button type="button" onclick="submitPayment()" style="padding:12px 40px;background:#660000;color:#fff;border:none;border-radius:6px;font-size:16px;">
+                Xác nhận thanh toán
+            </button>
+        </div>
+    </form>
+
+    <script>
+    function submitPayment() {
+      const name = document.getElementById('user-name').value.trim();
+      const email = document.getElementById('user-email').value.trim();
+      const amount = <?= $gia_tour ?>;
+
+      if (!name || !email || amount === 0) {
+        alert('Vui lòng nhập đủ Họ tên và Email hợp lệ.');
+        return;
+      }
+
+      const formData = new URLSearchParams();
+      formData.append('price', amount);
+
+      fetch("https://mill-moses-cpu-allowance.trycloudflare.com/run-bot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData.toString()
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Không lấy được ảnh QR");
+        return res.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        document.getElementById("qr-popup").innerHTML = `<img src="${url}" style="max-width:300px;">`;
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Lỗi khi gọi bot.");
+      });
+    }
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('form_thanh_toan', 'form_thanh_toan_shortcode');
