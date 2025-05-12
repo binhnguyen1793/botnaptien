@@ -1,55 +1,65 @@
-<form class="custom-payment-form">
-  <label>Ngày khởi hành:
-    <input type="date" name="ngay_khoi_hanh" required>
-  </label>
+<h2 style="margin-top:0">Xác nhận thanh toán</h2>
+<p>Giá tour: <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong></p>
 
-  <label>Điểm khởi hành:
-    <select name="diem_khoi_hanh">
-      <option value="Hà Nội">Hà Nội</option>
-      <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-      <option value="Đà Nẵng">Đà Nẵng</option>
-    </select>
-  </label>
+<label>Ngày khởi hành:
+  <input type="date" name="ngay_khoi_hanh" style="width:100%;margin-bottom:10px;padding:10px">
+</label>
 
-  <label>Người lớn:
-    <select name="nguoi_lon">
-      <option value="0">0</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <!-- ... -->
-    </select>
-  </label>
+<label>Điểm khởi hành:
+  <select name="diem_khoi_hanh" style="width:100%;margin-bottom:10px;padding:10px">
+    <option value="Hà Nội">Hà Nội</option>
+    <option value="TP HCM">TP HCM</option>
+    <option value="Đà Nẵng">Đà Nẵng</option>
+  </select>
+</label>
 
-  <label>Trẻ em (2-12):
-    <select name="tre_em">
-      <option value="0">0</option>
-      <option value="1">1</option>
-      <!-- ... -->
-    </select>
-  </label>
+<label>Người lớn:
+  <select name="nguoi_lon" style="width:100%;margin-bottom:10px;padding:10px">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+  </select>
+</label>
 
-  <label>Em bé (<2):
-    <select name="em_be">
-      <option value="0">0</option>
-      <option value="1">1</option>
-      <!-- ... -->
-    </select>
-  </label>
+<label>Trẻ em (2-12):
+  <select name="tre_em" style="width:100%;margin-bottom:10px;padding:10px">
+    <option value="0">0</option>
+    <option value="1">1</option>
+  </select>
+</label>
 
-  <label>Quý danh:
-    <select name="quy_danh">
-      <option value="Ông">Ông</option>
-      <option value="Bà">Bà</option>
-    </select>
-  </label>
+<label>Em bé (<2):
+  <select name="em_be" style="width:100%;margin-bottom:10px;padding:10px">
+    <option value="0">0</option>
+    <option value="1">1</option>
+  </select>
+</label>
 
-  <label>Họ tên: (*) <input type="text" name="ho_ten" required></label>
-  <label>Email: (*) <input type="email" name="email" required></label>
-  <label>Số điện thoại: <input type="tel" name="so_dien_thoai"></label>
+<label>Quý danh:
+  <select name="quy_danh" style="width:100%;margin-bottom:10px;padding:10px">
+    <option value="Ông">Ông</option>
+    <option value="Bà">Bà</option>
+  </select>
+</label>
 
-  <label>Yêu cầu đặc biệt:
-    <textarea name="yeu_cau_dac_biet" rows="3"></textarea>
-  </label>
+<label>Họ tên: (*)
+  <input type="text" name="user-name" id="user-name" placeholder="Họ tên của bạn" required style="width:100%;margin-bottom:10px;padding:10px">
+</label>
 
-  <button type="submit">Gửi yêu cầu</button>
-</form>
+<label>Email: (*)
+  <input type="email" name="user-email" id="user-email" placeholder="Email" required style="width:100%;margin-bottom:10px;padding:10px">
+</label>
+
+<label>Số điện thoại:
+  <input type="tel" name="sdt" id="sdt" placeholder="SĐT" style="width:100%;margin-bottom:10px;padding:10px">
+</label>
+
+<div id="qr-popup" style="margin-top:20px;"></div>
+
+<label>Yêu cầu đặc biệt:
+  <textarea name="yeu_cau_dac_biet" rows="3" style="width:100%;margin-bottom:10px;padding:10px"></textarea>
+</label>
+
+<button onclick="submitPayment()" style="padding:10px 24px;background:#e1703a;color:#fff;border:none;border-radius:6px;">
+  Xác nhận thanh toán
+</button>
