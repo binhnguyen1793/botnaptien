@@ -1,29 +1,173 @@
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const buttons = document.querySelectorAll(".tour-request-btn");
-  buttons.forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      const price = btn.getAttribute("data-price");
+import requests
+from bs4 import BeautifulSoup
+from openpyxl import Workbook
 
-      fetch("http://localhost:3000/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ price: price })
-      })
-      .then(response => {
-        if (response.ok) {
-          alert("Yêu cầu thanh toán đã gửi thành công!");
-        } else {
-          alert("Gửi thất bại, thử lại sau.");
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("Không thể kết nối đến server.");
-      });
-    });
-  });
-});
-</script>
+# Danh sách link bài viết
+list_links = [
+    "https://www.bestprice.vn/tour/ha-noi-thai-lan-5n4d-bangkok-pattaya-ks-5-buffet-86-tang-massage-thai-339.html",
+    "https://www.bestprice.vn/tour/du-ngoan-thanh-do-cuu-trai-cau-6-ngay-5-dem-1996.html",
+    "https://www.bestprice.vn/tour/ha-noi-busan-daegu-seoul-nami-1664.html",
+    "https://www.bestprice.vn/tour/kham-pha-han-quoc-5n5d-busan-daegu-seoul-1521.html",
+    "https://www.bestprice.vn/tour/ho-chi-minh-thuong-hai-bac-kinh-hang-chau-to-chau-7n6d-120.html",
+    "https://www.bestprice.vn/tour/ho-chi-minh-bangkok-pattaya-cong-vien-khung-long-nongnooch-5n4d-1056.html",
+    "https://www.bestprice.vn/tour/ha-noi-bangkok-pattaya-5n4d-1042.html",
+    "https://www.bestprice.vn/tour/ha-noi-singapore-malaysia-5n4d-mot-hanh-trinh-hai-quoc-gia-1055.html",
+    "https://www.bestprice.vn/tour/tour-singapore-malaysia-5n4d-khoi-hanh-tu-ho-chi-minh-1228.html",
+    "https://www.bestprice.vn/tour/uc-5n4d-sydney-central-coast-607.html",
+    "https://www.bestprice.vn/tour/du-lich-australia-sydney-melbourne-7n6d-khoi-hanh-tu-hcm-1232.html",
+    "https://www.bestprice.vn/tour/tour-thai-lan-5n4d-bangkok-pattaya-vuon-nhiet-doi-nong-nooch-1745.html",
+    "https://www.bestprice.vn/tour/tour-thai-lan-tu-da-nang-bangkok-pattaya-4n3d-1790.html",
+    "https://www.bestprice.vn/tour/tour-han-quoc-seoul-dao-nami-everland-5n4d-1220.html",
+    "https://www.bestprice.vn/tour/tour-du-lich-han-quoc-bay-asiana-airlines-tu-ha-noi-1767.html",
+    "https://www.bestprice.vn/tour/tour-uc-ha-noi-melbourne-canberra-sydney-7n6d-1212.html",
+    "https://www.bestprice.vn/tour/du-lich-han-quoc-5n4d-ha-noi-seoul-dao-nami-1277.html",
+    "https://www.bestprice.vn/tour/tour-uc-tet-sydney-melbourne-1217.html",
+    "https://www.bestprice.vn/tour/tour-bac-kinh-thuong-hai-bay-china-airlines-1736.html",
+    "https://www.bestprice.vn/tour/tour-han-quoc-tu-da-nang-1763.html",
+    "https://www.bestprice.vn/tour/tour-thuong-hai-hang-chau-to-chau-601.html",
+    "https://www.bestprice.vn/tour/tour-han-quoc-5n4d-khoi-hanh-tu-hai-phong-1751.html",
+    "https://www.bestprice.vn/tour/tour-du-lich-uc-8-ngay-7-dem-1741.html",
+    "https://www.bestprice.vn/tour/tour-hai-phong-busan-daegu-seoul-nami-1752.html",
+    "https://www.bestprice.vn/tour/ha-noi-sydney-melbourne-7n6d-1188.html",
+    "https://www.bestprice.vn/tour/ha-noi-busan-daegu-seoul-dao-nami-6n5d-bay-vietnam-airlines-1792.html",
+    "https://www.bestprice.vn/tour/ho-chi-minh-sydney-5n4d-1107.html",
+    "https://www.bestprice.vn/tour/tour-new-zeland-7n6d-auckland-taupo-hamilton-1238.html",
+    "https://www.bestprice.vn/tour/uc-6n5d-melbourne-sydney-central-coast-608.html",
+    "https://www.bestprice.vn/tour/dich-vu-lam-visa-han-quoc-1615.html",
+    "https://www.bestprice.vn/tour/ha-noi-han-quoc-dao-jeju-5n4d-kham-pha-hon-dao-ngoc-giua-bien-1069.html",
+    "https://www.bestprice.vn/tour/tour-uc-30-thang-4-hcm-melbourne-sydney-7n6d-1522.html",
+    "https://www.bestprice.vn/tour/uc-6n5d-ha-noi-sydney-melbourne-628.html",
+    "https://www.bestprice.vn/tour/du-lich-2-thang-9-seoul-nami-everland-khoi-hanh-tu-ha-noi-1657.html",
+    "https://www.bestprice.vn/tour/du-lich-han-quoc-30-thang-4-hcm-seoul-nami-everland-5n4d-1543.html",
+    "https://www.bestprice.vn/tour/ha-noi-seoul-nami-everland-cau-kinh-skywalk-5n4d-bay-hang-khong-bamboo-airways-1156.html",
+    "https://www.bestprice.vn/tour/ha-noi-seoul-dao-jeju-nami-cong-vien-everland-6n5d-bay-asiana-airlines-5-402.html",
+    "https://www.bestprice.vn/tour/tour-trung-quoc-tet-2025-giang-nam-5n4d-thuong-hai-hang-chau-o-tran-1756.html",
+    "https://www.bestprice.vn/tour/ho-chi-minh-han-quoc-seoul-nami-everland-5n4d-bay-hang-khong-vietjet-air-1071.html",
+    "https://www.bestprice.vn/tour/tour-cap-nhi-tan-tu-ha-noi-1784.html",
+
+    # thêm link tại đây
+]
+
+wb = Workbook()
+ws = wb.active
+ws.append([
+    "ID","Tiêu đề", "Review 1", "Review 2", "Review 3",
+    "Giá gốc", "Giá khuyến mãi", "Giới thiệu", "Điểm nổi bật", "Lịch trình",
+    "Bao gồm", "Không bao gồm", "Giới thiệu chi tiết", "Thông tin thêm",
+    "Quy định hủy", "Quy định em bé", "Lưu ý", "Thời gian", "Khởi hành", 
+    "Lộ trình","Ảnh đầu tiên", "Bảng giá"
+])
+
+def get_post_info(url):
+    try:
+        response = requests.get(url, timeout=10)
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        
+        # Tiêu đề
+        post_id = url.rstrip("/").split("/")[-1]
+        title = ""
+        title_candidates = soup.find_all("h1")
+        for h in title_candidates:
+            if "mktnd_txt_productname" in h.get("class", []):
+                title = h.get_text(strip=True)
+                break
+        if not title:
+            title = "Không có tiêu đề"
+
+
+        # Ảnh đại diện 
+        # Ảnh đại diện
+        image_url = ""
+        img_tag = soup.select_one(".gallery-top .swiper-slide img")
+        if img_tag and img_tag.get("src"):
+            image_url = img_tag["src"]
+
+
+        # Review
+        review_block = soup.select_one(".mktnd_txt_score_review")
+        review1 = review_block.get_text(strip=True) if review_block else ""
+        review2 = soup.select_one(".text-excellent")
+        review2 = review2.get_text(strip=True) if review2 else ""
+        review3 = soup.select_one(".mktnd_txt_total_review strong")
+        review3 = review3.get_text(strip=True) + " đánh giá" if review3 else ""
+
+        # Giá
+        price_origin = soup.select_one(".price-origin span")
+        original_price = price_origin.get_text(strip=True) if price_origin else ""
+        price_sale = soup.select_one(".price-from span")
+        sale_price = price_sale.get_text(strip=True) if price_sale else ""
+
+        # Giới thiệu
+        intro = ""
+        intro_div = soup.select_one(".read-content-side")
+        if intro_div:
+            intro = intro_div.get_text(strip=True)
+
+        # Điểm nổi bật
+        highlights = "; ".join(li.get_text(strip=True) for li in soup.select(".list-highlight li"))
+
+        # Lịch trình
+        itinerary_text = ""
+        for block in soup.select(".itinerary-box"):
+            day_title = block.select_one(".iti-day-title")
+            day_content = block.select_one(".itinerary-content")
+            if day_title and day_content:
+                itinerary_text += f"{day_title.get_text(strip=True)} | {day_content.get_text(strip=True)}\n"
+
+
+        # Bao gồm / Không bao gồm
+        includes = "\n".join(li.get_text(strip=True) for li in soup.select("#service_inclusion li"))
+        excludes = "\n".join(li.get_text(strip=True) for li in soup.select("#service_exclusion li"))
+
+        # Giới thiệu chi tiết
+        detail_block = soup.select_one("#h_tour_highlight + p")
+        detail_1 = detail_block.get_text(strip=True) if detail_block else ""
+
+        # Thông tin thêm, hủy, em bé, lưu ý
+        detail_2 = soup.select_one("#service_inclusion + .content")
+        cancel_policy = soup.select_one(".cancellation-box .collapse")
+        baby_policy = soup.select_one(".icon-child + td")
+        notes_block = soup.select_one("#important_info")
+        detail_2 = detail_2.get_text(strip=True) if detail_2 else ""
+        cancel_policy = cancel_policy.get_text(strip=True) if cancel_policy else ""
+        baby_policy = baby_policy.get_text(strip=True) if baby_policy else ""
+        notes = notes_block.get_text(strip=True) if notes_block else ""
+
+        # Thời gian, Khởi hành, Lộ trình
+        duration = soup.select_one(".mktnd_txt_duration")
+        departure = soup.select_one(".mktnd_txt_departure_date")
+        journey = soup.select_one(".mktnd_txt_journey")
+        duration = duration.get_text(strip=True) if duration else ""
+        departure_date = departure.get_text(strip=True) if departure else ""
+        journey = journey.get_text(strip=True) if journey else ""
+        
+        # Bảng ngày & giá (tr.tb-desktop)
+        departures = []
+        rows = soup.select("tr.tb-desktop")
+        for row in rows:
+            date_td = row.select_one("td.text-center")
+            price_span = row.select_one("span.price-from span")
+            date_text = date_td.get_text(strip=True) if date_td else ""
+            price_text = price_span.get_text(strip=True) if price_span else ""
+            if date_text or price_text:
+                departures.append(f"{date_text} | {price_text}")
+        departure_schedule = "\n".join(departures) if departures else "Không có bảng khởi hành & giá"
+
+        return (
+            post_id,title, review1, review2, review3,
+            original_price, sale_price, intro, highlights,
+            itinerary_text.strip(), includes, excludes,
+            detail_1, detail_2, cancel_policy, baby_policy, notes,
+            duration, departure_date, journey, image_url,departure_schedule
+        )
+    except Exception as e:
+        return ("Lỗi", str(e)) + ("",) * 18
+
+# Lặp qua các link
+for link in list_links:
+    result = get_post_info(link)
+    ws.append([str(i) if i is not None else "" for i in result])
+
+# Lưu file
+wb.save("C:/Users/Admin/Desktop/bai_viet_bestprice.xlsx")
