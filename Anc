@@ -47,21 +47,33 @@ function form_thanh_toan_shortcode() {
         font-size: 16px;
         cursor: pointer;
     }
+    .highlight-option {
+        background: #fff8e1;
+        padding: 10px;
+        border: 2px solid #ffa000;
+        border-radius: 6px;
+    }
+    .price-display {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+        color: #333;
+    }
     </style>
 
     <div class="form-tour-wrapper">
         <form id="payment-form">
             <div class="form-grid">
-                <p class="full-row" style="font-weight:bold;">
-                    Giá tour: <strong><?= number_format($gia_tour, 0, ',', '.') ?> đ</strong>
+                <p class="full-row price-display">
+                    Tổng giá tour: <span id="final-price"><?= number_format($gia_tour, 0, ',', '.') ?> đ</span>
                 </p>
 
                 <label>Ngày khởi hành:
-                    <input type="date" name="ngay_khoi_hanh">
+                    <input type="date" name="ngay_khoi_hanh" onchange="updatePrice()">
                 </label>
 
                 <label>Điểm khởi hành:
-                    <select name="diem_khoi_hanh">
+                    <select name="diem_khoi_hanh" onchange="updatePrice()">
                         <option value="Hà Nội">Hà Nội</option>
                         <option value="TP HCM">TP HCM</option>
                         <option value="Đà Nẵng">Đà Nẵng</option>
@@ -69,7 +81,7 @@ function form_thanh_toan_shortcode() {
                 </label>
 
                 <label>Người lớn:
-                    <select name="nguoi_lon">
+                    <select name="nguoi_lon" id="nguoi_lon" onchange="updatePrice()">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -77,16 +89,18 @@ function form_thanh_toan_shortcode() {
                 </label>
 
                 <label>Trẻ em (2-12):
-                    <select name="tre_em">
+                    <select name="tre_em" id="tre_em" onchange="updatePrice()">
                         <option value="0">0</option>
                         <option value="1">1</option>
+                        <option value="2">2</option>
                     </select>
                 </label>
 
                 <label>Em bé (<2):
-                    <select name="em_be">
+                    <select name="em_be" id="em_be" onchange="updatePrice()">
                         <option value="0">0</option>
                         <option value="1">1</option>
+                        <option value="2">2</option>
                     </select>
                 </label>
 
@@ -97,16 +111,25 @@ function form_thanh_toan_shortcode() {
                     </select>
                 </label>
 
-                <label>Họ tên: (*) 
+                <label>Họ tên: (*)
                     <input type="text" id="user-name" placeholder="Họ tên của bạn" required>
                 </label>
 
-                <label>Email: (*) 
+                <label>Email: (*)
                     <input type="email" id="user-email" placeholder="Email" required>
                 </label>
 
                 <label>Số điện thoại:
                     <input type="tel" id="sdt" placeholder="SĐT">
+                </label>
+
+                <label class="full-row highlight-option">
+                    Hình thức thanh toán:
+                    <select id="payment_type" onchange="updatePrice()" style="margin-top: 5px; padding: 10px;">
+                        <option value="100">Thanh toán 100% (giảm 15%)</option>
+                        <option value="50">Thanh toán 50% (giảm 5%)</option>
+                        <option value="0">Chưa chọn</option>
+                    </select>
                 </label>
 
                 <label class="full-row">Yêu cầu đặc biệt:
@@ -123,18 +146,40 @@ function form_thanh_toan_shortcode() {
     </div>
 
     <script>
+    let basePrice = <?= $gia_tour ?>;
+    let calculatedAmount = basePrice;
+
+    function updatePrice() {
+        const nguoiLon = parseInt(document.getElementById('nguoi_lon').value || 0);
+        const treEm = parseInt(document.getElementById('tre_em').value || 0);
+        const emBe = parseInt(document.getElementById('em_be').value || 0);
+        const paymentType = parseInt(document.getElementById('payment_type').value || 0);
+
+        let total = (nguoiLon * basePrice) + (treEm * basePrice * 0.5); // Em bé miễn phí
+
+        // Giảm giá theo hình thức thanh toán
+        if (paymentType === 50) {
+            total *= 0.95;
+        } else if (paymentType === 100) {
+            total *= 0.85;
+        }
+
+        calculatedAmount = Math.round(total); // làm tròn cho đẹp
+
+        document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
+    }
+
     function submitPayment() {
       const name = document.getElementById('user-name').value.trim();
       const email = document.getElementById('user-email').value.trim();
-      const amount = <?= $gia_tour ?>;
 
-      if (!name || !email || amount === 0) {
-        alert('Vui lòng nhập đủ Họ tên và Email hợp lệ.');
+      if (!name || !email || calculatedAmount === 0) {
+        alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
         return;
       }
 
       const formData = new URLSearchParams();
-      formData.append('price', amount);
+      formData.append('price', calculatedAmount);
 
       fetch("https://mill-moses-cpu-allowance.trycloudflare.com/run-bot", {
         method: "POST",
@@ -156,6 +201,9 @@ function form_thanh_toan_shortcode() {
         alert("Lỗi khi gọi bot.");
       });
     }
+
+    // Tự tính giá lần đầu khi trang load
+    document.addEventListener("DOMContentLoaded", updatePrice);
     </script>
     <?php
     return ob_get_clean();
