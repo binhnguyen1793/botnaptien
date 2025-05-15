@@ -1,16 +1,18 @@
 <?php if (have_rows('bang_gia')): ?>
-<section id="bang-gia-tour" class="tour-price-tabs">
+<section id="bang-gia-tour">
   <h2>📅 Bảng giá tour</h2>
 
   <?php
-    // Lấy các tháng có trong bảng
+    // Lấy danh sách tháng
     $months = [];
-    while (have_rows('bang_gia')): the_row();
-      $ngay = get_sub_field('ngay_khoi_hanh');
-      $month_key = date('Y-m', strtotime($ngay));
-      $months[$month_key] = 'Tháng ' . (int)date('m', strtotime($ngay));
-    endwhile;
-    reset_rows(); // quay lại đầu repeater
+    $rows = get_field('bang_gia'); // lấy trước rồi dùng foreach
+    foreach ($rows as $row) {
+      $ngay = $row['ngay_khoi_hanh'];
+      if ($ngay) {
+        $month_key = date('Y-m', strtotime($ngay));
+        $months[$month_key] = 'Tháng ' . (int)date('m', strtotime($ngay));
+      }
+    }
   ?>
 
   <div class="month-tabs">
@@ -31,24 +33,24 @@
         </tr>
       </thead>
       <tbody>
-        <?php while (have_rows('bang_gia')): the_row(); 
-          $ngay = get_sub_field('ngay_khoi_hanh');
-          $hang = get_sub_field('hang_tour');
-          $gia = get_sub_field('gia_tour');
-          $con_cho = get_sub_field('con_cho');
-          $thang = date('Y-m', strtotime($ngay));
+        <?php foreach ($rows as $row): 
+          $ngay = $row['ngay_khoi_hanh'];
+          $hang = $row['hang_tour'];
+          $gia = $row['gia_tour'];
+          $con_cho = $row['con_cho'];
+          $thang = $ngay ? date('Y-m', strtotime($ngay)) : '';
         ?>
         <tr data-month="<?php echo esc_attr($thang); ?>">
           <td>
-            <?php echo date('d/m/Y', strtotime($ngay)); ?><br>
+            <?php echo $ngay ? date('d/m/Y', strtotime($ngay)) : ''; ?><br>
             <span class="<?php echo ($con_cho === 'con') ? 'available' : 'unavailable'; ?>">
               <?php echo ($con_cho === 'con') ? 'Còn chỗ' : 'Kín chỗ'; ?>
             </span>
           </td>
           <td><?php echo esc_html($hang); ?></td>
           <td>
-            <strong><?php echo number_format($gia, 0, ',', '.') . 'đ'; ?></strong><br>
-            <small>+ <?php echo number_format($gia * 0.01, 0, ',', '.'); ?> điểm</small>
+            <strong><?php echo is_numeric($gia) ? number_format($gia, 0, ',', '.') . 'đ' : 'Liên hệ'; ?></strong><br>
+            <small>+ <?php echo is_numeric($gia) ? number_format($gia * 0.01, 0, ',', '.') . ' điểm' : ''; ?></small>
           </td>
           <td>
             <?php if ($con_cho === 'con'): ?>
@@ -58,12 +60,13 @@
             <?php endif; ?>
           </td>
         </tr>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
       </tbody>
     </table>
   </div>
 </section>
 <?php endif; ?>
+
 
 
 
