@@ -1,18 +1,8 @@
-<?php if ($luu_y): ?>
-  <div class="service-item"><span style="color:red;">⚠ Lưu ý *</span><span class="arrow">▼</span></div>
-  <div class="service-content">
-    <?php
-      $lines = explode(PHP_EOL, trim($luu_y));
-      if (!empty($lines)) {
-          echo '<strong>' . esc_html(trim(array_shift($lines))) . '</strong>'; // Dòng đầu in đậm, không <li>
-      }
-    ?>
-    <ul class="service-list">
-      <?php
-        foreach ($lines as $line) {
-            echo '<li>' . esc_html(trim($line)) . '</li>';
-        }
-      ?>
-    </ul>
+<?php if ($luu_y_them): ?>
+<section id="luu-y-them" class="note-extra-wrapper">
+  <h2>📝 Lưu ý thêm</h2>
+  <div class="note-extra-content">
+    <?php echo wp_kses_post($luu_y_them); ?>
   </div>
+</section>
 <?php endif; ?>
