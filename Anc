@@ -1,8 +1,150 @@
-<?php if (get_field('luu_y_them')): ?>
-  <section id="luu-y-them" class="note-extra-wrapper">
-    <h2>📝 Lưu ý thêm</h2>
-    <div class="note-extra-content">
-      <?php the_field('luu_y_them'); ?>
-    </div>
-  </section>
+<?php if (have_rows('bang_gia_tour')): ?>
+<section id="bang-gia-tour" class="tour-price-tabs">
+  <h2>📅 Bảng giá tour</h2>
+  
+  <div class="month-tabs">
+    <button class="tab-btn active" data-month="all">Tất cả</button>
+    <?php
+      $months = [];
+
+      // Lặp để lấy tất cả tháng
+      while (have_rows('bang_gia_tour')): the_row();
+        $ngay = get_sub_field('ngay_khoi_hanh');
+        $month_key = date('Y-m', strtotime($ngay));
+        $months[$month_key] = 'Tháng ' . (int)date('m', strtotime($ngay));
+      endwhile;
+
+      // Hiển thị các nút tháng
+      foreach ($months as $key => $label):
+    ?>
+      <button class="tab-btn" data-month="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
+    <?php endforeach; ?>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Ngày khởi hành</th>
+          <th>Hạng tour</th>
+          <th>Giá tour</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        reset_rows(); // quay lại đầu rows
+
+        while (have_rows('bang_gia_tour')): the_row();
+          $ngay = get_sub_field('ngay_khoi_hanh');
+          $hang = get_sub_field('hang_tour');
+          $gia = get_sub_field('gia_tour');
+          $con_cho = get_sub_field('con_cho');
+          $thang = date('Y-m', strtotime($ngay));
+        ?>
+        <tr data-month="<?php echo esc_attr($thang); ?>">
+          <td>
+            <?php echo date('d/m/Y', strtotime($ngay)); ?><br>
+            <span class="<?php echo $con_cho === 'con' ? 'available' : 'unavailable'; ?>">
+              <?php echo $con_cho === 'con' ? 'Còn chỗ' : 'Kín chỗ'; ?>
+            </span>
+          </td>
+          <td><?php echo esc_html($hang); ?></td>
+          <td>
+            <span class="gia-tour"><?php echo number_format($gia, 0, ',', '.') . 'đ'; ?></span><br>
+            <small>+ <?php echo number_format($gia * 0.01, 0, ',', '.'); ?> điểm</small>
+          </td>
+          <td>
+            <?php if ($con_cho === 'con'): ?>
+              <a href="/thanh-toan?price=<?php echo esc_attr($gia); ?>" class="btn-mua-ngay">Giữ chỗ ngay</a>
+            <?php else: ?>
+              <a href="#yeu-cau" class="btn-yeu-cau">Gửi yêu cầu</a>
+            <?php endif; ?>
+          </td>
+        </tr>
+        <?php endwhile; ?>
+      </tbody>
+    </table>
+  </div>
+</section>
 <?php endif; ?>
+
+
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const month = btn.getAttribute('data-month');
+      document.querySelectorAll('.price-table tbody tr').forEach(row => {
+        if (month === 'all' || row.getAttribute('data-month') === month) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+.month-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: #eee;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #e67e22;
+  color: #fff;
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.price-table th, .price-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.available {
+  color: green;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: red;
+  font-weight: bold;
+}
+
+.btn-mua-ngay, .btn-yeu-cau {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #e67e22;
+  color: #fff;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.btn-yeu-cau {
+  background: #fff;
+  border: 1px solid #e67e22;
+  color: #e67e22;
+}
