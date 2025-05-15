@@ -1,35 +1,18 @@
-<section id="lichtrinh">
-  <h2>📍 Lịch trình tour</h2>
-  <div class="itinerary">
+<?php if ($luu_y): ?>
+  <div class="service-item"><span style="color:red;">⚠ Lưu ý *</span><span class="arrow">▼</span></div>
+  <div class="service-content">
     <?php
-      $lich_trinh_text = get_field('lich_trinh');
-      $lich_trinh_arr = explode(PHP_EOL, trim($lich_trinh_text));
-
-      $current_title = '';
-      $current_content = '';
-
-      foreach ($lich_trinh_arr as $lt) {
-        if (strpos($lt, '###') !== false) {
-          // In phần trước nếu có
-          if (!empty($current_title)) {
-            echo '<div class="day">' . esc_html(trim($current_title)) . '</div>';
-            echo '<div class="content">' . nl2br(wp_kses_post(trim($current_content))) . '</div>';
-          }
-
-          // Bắt đầu phần mới
-          list($current_title, $first_line) = explode('###', $lt, 2);
-          $current_content = trim($first_line);
-        } else {
-          // Các dòng tiếp theo là phần nội dung tiếp tục
-          $current_content .= "\n" . $lt;
-        }
-      }
-
-      // In phần cuối cùng nếu còn
-      if (!empty($current_title)) {
-        echo '<div class="day">' . esc_html(trim($current_title)) . '</div>';
-        echo '<div class="content">' . nl2br(wp_kses_post(trim($current_content))) . '</div>';
+      $lines = explode(PHP_EOL, trim($luu_y));
+      if (!empty($lines)) {
+          echo '<strong>' . esc_html(trim(array_shift($lines))) . '</strong>'; // Dòng đầu in đậm, không <li>
       }
     ?>
+    <ul class="service-list">
+      <?php
+        foreach ($lines as $line) {
+            echo '<li>' . esc_html(trim($line)) . '</li>';
+        }
+      ?>
+    </ul>
   </div>
-</section>
+<?php endif; ?>
