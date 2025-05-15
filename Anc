@@ -64,3 +64,24 @@
   </div>
 </section>
 <?php endif; ?>
+
+
+
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const month = btn.getAttribute('data-month');
+      document.querySelectorAll('.price-table tbody tr').forEach(row => {
+        if (month === 'all' || row.getAttribute('data-month') === month) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
