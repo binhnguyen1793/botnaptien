@@ -1,211 +1,35 @@
-function form_thanh_toan_shortcode() {
-    ob_start();
-    $gia_tour = isset($_GET['price']) ? intval($_GET['price']) : 0;
-    ?>
-    <style>
-    .form-tour-wrapper {
-        max-width: 800px;
-        margin: auto;
-        font-family: Arial, sans-serif;
-    }
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-    .form-grid label {
-        font-weight: 500;
-        font-size: 14px;
-        display: flex;
-        flex-direction: column;
-    }
-    .form-grid input,
-    .form-grid select,
-    .form-grid textarea {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        margin-top: 5px;
-        font-size: 14px;
-    }
-    .form-grid textarea {
-        resize: vertical;
-    }
-    .form-grid .full-row {
-        grid-column: 1 / -1;
-    }
-    .form-submit {
-        text-align: center;
-        margin-top: 20px;
-    }
-    .form-submit button {
-        padding: 12px 40px;
-        background: #660000;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    .highlight-option {
-        background: #fff8e1;
-        padding: 10px;
-        border: 2px solid #ffa000;
-        border-radius: 6px;
-    }
-    .price-display {
-        font-weight: bold;
-        font-size: 18px;
-        margin-top: 10px;
-        color: #333;
-    }
-    </style>
+<section id="lichtrinh">
+  <h2>📍 Lịch trình tour</h2>
+  <div class="itinerary">
+    <?php
+      $lich_trinh_text = get_field('lich_trinh');
+      $lich_trinh_arr = explode(PHP_EOL, trim($lich_trinh_text));
 
-    <div class="form-tour-wrapper">
-        <form id="payment-form">
-            <div class="form-grid">
-                <p class="full-row price-display">
-                    Tổng giá tour: <span id="final-price"><?= number_format($gia_tour, 0, ',', '.') ?> đ</span>
-                </p>
+      $current_title = '';
+      $current_content = '';
 
-                <label>Ngày khởi hành:
-                    <input type="date" name="ngay_khoi_hanh" onchange="updatePrice()">
-                </label>
+      foreach ($lich_trinh_arr as $lt) {
+        if (strpos($lt, '###') !== false) {
+          // In phần trước nếu có
+          if (!empty($current_title)) {
+            echo '<div class="day">' . esc_html(trim($current_title)) . '</div>';
+            echo '<div class="content">' . nl2br(wp_kses_post(trim($current_content))) . '</div>';
+          }
 
-                <label>Điểm khởi hành:
-                    <select name="diem_khoi_hanh" onchange="updatePrice()">
-                        <option value="Hà Nội">Hà Nội</option>
-                        <option value="TP HCM">TP HCM</option>
-                        <option value="Đà Nẵng">Đà Nẵng</option>
-                    </select>
-                </label>
-
-                <label>Người lớn:
-                    <select name="nguoi_lon" id="nguoi_lon" onchange="updatePrice()">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                </label>
-
-                <label>Trẻ em (2-12):
-                    <select name="tre_em" id="tre_em" onchange="updatePrice()">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-                </label>
-
-                <label>Em bé (<2):
-                    <select name="em_be" id="em_be" onchange="updatePrice()">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-                </label>
-
-                <label>Quý danh:
-                    <select name="quy_danh">
-                        <option value="Ông">Ông</option>
-                        <option value="Bà">Bà</option>
-                    </select>
-                </label>
-
-                <label>Họ tên: (*)
-                    <input type="text" id="user-name" placeholder="Họ tên của bạn" required>
-                </label>
-
-                <label>Email: (*)
-                    <input type="email" id="user-email" placeholder="Email" required>
-                </label>
-
-                <label>Số điện thoại:
-                    <input type="tel" id="sdt" placeholder="SĐT">
-                </label>
-
-                <label class="full-row highlight-option">
-                    Hình thức thanh toán:
-                    <select id="payment_type" onchange="updatePrice()" style="margin-top: 5px; padding: 10px;">
-                        <option value="100">Thanh toán 100% (giảm 15%)</option>
-                        <option value="50">Thanh toán 50% (giảm 5%)</option>
-                        <option value="0">Chưa chọn</option>
-                    </select>
-                </label>
-
-                <label class="full-row">Yêu cầu đặc biệt:
-                    <textarea name="yeu_cau_dac_biet" rows="3"></textarea>
-                </label>
-
-                <div id="qr-popup" class="full-row" style="text-align:center;"></div>
-            </div>
-
-            <div class="form-submit">
-                <button type="button" onclick="submitPayment()">Xác nhận thanh toán</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-    let basePrice = <?= $gia_tour ?>;
-    let calculatedAmount = basePrice;
-
-    function updatePrice() {
-        const nguoiLon = parseInt(document.getElementById('nguoi_lon').value || 0);
-        const treEm = parseInt(document.getElementById('tre_em').value || 0);
-        const emBe = parseInt(document.getElementById('em_be').value || 0);
-        const paymentType = parseInt(document.getElementById('payment_type').value || 0);
-
-        let total = (nguoiLon * basePrice) + (treEm * basePrice * 0.5); // Em bé miễn phí
-
-        // Giảm giá theo hình thức thanh toán
-        if (paymentType === 50) {
-            total *= 0.95;
-        } else if (paymentType === 100) {
-            total *= 0.85;
+          // Bắt đầu phần mới
+          list($current_title, $first_line) = explode('###', $lt, 2);
+          $current_content = trim($first_line);
+        } else {
+          // Các dòng tiếp theo là phần nội dung tiếp tục
+          $current_content .= "\n" . $lt;
         }
-
-        calculatedAmount = Math.round(total); // làm tròn cho đẹp
-
-        document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
-    }
-
-    function submitPayment() {
-      const name = document.getElementById('user-name').value.trim();
-      const email = document.getElementById('user-email').value.trim();
-
-      if (!name || !email || calculatedAmount === 0) {
-        alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
-        return;
       }
 
-      const formData = new URLSearchParams();
-      formData.append('price', calculatedAmount);
-
-      fetch("https://mill-moses-cpu-allowance.trycloudflare.com/run-bot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData.toString()
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Không lấy được ảnh QR");
-        return res.blob();
-      })
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        document.getElementById("qr-popup").innerHTML = `<img src="${url}" style="max-width:300px;">`;
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Lỗi khi gọi bot.");
-      });
-    }
-
-    // Tự tính giá lần đầu khi trang load
-    document.addEventListener("DOMContentLoaded", updatePrice);
-    </script>
-    <?php
-    return ob_get_clean();
-}
-add_shortcode('form_thanh_toan', 'form_thanh_toan_shortcode');
+      // In phần cuối cùng nếu còn
+      if (!empty($current_title)) {
+        echo '<div class="day">' . esc_html(trim($current_title)) . '</div>';
+        echo '<div class="content">' . nl2br(wp_kses_post(trim($current_content))) . '</div>';
+      }
+    ?>
+  </div>
+</section>
