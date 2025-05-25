@@ -151,7 +151,7 @@ $diem_den_list = array_unique($diem_den_list);
 </style>
 
 <div class="responsive-layout" style="max-width:1140px;margin:auto;display:flex;gap:24px;margin-top:12px;flex-wrap:wrap;">
-  <div class="filter-toggle" onclick="document.querySelector('aside').classList.toggle('show')">Bộ lọc</div>
+  <div class="filter-toggle d-block d-md-none" onclick="document.querySelector('aside').classList.toggle('show')">Bộ lọc</div>
 
   <aside>
     <div class="filter-popup">
