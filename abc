@@ -1,215 +1,197 @@
-<?php
-/**
- * Template for taxonomy vung_mien_combo (only for combo post type)
- */
-
-get_header();
-$term = get_queried_object();
-$paged = get_query_var('paged') ? get_query_var('paged') : 1;
-
-// Lấy filter từ URL
-$filters = [
-  'khoihanh' => isset($_GET['khoihanh']) ? (array) $_GET['khoihanh'] : [],
-  'thoi_gian' => isset($_GET['thoi_gian']) ? (array) $_GET['thoi_gian'] : [],
-  'gia_khoang' => isset($_GET['gia_khoang']) ? (array) $_GET['gia_khoang'] : [],
-];
-
-$args = [
-  'post_type' => 'combo',
-  'posts_per_page' => 10,
-  'paged' => $paged,
-  'tax_query' => [[
-    'taxonomy' => 'vung_mien_combo',
-    'field'    => 'slug',
-    'terms'    => $term->slug,
-    'include_children' => true
-  ]],
-  'meta_query' => ['relation' => 'AND']
-];
-
-foreach ($filters['khoihanh'] as $val) {
-  $args['meta_query'][] = [
-    'key' => 'khoihanh',
-    'value' => sanitize_text_field($val),
-    'compare' => 'LIKE'
-  ];
+/* Giao diện BestPrice cho single-tour */
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
 }
 
-foreach ($filters['thoi_gian'] as $val) {
-  $args['meta_query'][] = [
-    'key' => 'thoi_gian',
-    'value' => sanitize_text_field($val),
-    'compare' => 'LIKE'
-  ];
+.tour-top-header {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
 }
 
-foreach ($filters['gia_khoang'] as $val) {
-  [$min, $max] = explode('-', $val);
-  $args['meta_query'][] = [
-    'key' => 'gia_tour',
-    'value' => [(int)$min, (int)$max],
-    'type' => 'NUMERIC',
-    'compare' => 'BETWEEN'
-  ];
+.tour-top-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 24px;
 }
 
-$query = new WP_Query($args);
-
-$all_combos = get_posts([
-  'post_type' => 'combo',
-  'numberposts' => -1,
-  'fields' => 'ids',
-  'tax_query' => [[
-    'taxonomy' => 'vung_mien_combo',
-    'field' => 'slug',
-    'terms' => $term->slug,
-    'include_children' => true
-  ]]
-]);
-
-$khoihanh_list = $thoi_gian_list = $gia_ranges = [];
-foreach ($all_combos as $pid) {
-  $kh = get_field('khoihanh', $pid);
-  $tg = get_field('thoi_gian', $pid);
-  $gia = get_field('gia_tour', $pid);
-
-  if ($kh) $khoihanh_list[] = $kh;
-  if ($tg) $thoi_gian_list[] = $tg;
-  if ($gia) {
-    $gia = (int)$gia;
-    if ($gia <= 2000000) $gia_ranges[] = '0-2000000';
-    elseif ($gia <= 4000000) $gia_ranges[] = '2000000-4000000';
-    else $gia_ranges[] = '4000000-10000000';
-  }
+.tour-featured-img {
+  flex: 0 0 55%;
+  max-width: 55%;
 }
-$khoihanh_list = array_unique($khoihanh_list);
-$thoi_gian_list = array_unique($thoi_gian_list);
-$gia_ranges = array_unique($gia_ranges);
-?>
 
-<style>
+.tour-featured-img img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tour-info-box {
+  flex: 0 0 40%;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-info-box p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.tour-info-box .tour-duration {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.tour-info-box .tour-price {
+  font-weight: bold;
+  font-size: 17px;
+  color: #e74c3c;
+}
+
+.tour-info-box .tour-price del {
+  color: #999;
+  margin-right: 8px;
+}
+
+.tour-request-btn,
+.tour-schedule-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.tour-request-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.tour-request-btn:hover {
+  background: #c0392b;
+}
+
+.tour-schedule-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.tour-schedule-btn:hover {
+  background: #e6e6e6;
+}
+
+.tour-guarantee img {
+  margin-top: 12px;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+.tour-info-box .icon {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.combo-included-box {
+  background: #fef9f5;
+  border: 1px solid #f3e0d6;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.combo-included-box ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.tour-wrapper {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+.tour-header img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.tour-title {
+  font-size: 24px !important;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #333;
+}
+
+.tour-section h2,
+#bang-gia-tour h2,
+#quytrinh h2,
+#danhgia h2,
+#tour-tuong-tu h2,
+#luu-y-them h2 {
+  font-size: 24px !important;
+}
+
+/* Responsive cập nhật: fix hiển thị full-width + sắp xếp lại */
 @media (max-width: 768px) {
-  .responsive-layout {
-    flex-direction: column;
-    padding: 12px;
-  }
-  aside {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
-  aside .filter-popup {
-    background: #fff;
-    border-radius: 10px;
-    padding: 24px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-  }
-  aside.show {
+  .tour-top-grid {
     display: flex;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 16px;
   }
-  .filter-toggle {
-    display: inline-block;
-    padding: 10px 16px;
-    background: #f2f2f2;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 12px;
-  }
-}
 
-@media (min-width: 769px) {
-  .filter-toggle {
-    display: none;
+  .tour-featured-img,
+  .tour-info-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
   }
-  aside {
-    border: 1px solid #007bff;
+
+  .tour-featured-img img {
+    width: 100% !important;
+    height: auto !important;
     border-radius: 8px;
-    padding: 16px;
-    background: #f9f9f9;
+    display: block;
+  }
+
+  .tour-info-box {
+    padding: 0 0 10px;
+  }
+
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 100% !important;
   }
 }
-</style>
 
-<div class="responsive-layout" style="max-width:1140px;margin:auto;display:flex;gap:24px;margin-top:12px;flex-wrap:wrap;">
-  <div class="filter-toggle" onclick="document.querySelector('aside').classList.toggle('show')">Bộ lọc</div>
-
-  <aside>
-    <div class="filter-popup">
-      <h3 style="margin-top:0">Bộ lọc</h3>
-      <form id="filter-form" method="get">
-        <p><strong>Khởi hành từ:</strong></p>
-        <?php foreach ($khoihanh_list as $val): ?>
-          <label><input type="checkbox" name="khoihanh[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['khoihanh']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-        <?php endforeach; ?>
-
-        <p><strong>Thời gian combo:</strong></p>
-        <?php foreach ($thoi_gian_list as $val): ?>
-          <label><input type="checkbox" name="thoi_gian[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['thoi_gian']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-        <?php endforeach; ?>
-
-        <p><strong>Mức giá trong khoảng:</strong></p>
-        <?php
-        $gia_labels = [
-          '0-2000000' => 'Dưới 2 triệu',
-          '2000000-4000000' => '2 – 4 triệu',
-          '4000000-10000000' => 'Trên 4 triệu'
-        ];
-        foreach ($gia_labels as $val => $label):
-          if (in_array($val, $gia_ranges)):
-        ?>
-          <label><input type="checkbox" name="gia_khoang[]" value="<?= $val ?>" <?= in_array($val, $filters['gia_khoang']) ? 'checked' : '' ?>> <?= $label ?></label><br>
-        <?php endif; endforeach; ?>
-      </form>
-    </div>
-  </aside>
-
-  <main style="flex:1">
-    <h2>Combo du lịch ở <?= esc_html($term->name) ?></h2>
-    <?php if ($query->have_posts()): ?>
-      <div style="display:flex;flex-direction:column;gap:24px">
-        <?php while ($query->have_posts()): $query->the_post(); ?>
-          <div style="border:1px solid #eee;padding:16px;border-radius:8px;display:flex;gap:16px;flex-wrap:wrap">
-            <div style="flex:0 0 200px">
-              <?php the_post_thumbnail('medium', ['style'=>'border-radius:8px']) ?>
-            </div>
-            <div style="flex:1">
-              <h3 style="margin:0"><a href="<?php the_permalink(); ?>" style="color:#333;text-decoration:none"><?php the_title(); ?></a></h3>
-              <p><strong>Khởi hành:</strong> <?php the_field('khoihanh'); ?> | <strong>Thời gian:</strong> <?php the_field('thoi_gian'); ?></p>
-              <p><strong>Giá:</strong> <?= is_numeric(get_field('gia_tour')) && get_field('gia_tour') > 0 ? '<strong style="color:red;">' . number_format(get_field('gia_tour'), 0, ',', '.') . 'đ</strong>' : '<strong>Liên hệ</strong>' ?> </p>
-              <a href="<?php the_permalink(); ?>" style="color:#e1703a;font-weight:bold">Xem chi tiết &raquo;</a>
-            </div>
-          </div>
-        <?php endwhile; ?>
-      </div>
-      <div style="margin-top:24px">
-        <?= paginate_links(['total' => $query->max_num_pages]) ?>
-      </div>
-    <?php else: ?>
-      <p>Không tìm thấy combo phù hợp.</p>
-    <?php endif; ?>
-    <?php wp_reset_postdata(); ?>
-  </main>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("filter-form");
-  const inputs = form.querySelectorAll("input[type=checkbox], input[type=radio]");
-  inputs.forEach(input => {
-    input.addEventListener("change", () => form.submit());
-  });
-});
-</script>
-
-<?php get_footer(); ?>
+/* Đảm bảo container không giới hạn chiều rộng */
+.container,
+.custom-container,
+.tour-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+}
