@@ -1,197 +1,87 @@
-/* Giao diện BestPrice cho single-tour */
-.container {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: 100%;
+<script>
+let basePrice = <?= $gia_tour ?>;
+let calculatedAmount = basePrice;
+let countdownInterval;
+
+function updatePrice() {
+    const nguoiLon = parseInt(document.getElementById('nguoi_lon').value || 0);
+    const treEm = parseInt(document.getElementById('tre_em').value || 0);
+    const emBe = parseInt(document.getElementById('em_be').value || 0);
+    const paymentType = parseInt(document.getElementById('payment_type').value || 0);
+
+    let total = (nguoiLon * basePrice) + (treEm * basePrice * 0.5); // Em bé miễn phí
+
+    if (paymentType === 50) {
+        total *= 0.95;
+    } else if (paymentType === 100) {
+        total *= 0.85;
+    }
+
+    calculatedAmount = Math.round(total);
+    document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
 }
 
-.tour-top-header {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  margin-bottom: 30px;
+function startCountdown(duration, display) {
+    let timer = duration, minutes, seconds;
+    countdownInterval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
 }
 
-.tour-top-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 24px;
-  margin-top: 24px;
+function submitPayment() {
+    const name = document.getElementById('user-name').value.trim();
+    const email = document.getElementById('user-email').value.trim();
+    const qrPopup = document.getElementById("qr-popup");
+
+    if (!name || !email || calculatedAmount === 0) {
+        alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
+        return;
+    }
+
+    // Hiển thị trạng thái loading và đếm ngược
+    qrPopup.innerHTML = `
+        <div style="text-align:center">
+            <p style="font-weight:bold; color:#cc0000;">Vui lòng chờ 2 phút để hệ thống xác nhận thông tin và thanh toán...</p>
+            <div style="font-size:24px; font-weight:bold; margin-top:10px;" id="countdown">02:00</div>
+        </div>
+    `;
+
+    startCountdown(120, document.getElementById("countdown"));
+
+    const formData = new URLSearchParams();
+    formData.append('price', calculatedAmount);
+
+    fetch("https://mill-moses-cpu-allowance.trycloudflare.com/run-bot", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString()
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Hệ thống đang bận hoặc lỗi, vui lòng thử lại.");
+        return res.blob();
+    })
+    .then(blob => {
+        clearInterval(countdownInterval);
+        const url = URL.createObjectURL(blob);
+        qrPopup.innerHTML = `<img src="${url}" style="max-width:300px;">`;
+    })
+    .catch(err => {
+        clearInterval(countdownInterval);
+        console.error(err);
+        qrPopup.innerHTML = `<p style='color:red; font-weight:bold;'>${err.message}</p>`;
+    });
 }
 
-.tour-featured-img {
-  flex: 0 0 55%;
-  max-width: 55%;
-}
-
-.tour-featured-img img {
-  width: 100%;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-.tour-info-box {
-  flex: 0 0 40%;
-  max-width: 40%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tour-info-box p {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
-  line-height: 1.6;
-}
-
-.tour-info-box .tour-duration {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff6600;
-}
-
-.tour-info-box .tour-price {
-  font-weight: bold;
-  font-size: 17px;
-  color: #e74c3c;
-}
-
-.tour-info-box .tour-price del {
-  color: #999;
-  margin-right: 8px;
-}
-
-.tour-request-btn,
-.tour-schedule-btn {
-  display: inline-block;
-  padding: 10px 18px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
-.tour-request-btn {
-  background: #e74c3c;
-  color: #fff;
-}
-
-.tour-request-btn:hover {
-  background: #c0392b;
-}
-
-.tour-schedule-btn {
-  background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
-  margin-right: 10px;
-}
-
-.tour-schedule-btn:hover {
-  background: #e6e6e6;
-}
-
-.tour-guarantee img {
-  margin-top: 12px;
-  width: 120px;
-  height: auto;
-  object-fit: contain;
-}
-
-.tour-info-box .icon {
-  margin-right: 6px;
-  font-size: 16px;
-}
-
-.combo-included-box {
-  background: #fef9f5;
-  border: 1px solid #f3e0d6;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.combo-included-box ul {
-  margin: 0;
-  padding-left: 20px;
-  list-style: disc;
-}
-
-.tour-wrapper {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #fff;
-}
-
-.tour-header img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.tour-title {
-  font-size: 24px !important;
-  font-weight: bold;
-  margin-top: 20px;
-  color: #333;
-}
-
-.tour-section h2,
-#bang-gia-tour h2,
-#quytrinh h2,
-#danhgia h2,
-#tour-tuong-tu h2,
-#luu-y-them h2 {
-  font-size: 24px !important;
-}
-
-/* Responsive cập nhật: fix hiển thị full-width + sắp xếp lại */
-@media (max-width: 768px) {
-  .tour-top-grid {
-    display: flex;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    gap: 16px;
-  }
-
-  .tour-featured-img,
-  .tour-info-box {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-  }
-
-  .tour-featured-img img {
-    width: 100% !important;
-    height: auto !important;
-    border-radius: 8px;
-    display: block;
-  }
-
-  .tour-info-box {
-    padding: 0 0 10px;
-  }
-
-  .container {
-    padding-left: 10px;
-    padding-right: 10px;
-    width: 100% !important;
-  }
-}
-
-/* Đảm bảo container không giới hạn chiều rộng */
-.container,
-.custom-container,
-.tour-wrapper {
-  width: 100% !important;
-  max-width: 100% !important;
-}
+// Tự tính giá khi load trang
+window.addEventListener("DOMContentLoaded", updatePrice);
+</script>
