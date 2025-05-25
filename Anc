@@ -1,4 +1,112 @@
-/* Fix hiển thị gom nửa màn trên mobile */
+/* Giao diện BestPrice cho single-tour và single-combo */
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
+}
+
+.tour-top-header {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
+}
+
+.tour-top-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.tour-featured-img {
+  flex: 0 0 55%;
+  max-width: 55%;
+}
+
+.tour-featured-img img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tour-info-box {
+  flex: 1 1 40%;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-info-box p,
+.tour-info-box ul {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.tour-info-box .tour-duration {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.tour-info-box .tour-price {
+  font-weight: bold;
+  font-size: 17px;
+  color: #e74c3c;
+}
+
+.tour-info-box .tour-price del {
+  color: #999;
+  margin-right: 8px;
+}
+
+.tour-request-btn,
+.tour-schedule-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.tour-request-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.tour-request-btn:hover {
+  background: #c0392b;
+}
+
+.tour-schedule-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.tour-schedule-btn:hover {
+  background: #e6e6e6;
+}
+
+.tour-guarantee img {
+  margin-top: 12px;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
 @media (max-width: 768px) {
   .tour-top-grid {
     flex-direction: column;
@@ -23,4 +131,49 @@
   .tour-info-box {
     padding: 12px 0;
   }
+
+  .tour-info-box p,
+  .tour-info-box ul {
+    margin-bottom: 10px;
+  }
+
+  .tour-info-box .tour-price {
+    font-size: 16px;
+  }
+
+  .tour-info-box .tour-request-btn,
+  .tour-info-box .tour-schedule-btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    background-color: #e1703a;
+    color: #fff;
+  }
+}
+
+/* Bổ sung cho phần "Combo bao gồm" nếu có */
+.combo-included-box {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 4px solid #f26522;
+  margin-top: 10px;
+}
+
+.combo-included-box strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #e1703a;
+}
+
+.combo-included-box ul {
+  padding-left: 20px;
+  margin: 0;
+  list-style: disc;
+  color: #333;
+}
+
+.combo-included-box li {
+  margin-bottom: 6px;
+  font-size: 14px;
 }
