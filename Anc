@@ -1,6 +1,6 @@
 <?php
 /**
- * Template for taxonomy vung_mien with toggleable filter UI (mobile-friendly)
+ * Template for taxonomy vung_mien with filter popup and responsive layout
  */
 
 get_header();
@@ -106,15 +106,28 @@ $diem_den_list = array_unique($diem_den_list);
     padding: 12px;
   }
   aside {
-    width: 100% !important;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
     display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  aside .filter-popup {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid #ccc;
   }
   aside.show {
-    display: block;
+    display: flex;
   }
   .filter-toggle {
     display: inline-block;
@@ -126,48 +139,59 @@ $diem_den_list = array_unique($diem_den_list);
     margin-bottom: 12px;
   }
 }
+
+@media (min-width: 769px) {
+  aside {
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    padding: 16px;
+    background: #f9f9f9;
+  }
+}
 </style>
 
 <div class="responsive-layout" style="max-width:1140px;margin:auto;display:flex;gap:24px;margin-top:12px;flex-wrap:wrap;">
   <div class="filter-toggle" onclick="document.querySelector('aside').classList.toggle('show')">Bộ lọc</div>
 
   <aside>
-    <h3 style="margin-top:0">Bộ lọc</h3>
-    <form id="filter-form" method="get">
-      <input type="hidden" name="type" value="<?= esc_attr($type) ?>">
-      <?php if ($khoihanh_list): ?>
-      <p><strong>Khởi hành:</strong></p>
-      <?php foreach ($khoihanh_list as $val): ?>
-        <label><input type="checkbox" name="khoihanh[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['khoihanh']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-      <?php endforeach; endif; ?>
+    <div class="filter-popup">
+      <h3 style="margin-top:0">Bộ lọc</h3>
+      <form id="filter-form" method="get">
+        <input type="hidden" name="type" value="<?= esc_attr($type) ?>">
+        <?php if ($khoihanh_list): ?>
+        <p><strong>Khởi hành:</strong></p>
+        <?php foreach ($khoihanh_list as $val): ?>
+          <label><input type="checkbox" name="khoihanh[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['khoihanh']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
+        <?php endforeach; endif; ?>
 
-      <?php if ($thoi_gian_list): ?>
-      <p><strong>Thời gian:</strong></p>
-      <?php foreach ($thoi_gian_list as $val): ?>
-        <label><input type="checkbox" name="thoi_gian[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['thoi_gian']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-      <?php endforeach; endif; ?>
+        <?php if ($thoi_gian_list): ?>
+        <p><strong>Thời gian:</strong></p>
+        <?php foreach ($thoi_gian_list as $val): ?>
+          <label><input type="checkbox" name="thoi_gian[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['thoi_gian']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
+        <?php endforeach; endif; ?>
 
-      <p><strong>Mức giá trong khoảng:</strong></p>
-      <?php
-      $gia_labels = [
-        '1000000-5000000' => 'Từ 1 triệu đến 5 triệu',
-        '5000000-10000000' => 'Từ 5 triệu đến 10 triệu',
-        '10000000-20000000' => 'Từ 10 triệu đến 20 triệu',
-        '20000000-30000000' => 'Từ 20 triệu đến 30 triệu',
-        '30000000-900000000' => 'Trên 30 triệu'
-      ];
-      foreach ($gia_labels as $val => $label):
-        if (in_array($val, $gia_ranges)):
-      ?>
-        <label><input type="checkbox" name="gia_khoang[]" value="<?= $val ?>" <?= in_array($val, $filters['gia_khoang']) ? 'checked' : '' ?>> <?= $label ?></label><br>
-      <?php endif; endforeach; ?>
+        <p><strong>Mức giá trong khoảng:</strong></p>
+        <?php
+        $gia_labels = [
+          '1000000-5000000' => 'Từ 1 triệu đến 5 triệu',
+          '5000000-10000000' => 'Từ 5 triệu đến 10 triệu',
+          '10000000-20000000' => 'Từ 10 triệu đến 20 triệu',
+          '20000000-30000000' => 'Từ 20 triệu đến 30 triệu',
+          '30000000-900000000' => 'Trên 30 triệu'
+        ];
+        foreach ($gia_labels as $val => $label):
+          if (in_array($val, $gia_ranges)):
+        ?>
+          <label><input type="checkbox" name="gia_khoang[]" value="<?= $val ?>" <?= in_array($val, $filters['gia_khoang']) ? 'checked' : '' ?>> <?= $label ?></label><br>
+        <?php endif; endforeach; ?>
 
-      <?php if ($diem_den_list): ?>
-      <p><strong>Điểm đến:</strong></p>
-      <?php foreach ($diem_den_list as $val): ?>
-        <label><input type="checkbox" name="diemden[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['diemden']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
-      <?php endforeach; endif; ?>
-    </form>
+        <?php if ($diem_den_list): ?>
+        <p><strong>Điểm đến:</strong></p>
+        <?php foreach ($diem_den_list as $val): ?>
+          <label><input type="checkbox" name="diemden[]" value="<?= esc_attr($val) ?>" <?= in_array($val, $filters['diemden']) ? 'checked' : '' ?>> <?= esc_html($val) ?></label><br>
+        <?php endforeach; endif; ?>
+      </form>
+    </div>
   </aside>
 
   <main style="flex:1">
