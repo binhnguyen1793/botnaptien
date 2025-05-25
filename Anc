@@ -1,91 +1,30 @@
-<div class="promo-box">
-  <div class="promo-header">
-    <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="icon">
-    <div class="promo-text">
-      <p class="promo-title">Cơ hội giảm giá tới <span>50%</span></p>
-      <p class="promo-subtitle">Hãy đăng ký ngay để nhận ưu đãi bí mật từ BestPrice nhé!</p>
-    </div>
-  </div>
-  <div class="promo-form">
-    <input type="email" placeholder="Nhập email của bạn">
-    <button>Đăng ký ngay</button>
-  </div>
-</div>
+<script>
+function updateGuest(type, delta) {
+    const limits = {
+        adult: { min: 1, max: 20 },
+        child: { min: 0, max: 8 },
+        baby:  { min: 0, max: 4 }
+    };
 
+    const countSpan = document.getElementById(type + '-count');
+    let count = parseInt(countSpan.innerText);
 
-.promo-box {
-  background: #fff;
-  border: 1px solid #f0f0f0;
-  padding: 16px;
-  border-radius: 10px;
-  max-width: 100%;
-  margin: 0 auto;
+    count += delta;
+
+    if (count < limits[type].min) count = limits[type].min;
+    if (count > limits[type].max) count = limits[type].max;
+
+    countSpan.innerText = count;
+
+    // Gán vào input ẩn
+    document.getElementById(type + '-input').value = count;
+
+    // Update hiển thị tổng khách
+    const adult = parseInt(document.getElementById('adult-count').innerText);
+    const child = parseInt(document.getElementById('child-count').innerText);
+    const baby  = parseInt(document.getElementById('baby-count').innerText);
+
+    const total = adult + child + baby;
+    document.getElementById('guest-summary-text').innerText = total + ' khách';
 }
-
-.promo-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.promo-header img {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-.promo-text .promo-title {
-  margin: 0;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.promo-text .promo-title span {
-  color: #e1703a;
-}
-
-.promo-text .promo-subtitle {
-  font-size: 14px;
-  margin: 4px 0 0;
-  color: #555;
-}
-
-.promo-form {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.promo-form input[type="email"] {
-  flex: 1 1 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background: #f9f9f9;
-  font-size: 14px;
-}
-
-.promo-form button {
-  padding: 10px 18px;
-  background-color: #ffe9d6;
-  color: #e1703a;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  flex: 0 0 auto;
-}
-
-/* Mobile chỉnh lại khoảng cách */
-@media (max-width: 768px) {
-  .promo-form {
-    flex-direction: column;
-  }
-
-  .promo-form input[type="email"],
-  .promo-form button {
-    width: 100%;
-  }
-}
+</script>
