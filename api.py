@@ -11,26 +11,31 @@ def run_bot():
     price = request.form.get("price", "no-price")
     print(f"💰 Nhận yêu cầu chạy bot với giá: {price}")
 
-    result = subprocess.run(["python", "bot.py"], capture_output=True, text=True)
+    # Gọi bot xử lý
+    result = subprocess.run(["python", "bot.py", price], capture_output=True, text=True)
     print(result.stdout)
     print(result.stderr)
 
-    image_path = os.path.join("static", "qr_code.png")
+    # Đường dẫn ảnh QR đã cắt và ảnh toàn trang
+    qr_image_path = os.path.join("static", "qr_code_detected.png")
+    full_image_path = os.path.join("static", "full_page.png")
 
-    if os.path.exists(image_path):
-        # ✅ Đánh dấu sẽ xóa sau khi gửi file
+    if os.path.exists(qr_image_path):
+        # ✅ Sau khi gửi file QR đã cắt, xóa cả 2 ảnh
         @after_this_request
-        def remove_file(response):
-            try:
-                os.remove(image_path)
-                print("🗑️ Đã xóa ảnh:", image_path)
-            except Exception as e:
-                print("❌ Lỗi xóa ảnh:", e)
+        def remove_files(response):
+            for path in [qr_image_path, full_image_path]:
+                try:
+                    if os.path.exists(path):
+                        os.remove(path)
+                        print(f"🗑️ Đã xóa ảnh: {path}")
+                except Exception as e:
+                    print(f"❌ Lỗi khi xóa ảnh {path}:", e)
             return response
 
-        return send_file(image_path, mimetype="image/png")
+        return send_file(qr_image_path, mimetype="image/png")
     else:
-        return "Không tìm thấy ảnh chụp!", 500
+        return "Không tìm thấy ảnh QR đã cắt!", 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
