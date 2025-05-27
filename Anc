@@ -56,9 +56,14 @@ function form_thanh_toan_shortcode() {
     }
     .price-display {
         font-weight: bold;
-        font-size: 18px;
-        margin-top: 10px;
+        font-size: 16px;
         color: #333;
+        margin-bottom: -10px;
+    }
+    .price-display del {
+        font-size: 14px;
+        color: #888;
+        margin-left: 8px;
     }
     </style>
 
@@ -66,10 +71,8 @@ function form_thanh_toan_shortcode() {
         <form id="payment-form">
             <div class="form-grid">
                 <p class="full-row price-display">
-                    Giá niêm yết: <span id="listed-price"><?= number_format($gia_tour, 0, ',', '.') ?> đ</span>
-                </p>
-                <p class="full-row price-display">
                     Tổng giá tour: <span id="final-price"><?= number_format($gia_tour, 0, ',', '.') ?> đ</span>
+                    <del id="listed-price"><?= number_format($gia_tour, 0, ',', '.') ?> đ</del>
                 </p>
 
                 <label>Ngày khởi hành:
@@ -83,6 +86,7 @@ function form_thanh_toan_shortcode() {
                         <option value="Đà Nẵng">Đà Nẵng</option>
                     </select>
                 </label>
+
                 <div class="full-row" style="display:grid; grid-template-columns:repeat(3,1fr);gap:15px;">
                     <label>Người lớn:
                         <select name="nguoi_lon" id="nguoi_lon" onchange="updatePrice()">
@@ -108,6 +112,7 @@ function form_thanh_toan_shortcode() {
                         </select>
                     </label>
                 </div>
+
                 <label>Quý danh:
                     <select name="quy_danh">
                         <option value="Ông">Ông</option>
@@ -129,7 +134,8 @@ function form_thanh_toan_shortcode() {
 
                 <label class="full-row highlight-option">
                     Hình thức thanh toán:
-                    <select id="payment_type" onchange="updatePrice()" style="margin-top: 5px; padding: 10px;">
+                    <select id="payment_type" required onchange="updatePrice()" style="margin-top: 5px; padding: 10px;">
+                        <option value="">-- Vui lòng chọn hình thức thanh toán --</option>
                         <option value="100">Thanh toán toàn bộ (giảm 20%)</option>
                         <option value="30">Cọc giữ chỗ (30%)</option>
                     </select>
@@ -164,75 +170,14 @@ function form_thanh_toan_shortcode() {
                 finalPrice *= 0.8; // Giảm 20%
             } else if (paymentType === 30) {
                 finalPrice *= 0.3; // Cọc 30%
+            } else {
+                finalPrice = 0;
             }
 
             calculatedAmount = Math.round(finalPrice);
             document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
             document.getElementById('listed-price').innerText = Math.round(listedPrice).toLocaleString('vi-VN') + ' đ';
         }
-
-        function submitPayment() {
-            const name = document.getElementById('user-name').value.trim();
-            const email = document.getElementById('user-email').value.trim();
-            const qrPopup = document.getElementById("qr-popup");
-
-            if (!name || !email || calculatedAmount === 0) {
-                alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
-                return;
-            }
-
-            qrPopup.innerHTML = `
-                <div style="text-align:center">
-                    <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
-                    <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
-                </div>
-            `;
-            let timer = 120;
-            const interval = setInterval(() => {
-                const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
-                const seconds = String(timer % 60).padStart(2, '0');
-                document.getElementById('countdown').innerText = `${minutes}:${seconds}`;
-                if (--timer < 0) clearInterval(interval);
-            }, 1000);
-
-            const formData = new URLSearchParams();
-            formData.append('price', calculatedAmount);
-
-            fetch("https://mill-moses-cpu-allowance.trycloudflare.com/run-bot", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData.toString()
-            })
-            .then(res => res.blob())
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                qrPopup.innerHTML = `
-                    <div>
-                        <p><strong>Mã QR thanh toán:</strong></p>
-                        <img src="${url}" style="max-width:300px;"><br><br>
-                        <label>Gửi ảnh xác nhận chuyển khoản:
-                            <input type="file" id="upload-proof" accept="image/*">
-                        </label><br>
-                        <button onclick="confirmPayment()">Xác nhận đã thanh toán</button>
-                        <p id="confirm-message" style="margin-top:10px; font-weight:bold;"></p>
-                    </div>
-                `;
-            });
-        }
-
-        function confirmPayment() {
-            const fileInput = document.getElementById('upload-proof');
-            const msg = document.getElementById('confirm-message');
-            if (!fileInput.files.length) {
-                msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
-                msg.style.color = 'red';
-                return;
-            }
-            msg.style.color = 'green';
-            msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
-        }
-
-        window.addEventListener("DOMContentLoaded", updatePrice);
     </script>
     <?php
     return ob_get_clean();
