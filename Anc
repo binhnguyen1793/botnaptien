@@ -1,18 +1,8 @@
-.hotel-request-btn {
-  display: inline-block;
-  padding: 10px 18px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-  border: 2px solid #660000;
-  background: #660000;
-  color: #fff;
-  text-align: center;
-}
-
-.hotel-request-btn:hover {
-  background: #990000;
-  border-color: #990000;
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
 }
