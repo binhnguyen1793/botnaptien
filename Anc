@@ -24,3 +24,55 @@
     </div>
   </div>
 </section>
+
+.hotel-top-header {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.hotel-top-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.hotel-featured-img {
+  flex: 0 0 55%;
+  max-width: 55%;
+}
+
+.hotel-featured-img img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.hotel-info-box {
+  flex: 0 0 40%;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .hotel-top-grid {
+    flex-direction: column;
+  }
+
+  .hotel-featured-img,
+  .hotel-info-box {
+    max-width: 100%;
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .hotel-featured-img img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+}
+
