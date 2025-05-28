@@ -1,39 +1,55 @@
 <header class="bp-header">
   <div class="bp-container">
-    <div class="bp-logo">
-      <a href="/"><img src="/path/to/logo.png" alt="BestPrice Travel"></a>
+    <!-- Logo bên trái -->
+    <div class="bp-left">
+      <a href="/" class="bp-logo">
+        <img src="/path/to/logo.png" alt="BestPrice Travel">
+      </a>
     </div>
-    <nav class="bp-nav">
-      <a href="#">✈ Vé máy bay</a>
-      <a href="#">🏨 Khách sạn</a>
-      <a href="#">🧳 Tour du lịch</a>
-      <a href="#">⛵ Du thuyền Hạ Long</a>
-      <a href="#">⋯</a>
-    </nav>
-    <div class="bp-contact">
-      <div class="bp-phone">
-        <strong>1900 2605</strong><br>
-        <span>(0240/28) 7307 2605</span>
-      </div>
-      <div class="bp-icons">
-        <a href="#"><i class="fa fa-user"></i></a>
-        <a href="#"><i class="fa fa-search"></i></a>
-      </div>
-    </div>
+
+    <!-- Nút menu + icon trên mobile -->
     <div class="bp-mobile-icons">
       <a href="#"><i class="fa fa-phone"></i></a>
       <a href="#"><i class="fa fa-user"></i></a>
       <button id="bp-toggle-menu"><i class="fa fa-bars"></i></button>
     </div>
+
+    <!-- Menu điều hướng -->
+    <nav class="bp-nav" id="bp-nav">
+      <a href="khach-san">🏨 Khách sạn</a>
+      <a href="tour">🧳 Tour du lịch</a>
+      <a href="combo">⛵ Combo khuyến mãi</a>
+      <a href="#">⋯</a>
+    </nav>
+
+    <!-- Số điện thoại bên phải -->
+    <div class="bp-right">
+      <div class="bp-phone">
+        <strong>1900 2605</strong><br>
+        <span>(0240/28) 7307 2605</span>
+      </div>
+    </div>
   </div>
 </header>
 
+<!-- Script để mở/đóng menu trên mobile -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('bp-toggle-menu');
+    const navMenu = document.getElementById('bp-nav');
+
+    toggleBtn.addEventListener('click', function () {
+      navMenu.classList.toggle('bp-nav-open');
+    });
+  });
+</script>
+
+
 
 .bp-header {
-  border-bottom: 2px solid #f26522;
-  padding: 8px 0;
-  font-family: sans-serif;
   background: white;
+  font-family: sans-serif;
+  padding: 8px 0;
 }
 
 .bp-container {
@@ -54,6 +70,8 @@
   display: flex;
   gap: 20px;
   font-size: 15px;
+  flex: 1;
+  justify-content: center;
 }
 
 .bp-nav a {
@@ -61,10 +79,9 @@
   color: #000;
 }
 
-.bp-contact {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.bp-left,
+.bp-right {
+  flex: 0 0 auto;
 }
 
 .bp-phone {
@@ -73,20 +90,30 @@
   color: #900;
 }
 
-.bp-icons a {
-  margin-left: 10px;
-  color: #333;
-  font-size: 16px;
-}
-
 .bp-mobile-icons {
   display: none;
 }
 
-/* Responsive: Mobile */
+/* Responsive cho mobile */
 @media (max-width: 768px) {
-  .bp-nav,
-  .bp-contact {
+  .bp-nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: white;
+    padding: 16px;
+  }
+
+  .bp-nav.bp-nav-open {
+    display: flex;
+  }
+
+  .bp-nav a {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .bp-right {
     display: none;
   }
 
