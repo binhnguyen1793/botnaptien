@@ -1,40 +1,107 @@
-<section id="bang-gia-tour">
-  <h2>📅 Bảng giá combo</h2>
-  <div class="table-wrapper">
-    <table class="price-table">
-      <thead>
-        <tr>
-          <th>Ngày khởi hành</th>
-          <th>Hạng tour</th>
-          <th>Giá tour</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Hàng ngày</td>
-          <td>Tiêu chuẩn</td>
-          <td><strong><?php echo number_format(get_field('gia_tour'), 0, ',', '.'); ?>đ</strong></td>
-          <td>
-            <a href="<?php echo site_url('/thanh-toan?price=' . intval(get_field('gia_tour'))); ?>" class="btn-mua-ngay">Đặt ngay</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<header class="bp-header">
+  <div class="bp-container">
+    <div class="bp-logo">
+      <a href="/"><img src="/path/to/logo.png" alt="BestPrice Travel"></a>
+    </div>
+    <nav class="bp-nav">
+      <a href="#">✈ Vé máy bay</a>
+      <a href="#">🏨 Khách sạn</a>
+      <a href="#">🧳 Tour du lịch</a>
+      <a href="#">⛵ Du thuyền Hạ Long</a>
+      <a href="#">⋯</a>
+    </nav>
+    <div class="bp-contact">
+      <div class="bp-phone">
+        <strong>1900 2605</strong><br>
+        <span>(0240/28) 7307 2605</span>
+      </div>
+      <div class="bp-icons">
+        <a href="#"><i class="fa fa-user"></i></a>
+        <a href="#"><i class="fa fa-search"></i></a>
+      </div>
+    </div>
+    <div class="bp-mobile-icons">
+      <a href="#"><i class="fa fa-phone"></i></a>
+      <a href="#"><i class="fa fa-user"></i></a>
+      <button id="bp-toggle-menu"><i class="fa fa-bars"></i></button>
+    </div>
   </div>
-</section>
+</header>
 
-.btn-mua-ngay {
-  display: inline-block;
-  background-color: #660000;
-  color: white;
-  padding: 12px 24px;
-  text-align: center;
-  border-radius: 4px;
-  font-weight: 600;
+
+.bp-header {
+  border-bottom: 2px solid #f26522;
+  padding: 8px 0;
+  font-family: sans-serif;
+  background: white;
+}
+
+.bp-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+.bp-logo img {
+  height: 36px;
+}
+
+.bp-nav {
+  display: flex;
+  gap: 20px;
+  font-size: 15px;
+}
+
+.bp-nav a {
   text-decoration: none;
-  transition: background-color 0.3s;
+  color: #000;
 }
-.btn-mua-ngay:hover {
-  background-color: #4d0000;
+
+.bp-contact {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
+
+.bp-phone {
+  text-align: right;
+  font-size: 12px;
+  color: #900;
+}
+
+.bp-icons a {
+  margin-left: 10px;
+  color: #333;
+  font-size: 16px;
+}
+
+.bp-mobile-icons {
+  display: none;
+}
+
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+  .bp-nav,
+  .bp-contact {
+    display: none;
+  }
+
+  .bp-mobile-icons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: auto;
+    font-size: 18px;
+  }
+
+  .bp-container {
+    justify-content: space-between;
+  }
+}
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
