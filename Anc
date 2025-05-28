@@ -1,156 +1,34 @@
-function tour_search_form_shortcode() {
-    ob_start(); ?>
+<section class="search-form search-form--tour">
+                    <h1>Tìm tour giá tốt</h1>
+        
+        <button class="btn-close-pop-sug hide">
+            <i class="ico-x"></i>
+        </button>
+                <form class="search-form__content tour_search_form" role="form" name="frmSearchForm" method="post" action="https://www.bestprice.vn/tour/tim-kiem.html">
+            <div class="search-form__content__left">
+                <div class="search-form__content__des search-form__content__des--tour" data-gtm-vis-recent-on-screen6393024_356="377" data-gtm-vis-first-on-screen6393024_356="377" data-gtm-vis-total-visible-time6393024_356="40000" data-gtm-vis-recent-on-screen6393024_357="379" data-gtm-vis-first-on-screen6393024_357="379" data-gtm-vis-total-visible-time6393024_357="50000" data-gtm-vis-recent-on-screen6393024_358="382" data-gtm-vis-first-on-screen6393024_358="382" data-gtm-vis-total-visible-time6393024_358="30000" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
+                    <i class="icon-search-form ico-address" data-class="#tour_destination"></i>
+                    <div class="search-form__content__des__input" data-gtm-vis-recent-on-screen6393024_356="377" data-gtm-vis-first-on-screen6393024_356="377" data-gtm-vis-total-visible-time6393024_356="39400" data-gtm-vis-recent-on-screen6393024_357="379" data-gtm-vis-first-on-screen6393024_357="379" data-gtm-vis-total-visible-time6393024_357="49900" data-gtm-vis-recent-on-screen6393024_358="382" data-gtm-vis-first-on-screen6393024_358="382" data-gtm-vis-total-visible-time6393024_358="29900" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
+                        <label class="label-search-form" data-class="#tour_destination" for="To">Địa điểm</label>
+<span class="twitter-typeahead" style="position: relative; display: inline-block; direction: ltr;"><input type="text" id="tour_destination" class="input-form-destination form-control tour-destination tour-destination tt-input" placeholder="Bạn muốn đi đâu?" autocomplete="off" value="" data-original-title="" title="" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;"><pre aria-hidden="true" style="position: absolute; visibility: hidden; white-space: pre; font-family: Roboto, Arial, sans-serif; font-size: 16px; font-style: normal; font-variant: normal; font-weight: 700; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre><span class="tt-dropdown-menu" style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none; right: auto;"><div class="tt-dataset-0" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1"></div><div class="tt-dataset-1" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1"></div></span></span>
 
-    <style>
-    .tour-search-wrapper {
-        max-width: 1140px;
-        margin: 0 auto;
-        padding: 0 16px;
-        margin-top: 32px;
-    }
-
-    .tour-search-title {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 12px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
-        color: #333;
-    }
-
-    .tour-search-form {
-        background: #fff;
-        padding: 20px 24px;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        display: flex;
-        gap: 16px;
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
-
-    .tour-search-form .form-group {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .tour-search-form label {
-        font-weight: 600;
-        font-size: 11px;
-        text-transform: uppercase;
-        color: #999;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .tour-search-form label::before {
-        content: "📍"; /* hoặc thay icon nếu cần */
-        font-size: 14px;
-    }
-
-    .tour-search-form select {
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-        color: #333;
-    }
-
-    .tour-search-form select:invalid {
-        color: #999;
-    }
-
-    .tour-search-form button {
-        padding: 12px 28px;
-        background-color: #e1703a;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 15px;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-
-    @media (max-width: 768px) {
-        .tour-search-form {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .tour-search-form button {
-            width: 100%;
-        }
-    }
-    </style>
-
-    <div class="tour-search-wrapper">
-        <div class="tour-search-title">Tìm tour giá tốt</div>
-        <form onsubmit="return false;" class="tour-search-form">
-
-            <!-- Địa điểm -->
-            <div class="form-group">
-                <label>Địa điểm</label>
-                <select name="diadiem" required>
-                    <option value="" disabled selected hidden>Bạn muốn đi đâu?</option>
-                    <?php
-                    $terms = get_terms([
-                        'taxonomy' => 'vung_mien_tour',
-                        'hide_empty' => false,
-                    ]);
-                    foreach ($terms as $term) {
-                        $slug_parts = [];
-                        $current = $term;
-                        while ($current && $current->parent != 0) {
-                            array_unshift($slug_parts, $current->slug);
-                            $current = get_term($current->parent, 'vung_mien_tour');
-                        }
-                        if ($current) {array_unshift($slug_parts, $current->slug);
-                        }
-                        $full_slug = implode('/', $slug_parts);
-                        echo '<option value="' . esc_attr($term->slug) . '" data-full-slug="' . esc_attr($full_slug) . '">' . esc_html($term->name) . '</option>';
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <!-- Khởi hành -->
-            <div class="form-group">
-                <label>Khởi hành từ</label>
-                <select name="khoihanh" required>
-                    <option value="" disabled selected hidden>Vui lòng chọn</option>
-                    <option value="ha-noi">Hà Nội</option>
-                    <option value="ho-chi-minh">Hồ Chí Minh</option>
-                    <option value="da-nang">Đà Nẵng</option>
-                    <option value="hai-phong">Hải Phòng</option>
-                </select>
-            </div>
-
-            <!-- Nút -->
-            <div style="flex: 0 0 auto;">
-                <button type="submit">Tìm ngay</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('.tour-search-form');
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const select = form.querySelector('[name="diadiem"]');
-            const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
-            if (slug) {
-                window.location.href = '/vung_mien_tour/' + slug + '/';
-            }
-        });
-    });
-    </script>
-
-    <?php
-    return ob_get_clean();
-}
-add_shortcode('tour_search_form', 'tour_search_form_shortcode');
+                                                    <button type="button" class="btn btn-default btn-close btn-close-pop-sug hide" data-gtm-vis-has-fired6393024_353="1" data-gtm-vis-has-fired6393024_354="1" data-gtm-vis-has-fired6393024_355="1">Đóng</button>
+                        
+                        <input type="hidden" name="destination" class="tour-destination-name" value="">
+                        <input type="hidden" name="tour_destination_input" class="tour-destination-input">
+                        <input type="hidden" id="oid" value="">
+                        <input type="hidden" id="is_update_des" value="1">
+                        <input type="hidden" name="tour_id" class="form-tour-id">
+                        <input type="hidden" name="url_title" class="form-url-title">
+                        <input type="hidden" name="form_search_text" class="form_search_text">
+                        <input type="hidden" name="des_id" class="form-des-id" value="1087">
+                        <input type="hidden" class="form-des-name" value="">
+                        <input type="hidden" class="form-tour-name" value="">
+                        <input type="hidden" class="dep-ha-noi" value="">
+                        <input type="hidden" class="dep-ho-chi-minh" value="">
+                        <input type="hidden" class="category_id" value="0">
+                        <input type="hidden" class="object-id" value="1087">
+                        <input type="hidden" class="object-url" value="trong-nuoc">
+                        <input type="hidden" class="object-type" value="tour">
+                    </div>
+                    <div class="tour_des_suggestion hide" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
