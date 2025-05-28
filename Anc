@@ -1,34 +1,143 @@
-<section class="search-form search-form--tour">
-                    <h1>Tìm tour giá tốt</h1>
-        
-        <button class="btn-close-pop-sug hide">
-            <i class="ico-x"></i>
-        </button>
-                <form class="search-form__content tour_search_form" role="form" name="frmSearchForm" method="post" action="https://www.bestprice.vn/tour/tim-kiem.html">
-            <div class="search-form__content__left">
-                <div class="search-form__content__des search-form__content__des--tour" data-gtm-vis-recent-on-screen6393024_356="377" data-gtm-vis-first-on-screen6393024_356="377" data-gtm-vis-total-visible-time6393024_356="40000" data-gtm-vis-recent-on-screen6393024_357="379" data-gtm-vis-first-on-screen6393024_357="379" data-gtm-vis-total-visible-time6393024_357="50000" data-gtm-vis-recent-on-screen6393024_358="382" data-gtm-vis-first-on-screen6393024_358="382" data-gtm-vis-total-visible-time6393024_358="30000" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
-                    <i class="icon-search-form ico-address" data-class="#tour_destination"></i>
-                    <div class="search-form__content__des__input" data-gtm-vis-recent-on-screen6393024_356="377" data-gtm-vis-first-on-screen6393024_356="377" data-gtm-vis-total-visible-time6393024_356="39400" data-gtm-vis-recent-on-screen6393024_357="379" data-gtm-vis-first-on-screen6393024_357="379" data-gtm-vis-total-visible-time6393024_357="49900" data-gtm-vis-recent-on-screen6393024_358="382" data-gtm-vis-first-on-screen6393024_358="382" data-gtm-vis-total-visible-time6393024_358="29900" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
-                        <label class="label-search-form" data-class="#tour_destination" for="To">Địa điểm</label>
-<span class="twitter-typeahead" style="position: relative; display: inline-block; direction: ltr;"><input type="text" id="tour_destination" class="input-form-destination form-control tour-destination tour-destination tt-input" placeholder="Bạn muốn đi đâu?" autocomplete="off" value="" data-original-title="" title="" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;"><pre aria-hidden="true" style="position: absolute; visibility: hidden; white-space: pre; font-family: Roboto, Arial, sans-serif; font-size: 16px; font-style: normal; font-variant: normal; font-weight: 700; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre><span class="tt-dropdown-menu" style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none; right: auto;"><div class="tt-dataset-0" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1"></div><div class="tt-dataset-1" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1"></div></span></span>
+<div class="tour-search-wrapper">
+    <form onsubmit="return redirectToVungMien(event);" class="tour-search-form">
+        <div class="tour-search-title">Tìm tour giá tốt</div>
 
-                                                    <button type="button" class="btn btn-default btn-close btn-close-pop-sug hide" data-gtm-vis-has-fired6393024_353="1" data-gtm-vis-has-fired6393024_354="1" data-gtm-vis-has-fired6393024_355="1">Đóng</button>
-                        
-                        <input type="hidden" name="destination" class="tour-destination-name" value="">
-                        <input type="hidden" name="tour_destination_input" class="tour-destination-input">
-                        <input type="hidden" id="oid" value="">
-                        <input type="hidden" id="is_update_des" value="1">
-                        <input type="hidden" name="tour_id" class="form-tour-id">
-                        <input type="hidden" name="url_title" class="form-url-title">
-                        <input type="hidden" name="form_search_text" class="form_search_text">
-                        <input type="hidden" name="des_id" class="form-des-id" value="1087">
-                        <input type="hidden" class="form-des-name" value="">
-                        <input type="hidden" class="form-tour-name" value="">
-                        <input type="hidden" class="dep-ha-noi" value="">
-                        <input type="hidden" class="dep-ho-chi-minh" value="">
-                        <input type="hidden" class="category_id" value="0">
-                        <input type="hidden" class="object-id" value="1087">
-                        <input type="hidden" class="object-url" value="trong-nuoc">
-                        <input type="hidden" class="object-type" value="tour">
-                    </div>
-                    <div class="tour_des_suggestion hide" data-gtm-vis-has-fired6393024_358="1" data-gtm-vis-has-fired6393024_356="1" data-gtm-vis-has-fired6393024_357="1">
+        <!-- Địa điểm -->
+        <div class="form-group">
+            <label>ĐỊA ĐIỂM</label>
+            <select name="diadiem" required>
+                <option value="">Bạn muốn đi đâu?</option>
+                <?php
+                $terms = get_terms([
+                    'taxonomy' => 'vung_mien_tour',
+                    'hide_empty' => false,
+                ]);
+                foreach ($terms as $term) {
+                    $slug_parts = [];
+                    $current = $term;
+                    while ($current && $current->parent != 0) {
+                        array_unshift($slug_parts, $current->slug);
+                        $current = get_term($current->parent, 'vung_mien_tour');
+                    }
+                    if ($current) {
+                        array_unshift($slug_parts, $current->slug);
+                    }
+                    $full_slug = implode('/', $slug_parts);
+                    echo '<option value="' . esc_attr($term->slug) . '" data-full-slug="' . esc_attr($full_slug) . '">' . esc_html($term->name) . '</option>';
+                }
+                ?>
+            </select>
+        </div>
+
+        <!-- Khởi hành -->
+        <div class="form-group">
+            <label>KHỞI HÀNH TỪ</label>
+            <select name="khoihanh" required>
+                <option value="">Vui lòng chọn</option>
+                <option value="ha-noi">Hà Nội</option>
+                <option value="ho-chi-minh">Hồ Chí Minh</option>
+                <option value="da-nang">Đà Nẵng</option>
+                <option value="hai-phong">Hải Phòng</option>
+            </select>
+        </div>
+
+        <!-- Nút -->
+        <div class="form-group" style="flex: 0 0 auto;">
+            <button type="submit">Tìm ngay</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.tour-search-wrapper {
+    max-width: 888px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.tour-search-form {
+    background: #fff;
+    padding: 24px 28px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.tour-search-title {
+    width: 100%;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.form-group {
+    flex: 1 1 calc(33.333% - 10px);
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.form-group select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-group select:invalid {
+    color: #999;
+}
+
+.form-group button {
+    padding: 12px 24px;
+    background-color: #e1703a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .tour-search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-group {
+        flex: 1 1 100%;
+    }
+    .form-group button {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('.tour-search-form');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const select = form.querySelector('[name="diadiem"]');
+        const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
+        if (slug) {
+            window.location.href = '/vung_mien_tour/' + slug + '/';
+        }
+    });
+});
+</script>
