@@ -1,16 +1,16 @@
-echo '</div>'; // Kết thúc danh sách term
+.custom-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background-color: #ddd;
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-    // Nút "Xem tất cả"
-    echo '
-    <div style="text-align:center; margin-top: 16px;">
-        <a href="https://annamtourist.rf.gd/vung_mien_tour/du-lich-nuoc-ngoai/" 
-           style="display:inline-block; padding: 8px 16px; border: 2px solid #660000; color: #660000; text-decoration: none; border-radius: 4px; background-color: #fff; font-weight: bold; transition: all 0.3s;">
-           Xem tất cả &gt;
-        </a>
-        <style>
-            .vungmien-list + div a:hover {
-                background-color: #660000;
-                color: #fff;
-            }
-        </style>
-    </div>';
+.custom-button.red {
+  background-color: #c10000;
+  color: white;
+}
