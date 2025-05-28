@@ -1,17 +1,26 @@
 function tour_search_form_shortcode() {
     ob_start(); ?>
-    
+
     <style>
     .tour-search-wrapper {
         max-width: 1140px;
-        margin-top: -60px;
-        position: relative;
-        z-index: 99;
+        margin: 0 auto;
+        padding: 0 16px;
+        margin-top: 32px;
+    }
+
+    .tour-search-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+        color: #333;
     }
 
     .tour-search-form {
         background: #fff;
-        padding: 24px 32px;
+        padding: 20px 24px;
         border-radius: 12px;
         box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         display: flex;
@@ -28,17 +37,17 @@ function tour_search_form_shortcode() {
 
     .tour-search-form label {
         font-weight: 600;
-        font-size: 13px;
+        font-size: 11px;
         text-transform: uppercase;
         color: #999;
         margin-bottom: 4px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
     }
 
     .tour-search-form label::before {
-        content: "📍";
+        content: "📍"; /* hoặc thay icon nếu cần */
         font-size: 14px;
     }
 
@@ -56,13 +65,14 @@ function tour_search_form_shortcode() {
 
     .tour-search-form button {
         padding: 12px 28px;
-        background-color: #660000;
+        background-color: #e1703a;
         color: #fff;
         border: none;
         border-radius: 8px;
         font-weight: bold;
         font-size: 15px;
         cursor: pointer;
+        flex-shrink: 0;
     }
 
     @media (max-width: 768px) {
@@ -70,11 +80,16 @@ function tour_search_form_shortcode() {
             flex-direction: column;
             align-items: stretch;
         }
+
+        .tour-search-form button {
+            width: 100%;
+        }
     }
     </style>
 
     <div class="tour-search-wrapper">
-        <form onsubmit="return redirectToVungMien(event);" class="tour-search-form">
+        <div class="tour-search-title">Tìm tour giá tốt</div>
+        <form onsubmit="return false;" class="tour-search-form">
 
             <!-- Địa điểm -->
             <div class="form-group">
@@ -93,8 +108,7 @@ function tour_search_form_shortcode() {
                             array_unshift($slug_parts, $current->slug);
                             $current = get_term($current->parent, 'vung_mien_tour');
                         }
-                        if ($current) {
-                            array_unshift($slug_parts, $current->slug);
+                        if ($current) {array_unshift($slug_parts, $current->slug);
                         }
                         $full_slug = implode('/', $slug_parts);
                         echo '<option value="' . esc_attr($term->slug) . '" data-full-slug="' . esc_attr($full_slug) . '">' . esc_html($term->name) . '</option>';
@@ -102,7 +116,8 @@ function tour_search_form_shortcode() {
                     ?>
                 </select>
             </div>
-<!-- Khởi hành -->
+
+            <!-- Khởi hành -->
             <div class="form-group">
                 <label>Khởi hành từ</label>
                 <select name="khoihanh" required>
@@ -122,16 +137,17 @@ function tour_search_form_shortcode() {
     </div>
 
     <script>
-    function redirectToVungMien(event) {
-        event.preventDefault();
-        const form = event.target;
-        const select = form.querySelector('[name="diadiem"]');
-        const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
-        if (slug) {
-            window.location.href = '/vung_mien_tour/' + slug + '/';
-        }
-        return false;
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.tour-search-form');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const select = form.querySelector('[name="diadiem"]');
+            const slug = select.options[select.selectedIndex].getAttribute('data-full-slug');
+            if (slug) {
+                window.location.href = '/vung_mien_tour/' + slug + '/';
+            }
+        });
+    });
     </script>
 
     <?php
