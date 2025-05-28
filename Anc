@@ -103,7 +103,17 @@
     background: white;
     padding: 16px;
   }
-
+  /* Chỉnh riêng nút toggle menu */
+  #bp-toggle-menu {
+    background: none;
+    border: none;
+    padding: 12px;
+    font-size: 24px; /* Tăng kích thước 3 gạch */
+    cursor: pointer;
+    min-width: 44px; /* Đảm bảo vùng bấm đủ rộng */
+    min-height: 44px;
+    color: #333;
+  }
   .bp-nav.bp-nav-open {
     display: flex;
   }
@@ -116,7 +126,9 @@
   .bp-right {
     display: none;
   }
-
+  .bp-mobile-icons i.fa-bars {
+    font-size: 26px;
+  }
   .bp-mobile-icons {
     display: flex;
     gap: 12px;
