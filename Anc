@@ -1,6 +1,40 @@
-<td>
-  <?php echo $ngay ? date('Y-m-d', strtotime($ngay)) : 'Hàng ngày'; ?><br>
-  <span class="<?php echo ($con_cho === 'con') ? 'available' : 'unavailable'; ?>">
-    <?php echo ($con_cho === 'Còn chỗ') ? 'Còn chỗ' : 'Kín chỗ'; ?>
-  </span>
-</td>
+<section id="bang-gia-tour">
+  <h2>📅 Bảng giá combo</h2>
+  <div class="table-wrapper">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Ngày khởi hành</th>
+          <th>Hạng tour</th>
+          <th>Giá tour</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hàng ngày</td>
+          <td>Tiêu chuẩn</td>
+          <td><strong><?php echo number_format(get_field('gia_tour'), 0, ',', '.'); ?>đ</strong></td>
+          <td>
+            <a href="<?php echo site_url('/thanh-toan?price=' . intval(get_field('gia_tour'))); ?>" class="btn-mua-ngay">Đặt ngay</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+.btn-mua-ngay {
+  display: inline-block;
+  background-color: #660000;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+.btn-mua-ngay:hover {
+  background-color: #4d0000;
+}
