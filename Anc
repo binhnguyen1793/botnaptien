@@ -1,16 +1,6 @@
-<div class="rules-note">
-    <strong>Quy định huỷ/đổi dịch vụ:</strong><br>
-    • Huỷ/đổi trước ngày khởi hành <strong>tối thiểu 14 ngày</strong>: Hoàn 100% giá trị thanh toán.<br>
-    • Huỷ/đổi trước ngày khởi hành <strong>dưới 14 ngày</strong>: Khấu trừ 70% nếu đổi sang tour khác hoặc 50% nếu huỷ hoàn toàn.<br>
-    • Thời gian hoàn tiền tối đa <strong>3 ngày làm việc</strong> kể từ thời điểm tiếp nhận yêu cầu.
-</div>
-
-
-.rules-note {
-    background: #f9f9f9;
-    padding: 15px;
-    border-left: 4px solid #660000;
-    margin-bottom: 20px;
-    font-size: 14px;
-    line-height: 1.5;
-}
+<td>
+  <?php echo $ngay ? date('Y-m-d', strtotime($ngay)) : 'Hàng ngày'; ?><br>
+  <span class="<?php echo ($con_cho === 'con') ? 'available' : 'unavailable'; ?>">
+    <?php echo ($con_cho === 'Còn chỗ') ? 'Còn chỗ' : 'Kín chỗ'; ?>
+  </span>
+</td>
