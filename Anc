@@ -1,111 +1,100 @@
-function shortcode_tin_tuc_layout($atts) {
-    $atts = shortcode_atts([
-        'slug' => '',
-        'limit' => 10,
-    ], $atts);
+<?php
+/**
+ * Custom archive.php hiển thị giao diện báo đúcng như ảnh mẫu
+ * Vị trí: /wp-content/themes/your-theme-child/archive.php
+ */
+get_header();
 
-    if (!$atts['slug']) return 'Thiếu slug chuyên mục.';
-    $cat = get_category_by_slug($atts['slug']);
-    if (!$cat) return 'Không tìm thấy chuyên mục.';
+$cat = get_queried_object();
+$paged = get_query_var('paged') ? get_query_var('paged') : 1;
+$args = [
+    'post_type' => 'post',
+    'posts_per_page' => 10,
+    'paged' => $paged,
+    'cat' => $cat->term_id
+];
+$query = new WP_Query($args);
+?>
 
-    $query = new WP_Query([
-        'cat' => $cat->term_id,
-        'posts_per_page' => $atts['limit']
-    ]);
+<div class="container my-5">
+  <h2 class="archive-title mb-4"><?php echo single_cat_title('', false); ?></h2>
+  <div class="row g-4">
+    <!-- Cột trái -->
+    <div class="col-lg-8">
+      <?php if ($query->have_posts()) : $query->the_post(); ?>
+        <!-- Bài nổi bật -->
+        <div class="mb-4 p-3 border rounded bg-white">
+          <a href="<?php the_permalink(); ?>">
+            <?php the_post_thumbnail('large', ['class' => 'img-fluid rounded mb-2']); ?>
+          </a>
+          <h3><a href="<?php the_permalink(); ?>" class="text-main"><?php the_title(); ?></a></h3>
+        </div>
 
-    if (!$query->have_posts()) return 'Không có bài viết.';
-
-    ob_start();
-
-    ?>
-    <div class="tin-tuc-wrapper row g-4">
-        <!-- Bên trái: Bài lớn + 3 bài list -->
-        <div class="col-lg-8">
-            <?php
-            // BÀI NỔI BẬT
-            $query->the_post(); ?>
-            <div class="featured-article p-3 border rounded bg-white">
+        <!-- 3 bài có ảnh nhỏ đặt dưới -->
+        <div class="d-flex flex-column gap-3">
+          <?php for ($i = 0; $i < 3 && $query->have_posts(); $i++) : $query->the_post(); ?>
+            <div class="row p-3 border rounded bg-white align-items-center">
+              <div class="col-md-4">
                 <a href="<?php the_permalink(); ?>">
-                    <?php the_post_thumbnail('large', ['class' => 'img-fluid rounded mb-2']); ?>
+                  <?php the_post_thumbnail('medium', ['class' => 'img-fluid rounded']); ?>
                 </a>
-                <h3 class="main-title">
-                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                </h3>
+              </div>
+              <div class="col-md-8">
+                <h5><a href="<?php the_permalink(); ?>" class="text-main"><?php the_title(); ?></a></h5>
+                <p class="text-muted mb-0"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></p>
+              </div>
             </div>
-
-            <!-- 3 BÀI DƯỚI: LIST NGANG -->
-            <div class="mt-4 d-flex flex-column gap-3">
-                <?php for ($i = 0; $i < 3 && $query->have_posts(); $i++): $query->the_post(); ?>
-                    <div class="row p-3 border rounded bg-white">
-                        <div class="col-md-4">
-                            <a href="<?php the_permalink(); ?>">
-                                <?php the_post_thumbnail('medium', ['class' => 'img-fluid rounded']); ?>
-                            </a>
-                        </div>
-                        <div class="col-md-8">
-                            <h5 class="sub-title">
-                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                            </h5>
-                            <p class="text-muted mb-0"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></p>
-                        </div>
-                    </div>
-                <?php endfor; ?>
-            </div>
+          <?php endfor; ?>
         </div>
-
-        <!-- Bên phải: Danh sách bài nhỏ -->
-        <div class="col-lg-4">
-            <div class="bg-white p-3 border rounded">
-                <h5 class="mb-3">Tin mới trong mục</h5>
-                <ul class="list-unstyled d-flex flex-column gap-2">
-                    <?php while ($query->have_posts()): $query->the_post(); ?>
-                        <li>
-                            <a href="<?php the_permalink(); ?>" class="small-title"><?php the_title(); ?></a>
-                        </li>
-                    <?php endwhile; ?>
-                </ul>
-            </div>
-        </div>
+      <?php endif; ?>
     </div>
 
-    <!-- CSS -->
-    <style>
-        .main-title a {
-            color: #660000;
-            font-size: 22px;
-            font-weight: bold;
-            text-decoration: none;
-        }
+    <!-- Cột phải -->
+    <div class="col-lg-4">
+      <div class="bg-white p-3 border rounded">
+        <h5 class="text-main mb-3">Tin mới nhất</h5>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+          <?php while ($query->have_posts()) : $query->the_post(); ?>
+            <li><a href="<?php the_permalink(); ?>" class="text-main small fw-medium"><?php the_title(); ?></a></li>
+          <?php endwhile; ?>
+        </ul>
+      </div>
+    </div>
+  </div>
 
-        .sub-title a {
-            color: #660000;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .small-title {
-            font-size: 14px;
-            color: #660000;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        .small-title:hover {
-            text-decoration: underline;
-        }
-
-        .tin-tuc-wrapper {
-            margin-top: 30px;
-        }
-
-        .tin-tuc-wrapper .border {
-            border-color: #ddd !important;
-        }
-    </style>
+  <!-- Phân trang -->
+  <div class="mt-4">
     <?php
+    echo paginate_links([
+      'total' => $query->max_num_pages,
+      'prev_text' => '« Trước',
+      'next_text' => 'Tiếp »'
+    ]);
+    ?>
+  </div>
+</div>
 
-    wp_reset_postdata();
-    return ob_get_clean();
-}
-add_shortcode('tin_tuc_layout', 'shortcode_tin_tuc_layout');
+<style>
+  .text-main {
+    color: #660000 !important;
+    text-decoration: none;
+  }
+  .text-main:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 768px) {
+    .archive-title {
+      font-size: 22px;
+      text-align: center;
+    }
+    .row .col-md-4, .row .col-md-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    .row.align-items-center {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<?php get_footer(); ?>
