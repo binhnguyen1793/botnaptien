@@ -1,72 +1,111 @@
-function shortcode_news_block($atts) {
+function shortcode_tin_tuc_layout($atts) {
     $atts = shortcode_atts([
         'slug' => '',
         'limit' => 10,
     ], $atts);
 
-    if (!$atts['slug']) return 'Thiếu chuyên mục.';
-
+    if (!$atts['slug']) return 'Thiếu slug chuyên mục.';
     $cat = get_category_by_slug($atts['slug']);
     if (!$cat) return 'Không tìm thấy chuyên mục.';
 
     $query = new WP_Query([
         'cat' => $cat->term_id,
-        'posts_per_page' => $atts['limit'],
+        'posts_per_page' => $atts['limit']
     ]);
 
     if (!$query->have_posts()) return 'Không có bài viết.';
 
     ob_start();
 
-    // Lấy bài đầu tiên
-    $query->the_post();
     ?>
-    <div class="tin-tuc-custom">
-        <div class="row">
-            <!-- Bài nổi bật -->
-            <div class="col-lg-8">
-                <div class="featured">
-                    <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail('large', ['class' => 'img-fluid rounded']); ?></a>
-                    <h3 class="main-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                </div>
+    <div class="tin-tuc-wrapper row g-4">
+        <!-- Bên trái: Bài lớn + 3 bài list -->
+        <div class="col-lg-8">
+            <?php
+            // BÀI NỔI BẬT
+            $query->the_post(); ?>
+            <div class="featured-article p-3 border rounded bg-white">
+                <a href="<?php the_permalink(); ?>">
+                    <?php the_post_thumbnail('large', ['class' => 'img-fluid rounded mb-2']); ?>
+                </a>
+                <h3 class="main-title">
+                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                </h3>
             </div>
 
-            <!-- 4 bài nhỏ -->
-            <div class="col-lg-4">
-                <ul class="list-small">
-                    <?php for ($i = 0; $i < 4 && $query->have_posts(); $i++): $query->the_post(); ?>
-                        <li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
-                    <?php endfor; ?>
+            <!-- 3 BÀI DƯỚI: LIST NGANG -->
+            <div class="mt-4 d-flex flex-column gap-3">
+                <?php for ($i = 0; $i < 3 && $query->have_posts(); $i++): $query->the_post(); ?>
+                    <div class="row p-3 border rounded bg-white">
+                        <div class="col-md-4">
+                            <a href="<?php the_permalink(); ?>">
+                                <?php the_post_thumbnail('medium', ['class' => 'img-fluid rounded']); ?>
+                            </a>
+                        </div>
+                        <div class="col-md-8">
+                            <h5 class="sub-title">
+                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                            </h5>
+                            <p class="text-muted mb-0"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></p>
+                        </div>
+                    </div>
+                <?php endfor; ?>
+            </div>
+        </div>
+
+        <!-- Bên phải: Danh sách bài nhỏ -->
+        <div class="col-lg-4">
+            <div class="bg-white p-3 border rounded">
+                <h5 class="mb-3">Tin mới trong mục</h5>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    <?php while ($query->have_posts()): $query->the_post(); ?>
+                        <li>
+                            <a href="<?php the_permalink(); ?>" class="small-title"><?php the_title(); ?></a>
+                        </li>
+                    <?php endwhile; ?>
                 </ul>
             </div>
         </div>
-
-        <!-- 3 bài danh sách -->
-        <div class="mt-4 d-flex flex-column gap-3">
-            <?php for ($i = 0; $i < 3 && $query->have_posts(); $i++): $query->the_post(); ?>
-                <div class="row border p-3 rounded">
-                    <div class="col-md-4"><?php the_post_thumbnail('medium', ['class' => 'img-fluid rounded']); ?></div>
-                    <div class="col-md-8">
-                        <h5 class="sub-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
-                        <p class="text-muted"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></p>
-                    </div>
-                </div>
-            <?php endfor; ?>
-        </div>
     </div>
 
+    <!-- CSS -->
     <style>
-        .main-title a { color: #660000; font-size: 24px; font-weight: bold; text-decoration: none; }
-        .list-small { padding-left: 20px; }
-        .list-small li { margin-bottom: 8px; font-size: 14px; }
-        .list-small li a { color: #660000; text-decoration: none; font-weight: 500; }
-        .list-small li a:hover { text-decoration: underline; }
-        .sub-title a { color: #660000; text-decoration: none; font-weight: 600; }
-        .sub-title a:hover { text-decoration: underline; }
+        .main-title a {
+            color: #660000;
+            font-size: 22px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .sub-title a {
+            color: #660000;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .small-title {
+            font-size: 14px;
+            color: #660000;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .small-title:hover {
+            text-decoration: underline;
+        }
+
+        .tin-tuc-wrapper {
+            margin-top: 30px;
+        }
+
+        .tin-tuc-wrapper .border {
+            border-color: #ddd !important;
+        }
     </style>
     <?php
 
     wp_reset_postdata();
     return ob_get_clean();
 }
-add_shortcode('tin_tuc_block', 'shortcode_news_block');
+add_shortcode('tin_tuc_layout', 'shortcode_tin_tuc_layout');
