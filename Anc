@@ -1,44 +1,138 @@
-<aside class="blog-sidebar">
-    <div class="sidebar-section">
-        <div class="sidebar-header">
-            <h3>TIN MỚI NHẤT</h3>
-            <a href="/blog">Xem thêm ></a>
-        </div>
-        <?php
-        $recent = new WP_Query(['posts_per_page' => 5]);
-        while($recent->have_posts()): $recent->the_post(); ?>
-            <div class="sidebar-post">
-                <a href="<?php the_permalink(); ?>">
-                    <div class="thumb"><?php the_post_thumbnail('thumbnail'); ?></div>
-                    <div class="info"><?php the_title(); ?></div>
-                </a>
-            </div>
-        <?php endwhile; wp_reset_postdata(); ?>
-    </div>
+<?php get_header(); ?>
 
-    <div class="sidebar-section city-block">
-        <h4>Tỉnh thành có nhiều tin đăng nhất</h4>
-        <div class="city-grid">
-            <div class="city-item">
-                <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-ha-noi.jpg" alt="Hà Nội">
-                <div>Hà Nội</div>
+<div class="blog-category-container">
+    <!-- MAIN CONTENT -->
+    <div class="blog-main">
+        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+            <div class="blog-card">
+                <div class="blog-thumbnail">
+                    <a href="<?php the_permalink(); ?>">
+                        <?php the_post_thumbnail('medium'); ?>
+                    </a>
+                </div>
+                <div class="blog-content">
+                    <h2 class="blog-title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h2>
+                    <div class="blog-excerpt">
+                        <?php echo wp_trim_words(get_the_excerpt(), 25); ?>
+                    </div>
+                </div>
             </div>
-            <div class="city-item">
-                <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-tp-ho-chi-minh.jpg" alt="TP.HCM">
-                <div>TP. Hồ Chí Minh</div>
-            </div>
+        <?php endwhile; else: ?>
+            <p>Không có bài viết nào.</p>
+        <?php endif; ?>
+
+        <div class="pagination">
+            <?php the_posts_pagination(); ?>
         </div>
     </div>
-</aside>
 
+    <!-- SIDEBAR -->
+    <aside class="blog-sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-header">
+                <h3>TIN MỚI NHẤT</h3>
+                <a href="/blog">Xem thêm ></a>
+            </div>
+            <?php
+            $recent = new WP_Query(['posts_per_page' => 5]);
+            while ($recent->have_posts()) : $recent->the_post(); ?>
+                <div class="sidebar-post">
+                    <a href="<?php the_permalink(); ?>">
+                        <div class="thumb"><?php the_post_thumbnail('thumbnail'); ?></div>
+                        <div class="info"><?php echo wp_trim_words(get_the_title(), 10); ?></div>
+                    </a>
+                </div>
+            <?php endwhile;
+            wp_reset_postdata(); ?>
+        </div>
 
-blog-sidebar {
-    padding: 20px;
-    background: #f9f9f9;
+        <div class="sidebar-section city-block">
+            <h4>Tỉnh thành có nhiều tin đăng nhất</h4>
+            <div class="city-grid">
+                <div class="city-item">
+                    <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-ha-noi.jpg" alt="Hà Nội">
+                    <div>Hà Nội</div>
+                </div>
+                <div class="city-item">
+                    <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-tp-ho-chi-minh.jpg" alt="TP.HCM">
+                    <div>TP. Hồ Chí Minh</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<?php get_footer(); ?>
+
+.blog-category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 30px auto;
+    max-width: 1200px;
+}
+
+.blog-main {
+    flex: 1 1 70%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+.blog-card {
+    display: flex;
+    gap: 20px;
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 6px;
+    transition: box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.blog-thumbnail img {
+    width: 180px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.blog-content {
+    flex: 1;
+}
+
+.blog-title {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.blog-excerpt {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.blog-sidebar {
+    flex: 1 1 25%;
+    padding-left: 20px;
 }
 
 .sidebar-section {
     margin-bottom: 30px;
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
 }
 
 .sidebar-header {
@@ -75,7 +169,6 @@ blog-sidebar {
 }
 
 .sidebar-post .info {
-    flex: 1;
     font-size: 14px;
     color: #333;
     line-height: 1.3;
