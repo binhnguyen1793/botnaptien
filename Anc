@@ -20,57 +20,71 @@ if (!empty($terms) && !is_wp_error($terms)) {
     $related_tours = new WP_Query($args);
 
     if ($related_tours->have_posts()) : ?>
-        <div class="related-tours-wrapper">
-            <h3 class="related-title">Tour du lịch tương tự</h3>
-            <div class="related-tours-grid">
-                <?php while ($related_tours->have_posts()) : $related_tours->the_post(); ?>
-                    <div class="related-tour-card">
-                        <a href="<?php the_permalink(); ?>">
-                            <div class="related-thumb">
-                                <?php the_post_thumbnail('medium'); ?>
-                            </div>
-                            <h4 class="related-tour-title"><?php echo wp_trim_words(get_the_title(), 12); ?></h4>
-                        </a>
-                        <div class="related-tour-info">
-                            <div class="related-location">
-                                <?php the_field('dia_diem_khoi_hanh'); ?>
-                            </div>
-                            <div class="related-duration">
-                                <?php the_field('so_ngay'); ?>N<?php the_field('so_dem'); ?>Đ
-                            </div>
-                            <div class="related-price">
-                                <?php if (get_field('gia_km')) : ?>
-                                    <span class="old-price"><?php echo number_format(get_field('gia_goc'), 0, ',', '.'); ?>đ</span>
-                                    <span class="new-price"><?php echo number_format(get_field('gia_km'), 0, ',', '.'); ?>đ</span>
-                                <?php else : ?>
-                                    <span class="new-price">Gửi yêu cầu</span>
-                                <?php endif; ?>
+        <div class="related-tours-wrapper-box">
+            <div class="related-tours-wrapper">
+                <h3 class="related-title">Tour du lịch tương tự</h3>
+                <div class="related-tours-grid">
+                    <?php while ($related_tours->have_posts()) : $related_tours->the_post(); ?>
+                        <div class="related-tour-card">
+                            <a href="<?php the_permalink(); ?>">
+                                <div class="related-thumb">
+                                    <?php the_post_thumbnail('medium'); ?>
+                                </div>
+                                <h4 class="related-tour-title"><?php echo wp_trim_words(get_the_title(), 12); ?></h4>
+                            </a>
+                            <div class="related-tour-info">
+                                <div class="related-location">
+                                    <?php the_field('dia_diem_khoi_hanh'); ?>
+                                </div>
+                                <div class="related-duration">
+                                    <?php the_field('so_ngay'); ?>N<?php the_field('so_dem'); ?>Đ
+                                </div>
+                                <div class="related-price">
+                                    <?php if (get_field('gia_km')) : ?>
+                                        <span class="old-price"><?php echo number_format(get_field('gia_goc'), 0, ',', '.'); ?>đ</span>
+                                        <span class="new-price"><?php echo number_format(get_field('gia_km'), 0, ',', '.'); ?>đ</span>
+                                    <?php else : ?>
+                                        <span class="new-price">Gửi yêu cầu</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endwhile; wp_reset_postdata(); ?>
+                    <?php endwhile; wp_reset_postdata(); ?>
+                </div>
             </div>
         </div>
     <?php endif;
 }
 ?>
 
-.related-tours-wrapper {
-    margin-top: 40px;
+/* KHUNG TỔNG - căn giữa đẹp */
+.related-tours-wrapper-box {
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
+/* TIÊU ĐỀ */
 .related-title {
     font-size: 22px;
-    margin-bottom: 20px;
     font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
+/* GRID chứa các tour */
 .related-tours-grid {
     display: flex;
-    gap: 20px;
     flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
 }
 
+/* CARD từng tour */
 .related-tour-card {
     flex: 1 1 calc(25% - 20px);
     background: #fff;
@@ -78,12 +92,14 @@ if (!empty($terms) && !is_wp_error($terms)) {
     border-radius: 6px;
     padding: 10px;
     transition: box-shadow 0.3s ease;
+    text-align: left;
 }
 
 .related-tour-card:hover {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+/* Ảnh đại diện */
 .related-thumb img {
     width: 100%;
     height: 140px;
@@ -91,6 +107,7 @@ if (!empty($terms) && !is_wp_error($terms)) {
     border-radius: 6px;
 }
 
+/* Tên tour */
 .related-tour-title {
     font-size: 16px;
     margin: 10px 0;
@@ -98,6 +115,7 @@ if (!empty($terms) && !is_wp_error($terms)) {
     color: #222;
 }
 
+/* Thông tin phụ */
 .related-tour-info {
     font-size: 14px;
     color: #666;
@@ -111,6 +129,7 @@ if (!empty($terms) && !is_wp_error($terms)) {
     margin-bottom: 5px;
 }
 
+/* Giá */
 .old-price {
     text-decoration: line-through;
     color: #999;
@@ -122,3 +141,16 @@ if (!empty($terms) && !is_wp_error($terms)) {
     color: #c00000;
     font-weight: bold;
 }
+
+/* RESPONSIVE CHO MOBILE */
+@media (max-width: 768px) {
+    .related-tours-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .related-tour-card {
+        flex: 1 1 100%;
+    }
+}
+
