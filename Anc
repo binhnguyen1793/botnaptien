@@ -1,119 +1,112 @@
-<?php get_header(); ?>
-
-<div class="blog-category-container">
-    <div class="blog-main">
-        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-            <div class="blog-card">
-                <div class="blog-thumbnail">
-                    <a href="<?php the_permalink(); ?>">
-                        <?php the_post_thumbnail('medium'); ?>
-                    </a>
-                </div>
-                <div class="blog-content">
-                    <h2 class="blog-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-                    <div class="blog-excerpt"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></div>
-                </div>
-            </div>
-        <?php endwhile; else: ?>
-            <p>Không có bài viết nào.</p>
-        <?php endif; ?>
-
-        <div class="pagination">
-            <?php the_posts_pagination(); ?>
+<aside class="blog-sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-header">
+            <h3>TIN MỚI NHẤT</h3>
+            <a href="/blog">Xem thêm ></a>
         </div>
+        <?php
+        $recent = new WP_Query(['posts_per_page' => 5]);
+        while($recent->have_posts()): $recent->the_post(); ?>
+            <div class="sidebar-post">
+                <a href="<?php the_permalink(); ?>">
+                    <div class="thumb"><?php the_post_thumbnail('thumbnail'); ?></div>
+                    <div class="info"><?php the_title(); ?></div>
+                </a>
+            </div>
+        <?php endwhile; wp_reset_postdata(); ?>
     </div>
 
-    <aside class="blog-sidebar">
-        <h3>Bài viết mới</h3>
-        <ul>
-            <?php
-            $recent = new WP_Query(['posts_per_page' => 5]);
-            while($recent->have_posts()): $recent->the_post(); ?>
-                <li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
-            <?php endwhile; wp_reset_postdata(); ?>
-        </ul>
-    </aside>
-</div>
+    <div class="sidebar-section city-block">
+        <h4>Tỉnh thành có nhiều tin đăng nhất</h4>
+        <div class="city-grid">
+            <div class="city-item">
+                <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-ha-noi.jpg" alt="Hà Nội">
+                <div>Hà Nội</div>
+            </div>
+            <div class="city-item">
+                <img src="https://cdn.bestprice.vn/images/destinations/large/vietnam-tp-ho-chi-minh.jpg" alt="TP.HCM">
+                <div>TP. Hồ Chí Minh</div>
+            </div>
+        </div>
+    </div>
+</aside>
 
-<?php get_footer(); ?>
 
+blog-sidebar {
+    padding: 20px;
+    background: #f9f9f9;
+}
 
-.blog-category-container {
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-header {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin: 30px auto;
-    max-width: 1200px;
-}
-
-.blog-main {
-    flex: 1 1 70%;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 30px;
-}
-
-.blog-card {
-    display: flex;
-    gap: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-    transition: box-shadow 0.3s ease;
-}
-
-.blog-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.blog-thumbnail img {
-    width: 180px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-.blog-content {
-    flex: 1;
-}
-
-.blog-title {
-    margin-top: 0;
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.blog-excerpt {
-    color: #555;
-}
-
-.blog-sidebar {
-    flex: 1 1 25%;
-    padding-left: 20px;
-    border-left: 1px solid #ccc;
-}
-
-.blog-sidebar h3 {
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+.sidebar-header h3 {
+    margin: 0;
     font-size: 18px;
+    font-weight: bold;
 }
 
-.blog-sidebar ul {
-    list-style: none;
-    padding: 0;
+.sidebar-header a {
+    font-size: 14px;
+    color: #0073aa;
+    text-decoration: none;
 }
 
-.blog-sidebar li {
+.sidebar-post {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.sidebar-post .thumb img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.sidebar-post .info {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.3;
+}
+
+.city-block h4 {
+    font-size: 16px;
     margin-bottom: 10px;
 }
 
-.blog-sidebar li a {
-    text-decoration: none;
-    color: #d80000;
+.city-grid {
+    display: flex;
+    gap: 10px;
 }
 
-.pagination {
+.city-item {
+    flex: 1;
     text-align: center;
-    margin-top: 30px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.city-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+}
+
+.city-item div {
+    padding: 5px;
+    font-size: 14px;
 }
