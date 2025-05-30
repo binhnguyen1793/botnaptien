@@ -1,156 +1,89 @@
-<?php
-// Lấy vùng miền của tour hiện tại
-$terms = wp_get_post_terms(get_the_ID(), 'vung_mien_tour');
-if (!empty($terms) && !is_wp_error($terms)) {
-    $term_ids = wp_list_pluck($terms, 'term_id');
+<section id="danhgia">
+  <h2>📌 Đánh giá</h2>
+  <div class="review-summary">
+    <div class="review-score">9.1</div>
+    <div class="review-details">
+      <p><strong>Tuyệt vời</strong></p>
+      <p>50 đánh giá</p>
+    </div>
+  </div>
 
-    $args = [
-        'post_type' => 'tour',
-        'posts_per_page' => 4,
-        'post__not_in' => [get_the_ID()],
-        'tax_query' => [
-            [
-                'taxonomy' => 'vung_mien_tour',
-                'field' => 'term_id',
-                'terms' => $term_ids,
-            ]
-        ]
+  <div id="review-list">
+    <?php
+    // Tạo dữ liệu giả 50 đánh giá cứng
+    $names = ['Thu Huyền', 'Mỹ Kim', 'Khánh Linh', 'Anh Tuấn', 'Ngọc Anh', 'Bảo Trâm', 'Hải My', 'Duy Khánh', 'Minh Châu', 'Hoàng Nam'];
+    $dates = ['12/01/2024', '15/02/2024', '20/03/2024', '05/04/2024', '30/05/2024', '10/06/2024', '18/07/2024', '25/08/2024', '03/09/2024', '11/10/2024'];
+    $comments = [
+        "Chuyến đi tuyệt vời, lịch trình hợp lý, đồ ăn ngon.",
+        "Hướng dẫn viên rất nhiệt tình và thân thiện.",
+        "Cảnh đẹp mê hồn, dịch vụ trên cả mong đợi.",
+        "Gia đình tôi đã có khoảng thời gian đáng nhớ.",
+        "Tour tổ chức chuyên nghiệp, mọi thứ đều suôn sẻ.",
+        "Tôi sẽ giới thiệu tour này cho bạn bè.",
+        "Xe đưa đón đúng giờ, khách sạn sạch sẽ và tiện nghi.",
+        "Mỗi địa điểm dừng chân đều để lại ấn tượng tốt.",
+        "Rất hài lòng với dịch vụ của công ty.",
+        "Lần sau chắc chắn tôi sẽ quay lại."
     ];
 
-    $related_tours = new WP_Query($args);
-
-    if ($related_tours->have_posts()) : ?>
-        <div class="related-tours-wrapper-box">
-            <div class="related-tours-wrapper">
-                <h3 class="related-title">Tour du lịch tương tự</h3>
-                <div class="related-tours-grid">
-                    <?php while ($related_tours->have_posts()) : $related_tours->the_post(); ?>
-                        <div class="related-tour-card">
-                            <a href="<?php the_permalink(); ?>">
-                                <div class="related-thumb">
-                                    <?php the_post_thumbnail('medium'); ?>
-                                </div>
-                                <h4 class="related-tour-title"><?php echo wp_trim_words(get_the_title(), 12); ?></h4>
-                            </a>
-                            <div class="related-tour-info">
-                                <div class="related-location">
-                                    <?php the_field('dia_diem_khoi_hanh'); ?>
-                                </div>
-                                <div class="related-duration">
-                                    <?php the_field('so_ngay'); ?>N<?php the_field('so_dem'); ?>Đ
-                                </div>
-                                <div class="related-price">
-                                    <?php if (get_field('gia_km')) : ?>
-                                        <span class="old-price"><?php echo number_format(get_field('gia_goc'), 0, ',', '.'); ?>đ</span>
-                                        <span class="new-price"><?php echo number_format(get_field('gia_km'), 0, ',', '.'); ?>đ</span>
-                                    <?php else : ?>
-                                        <span class="new-price">Gửi yêu cầu</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; wp_reset_postdata(); ?>
-                </div>
+    for ($i = 0; $i < 50; $i++) {
+        $name = $names[array_rand($names)];
+        $date = $dates[array_rand($dates)];
+        $score = round(mt_rand(85, 99) / 10, 1);
+        $short = $comments[array_rand($comments)];
+        $long = $comments[array_rand($comments)] . ' ' . $comments[array_rand($comments)];
+        ?>
+        <div class="review-item">
+          <div class="review-score-small"><?php echo $score; ?></div>
+          <div class="review-text">
+            <p class="author">Tuyệt vời - <?php echo $name; ?></p>
+            <p><?php echo $date; ?></p>
+            <p>
+              <?php echo $short; ?>
+              <span class="extra hidden"><?php echo $long; ?></span>
+              <span class="toggle-text">Xem thêm »</span>
+            </p>
+            <div class="review-images">
+              <img src="https://via.placeholder.com/100x70" alt="Ảnh đánh giá">
+              <img src="https://via.placeholder.com/100x70" alt="Ảnh đánh giá">
             </div>
+          </div>
         </div>
-    <?php endif;
-}
-?>
-
-/* KHUNG TỔNG - căn giữa đẹp */
-.related-tours-wrapper-box {
-    max-width: 1200px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-}
-
-/* TIÊU ĐỀ */
-.related-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* GRID chứa các tour */
-.related-tours-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
-
-/* CARD từng tour */
-.related-tour-card {
-    flex: 1 1 calc(25% - 20px);
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px;
-    transition: box-shadow 0.3s ease;
-    text-align: left;
-}
-
-.related-tour-card:hover {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-/* Ảnh đại diện */
-.related-thumb img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-/* Tên tour */
-.related-tour-title {
-    font-size: 16px;
-    margin: 10px 0;
-    min-height: 42px;
-    color: #222;
-}
-
-/* Thông tin phụ */
-.related-tour-info {
-    font-size: 14px;
-    color: #666;
-}
-
-.related-location {
-    margin-bottom: 5px;
-}
-
-.related-duration {
-    margin-bottom: 5px;
-}
-
-/* Giá */
-.old-price {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 13px;
-    margin-right: 5px;
-}
-
-.new-price {
-    color: #c00000;
-    font-weight: bold;
-}
-
-/* RESPONSIVE CHO MOBILE */
-@media (max-width: 768px) {
-    .related-tours-grid {
-        flex-direction: column;
-        gap: 20px;
+        <?php
     }
+    ?>
+  </div>
 
-    .related-tour-card {
-        flex: 1 1 100%;
-    }
-}
+  <div class="review-toggle">
+    <button id="load-more-review" class="toggle-review-btn">Xem thêm đánh giá</button>
+  </div>
+</section>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const reviews = document.querySelectorAll("#review-list .review-item");
+  const btn = document.getElementById("load-more-review");
+  const perLoad = 3;
+  let visible = perLoad;
+
+  reviews.forEach((el, index) => {
+    el.style.display = index < visible ? "block" : "none";
+  });
+
+  btn.addEventListener("click", function () {
+    visible += perLoad;
+    reviews.forEach((el, index) => {
+      if (index < visible) el.style.display = "block";
+    });
+    if (visible >= reviews.length) btn.style.display = "none";
+  });
+
+  document.querySelectorAll(".toggle-text").forEach(toggle => {
+    toggle.addEventListener("click", function () {
+      const extra = this.previousElementSibling;
+      extra.classList.toggle("hidden");
+      this.textContent = extra.classList.contains("hidden") ? "Xem thêm »" : "Thu gọn «";
+    });
+  });
+});
+</script>
