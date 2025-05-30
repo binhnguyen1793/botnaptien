@@ -1,89 +1,20 @@
-<section id="danhgia">
-  <h2>📌 Đánh giá</h2>
-  <div class="review-summary">
-    <div class="review-score">9.1</div>
-    <div class="review-details">
-      <p><strong>Tuyệt vời</strong></p>
-      <p>50 đánh giá</p>
-    </div>
-  </div>
+.review-toggle {
+  text-align: center;
+  margin-top: 20px;
+}
 
-  <div id="review-list">
-    <?php
-    // Tạo dữ liệu giả 50 đánh giá cứng
-    $names = ['Thu Huyền', 'Mỹ Kim', 'Khánh Linh', 'Anh Tuấn', 'Ngọc Anh', 'Bảo Trâm', 'Hải My', 'Duy Khánh', 'Minh Châu', 'Hoàng Nam'];
-    $dates = ['12/01/2024', '15/02/2024', '20/03/2024', '05/04/2024', '30/05/2024', '10/06/2024', '18/07/2024', '25/08/2024', '03/09/2024', '11/10/2024'];
-    $comments = [
-        "Chuyến đi tuyệt vời, lịch trình hợp lý, đồ ăn ngon.",
-        "Hướng dẫn viên rất nhiệt tình và thân thiện.",
-        "Cảnh đẹp mê hồn, dịch vụ trên cả mong đợi.",
-        "Gia đình tôi đã có khoảng thời gian đáng nhớ.",
-        "Tour tổ chức chuyên nghiệp, mọi thứ đều suôn sẻ.",
-        "Tôi sẽ giới thiệu tour này cho bạn bè.",
-        "Xe đưa đón đúng giờ, khách sạn sạch sẽ và tiện nghi.",
-        "Mỗi địa điểm dừng chân đều để lại ấn tượng tốt.",
-        "Rất hài lòng với dịch vụ của công ty.",
-        "Lần sau chắc chắn tôi sẽ quay lại."
-    ];
+.toggle-review-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 1px solid #660000;
+  color: #660000;
+  background: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    for ($i = 0; $i < 50; $i++) {
-        $name = $names[array_rand($names)];
-        $date = $dates[array_rand($dates)];
-        $score = round(mt_rand(85, 99) / 10, 1);
-        $short = $comments[array_rand($comments)];
-        $long = $comments[array_rand($comments)] . ' ' . $comments[array_rand($comments)];
-        ?>
-        <div class="review-item">
-          <div class="review-score-small"><?php echo $score; ?></div>
-          <div class="review-text">
-            <p class="author">Tuyệt vời - <?php echo $name; ?></p>
-            <p><?php echo $date; ?></p>
-            <p>
-              <?php echo $short; ?>
-              <span class="extra hidden"><?php echo $long; ?></span>
-              <span class="toggle-text">Xem thêm »</span>
-            </p>
-            <div class="review-images">
-              <img src="https://via.placeholder.com/100x70" alt="Ảnh đánh giá">
-              <img src="https://via.placeholder.com/100x70" alt="Ảnh đánh giá">
-            </div>
-          </div>
-        </div>
-        <?php
-    }
-    ?>
-  </div>
-
-  <div class="review-toggle">
-    <button id="load-more-review" class="toggle-review-btn">Xem thêm đánh giá</button>
-  </div>
-</section>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const reviews = document.querySelectorAll("#review-list .review-item");
-  const btn = document.getElementById("load-more-review");
-  const perLoad = 3;
-  let visible = perLoad;
-
-  reviews.forEach((el, index) => {
-    el.style.display = index < visible ? "block" : "none";
-  });
-
-  btn.addEventListener("click", function () {
-    visible += perLoad;
-    reviews.forEach((el, index) => {
-      if (index < visible) el.style.display = "block";
-    });
-    if (visible >= reviews.length) btn.style.display = "none";
-  });
-
-  document.querySelectorAll(".toggle-text").forEach(toggle => {
-    toggle.addEventListener("click", function () {
-      const extra = this.previousElementSibling;
-      extra.classList.toggle("hidden");
-      this.textContent = extra.classList.contains("hidden") ? "Xem thêm »" : "Thu gọn «";
-    });
-  });
-});
-</script>
+.toggle-review-btn:hover {
+  background: #660000;
+  color: #ffffff;
+}
