@@ -1,107 +1,13 @@
-<div class="container"> 
-<?php if (have_rows('bang_gia')): ?>
-<section id="bang-gia-tour">
-  <h2>📅 Bảng giá tour</h2>
-
-  <?php
-    $months = [];
-    $rows = get_field('bang_gia');
-    foreach ($rows as $row) {
-      $ngay = $row['ngay_khoi'];
-      if ($ngay) {
-        $month_key = date('Y-m', strtotime($ngay));
-        $months[$month_key] = 'Tháng ' . (int)date('m', strtotime($ngay));
-      }
-    }
-  ?>
-
-  <div class="month-tabs">
-    <button class="tab-btn active" data-month="all">Tất cả</button>
-    <?php foreach ($months as $key => $label): ?>
-      <button class="tab-btn" data-month="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
-    <?php endforeach; ?>
-  </div>
-
-  <div class="table-wrapper">
-    <table class="price-table">
-      <thead>
-        <tr>
-          <th>Ngày khởi hành</th>
-          <th>Hạng tour</th>
-          <th>Giá tour</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($rows as $row): 
-          $ngay = $row['ngay_khoi'];
-          $hang = $row['hang_tour'];
-          $gia = $row['gia_tour'];
-          $con_cho = $row['con_cho'];
-          $thang = $ngay ? date('Y-m', strtotime($ngay)) : '';
-        ?>
-        <tr data-month="<?php echo esc_attr($thang); ?>">
-          <td>
-            <?php echo $ngay ? date('Y-m-d', strtotime($ngay)) : ''; ?><br>
-            <span class="<?php echo ($con_cho === 'con') ? 'available' : 'unavailable'; ?>">
-              <?php echo ($con_cho === 'Còn chỗ') ? 'Còn chỗ' : 'Kín chỗ'; ?>
-            </span>
-          </td>
-          <td><?php echo esc_html($hang); ?></td>
-          <td>
-            <strong><?php echo is_numeric($gia) ? number_format($gia, 0, ',', '.') . 'đ' : 'Liên hệ'; ?></strong><br>
-            <small>+ <?php echo is_numeric($gia) ? number_format($gia * 0.01, 0, ',', '.') . ' điểm' : ''; ?></small>
-          </td>
-          <td>
-            <?php if ($con_cho === 'Còn chỗ'): ?>
-              <a href="/thanh-toan?price=<?php echo esc_attr($gia); ?>" class="btn-mua-ngay">Giữ chỗ ngay</a>
-            <?php else: ?>
-              <a href="#yeu-cau" class="btn-yeu-cau">Gửi yêu cầu</a>
-            <?php endif; ?>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<?php else: ?>
-<!-- Mặc định hiển thị bảng trống khi không có dữ liệu -->
-<section id="bang-gia-tour">
-  <h2>📅 Bảng giá tour</h2>
-  <div class="table-wrapper">
-    <table class="price-table">
-      <thead>
-        <tr>
-          <th>Ngày khởi hành</th>
-          <th>Hạng giá combo</th>
-          <th>Giá combo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td><button class="btn-mua-ngay">Đặt ngay</button></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-<?php endif; ?>
+<div class="hotel-featured-gallery">
+  <?php 
+  $gallery = get_field('anh_dai_dien');
+  if ($gallery): ?>
+    <div class="hotel-gallery-slider">
+      <?php foreach ($gallery as $image): ?>
+        <div class="hotel-gallery-slide">
+          <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 </div>
-
-
-.price-table td {
-  text-align: center;
-  vertical-align: middle;
-}
-.btn-mua-ngay {
-  background: #ffc107;
-  color: #000;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 3px;
-  font-weight: bold;
-}
