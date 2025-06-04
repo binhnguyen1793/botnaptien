@@ -1,16 +1,16 @@
 <?php 
 $anh_phong = get_sub_field('anh_phong');
 if ($anh_phong && is_array($anh_phong)) : 
-    $anh_dai_dien = $anh_phong[0]; // Lấy ảnh đầu tiên làm đại diện
+    $ten_phong_slug = sanitize_title($ten_phong); // tạo group fancybox riêng cho mỗi phòng
+    $anh_dai_dien = $anh_phong[0];
 ?>
   <div class="room-image">
-    <a href="<?php echo esc_url($anh_dai_dien); ?>" data-fancybox="phong-<?php echo $ten_phong; ?>">
+    <a data-fancybox="<?php echo $ten_phong_slug; ?>" href="<?php echo esc_url($anh_dai_dien); ?>">
       <img src="<?php echo esc_url($anh_dai_dien); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
     </a>
 
-    <!-- Ẩn các ảnh còn lại nhưng để Fancybox hiển thị -->
     <?php foreach(array_slice($anh_phong, 1) as $anh): ?>
-      <a href="<?php echo esc_url($anh); ?>" data-fancybox="phong-<?php echo $ten_phong; ?>" style="display:none;"></a>
+      <a data-fancybox="<?php echo $ten_phong_slug; ?>" href="<?php echo esc_url($anh); ?>" style="display:none;"></a>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
@@ -18,18 +18,8 @@ if ($anh_phong && is_array($anh_phong)) :
 
 function them_fancybox_vao_khachsan() {
     if (is_singular('khach_san')) {
-        wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css');
-        wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js', array(), null, true);
+        wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css');
+        wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js', array(), null, true);
     }
 }
 add_action('wp_enqueue_scripts', 'them_fancybox_vao_khachsan');
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  Fancybox.bind("[data-fancybox]", {
-    Thumbs: false,
-    Toolbar: {
-      display: ["close"],
-    },
-  });
-});
