@@ -1,67 +1,47 @@
-<div class="hotel-default-policy">
-
-  <h3><strong>Quy định nhận & trả phòng</strong></h3>
-  <p><strong>Thời gian nhận phòng:</strong> 14:00</p>
-  <p><strong>Thời gian trả phòng:</strong> 12:00</p>
-
-  <hr>
-
-  <p><strong>Quy định nhận phòng:</strong></p>
-  <ul>
-    <li>CCCD hoặc passport.</li>
-    <li>Phiếu xác nhận đặt phòng của hệ thống.</li>
-  </ul>
-  <p style="color: red;"><strong>*Lưu ý:</strong><br>
-    Theo quy định của pháp luật Việt Nam, khi 1 khách nước ngoài + 1 khách Việt Nam ở chung phòng thì yêu cầu phải có giấy đăng ký kết hôn.
-  </p>
-
-  <hr>
-
-  <h3><strong>Quy định hủy/đổi đặt phòng</strong></h3>
-  <ul>
-    <li>Phí hủy/đổi = phí hủy của khách sạn + phí xử lý giao dịch.</li>
-    <li><strong>Phí hủy/đổi của khách sạn được quy định như sau:</strong></li>
-    <ul>
-      <li>Không hoàn phòng, nhưng được phép đổi đơn đặt phòng.</li>
-    </ul>
-    <li><strong>Phí xử lý giao dịch:</strong></li>
-    <ul>
-      <li>Dưới 3 triệu: 2% tổng giá trị (tối thiểu 30.000đ)</li>
-      <li>Trên 3 triệu: 1.5% tổng giá trị</li>
-    </ul>
-  </ul>
-
-  <hr>
-
-  <h3><strong>Trẻ em và giường phụ</strong></h3>
-  <ul>
-    <li><strong>Em bé (dưới 5 tuổi):</strong> Miễn phí nếu ngủ cùng bố mẹ.</li>
-    <li><strong>Trẻ em (5–10 tuổi):</strong> Thu theo quy định khách sạn.</li>
-  </ul>
-
-</div>
+<section class="hotel-article-section">
+  <div class="container">
+    <div class="hotel-article-wrapper">
+      <aside class="hotel-article-sidebar">
+        <?php
+        // Tự sinh mục lục nếu dùng plugin như Easy Table of Contents
+        if (function_exists('ez_toc')) {
+          echo ez_toc();
+        }
+        ?>
+      </aside>
+      <article class="hotel-article-content">
+        <?php the_content(); ?>
+      </article>
+    </div>
+  </div>
+</section>
 
 
-
-
-.hotel-default-policy {
-  font-size: 15px;
-  line-height: 1.7;
+.hotel-article-section {
   margin-top: 40px;
+  padding: 20px 0;
+  background-color: #fff;
 }
 
-.hotel-default-policy hr {
-  border: none;
-  border-top: 1px dashed #ccc;
-  margin: 25px 0;
+.hotel-article-wrapper {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
 }
 
-.hotel-default-policy h3 {
-  font-size: 17px;
-  margin-top: 20px;
+.hotel-article-sidebar {
+  width: 25%;
+  border-right: 1px solid #ddd;
+  padding-right: 20px;
+  font-size: 14px;
+  position: sticky;
+  top: 100px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-.hotel-default-policy ul {
-  margin-left: 20px;
-  padding-left: 0;
+.hotel-article-content {
+  width: 75%;
+  font-size: 16px;
+  line-height: 1.7;
 }
