@@ -1,1 +1,45 @@
-<pre><?php print_r($gallery); ?></pre>
+<div class="hotel-featured-gallery">
+  <?php 
+  $gallery = get_field('anh_dai_dien');
+  if ($gallery && is_array($gallery)) : ?>
+    <div class="hotel-gallery-slider">
+      <?php foreach ($gallery as $image_url): ?>
+        <div class="hotel-gallery-slide">
+          <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn">
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php else: ?>
+    <p style="color:red;">Chưa có ảnh đại diện.</p>
+  <?php endif; ?>
+</div>
+
+
+.hotel-featured-gallery {
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.hotel-gallery-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 12px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hotel-gallery-slide {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  scroll-snap-align: start;
+}
+
+.hotel-gallery-slide img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
