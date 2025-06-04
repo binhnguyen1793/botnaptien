@@ -1,17 +1,3 @@
-<?php 
-$anh_phong = get_sub_field('anh_phong');
-if ($anh_phong && is_array($anh_phong)) : 
-    $ten_phong_slug = 'phong-' . sanitize_title($ten_phong);
-?>
-  <div class="room-image">
-    <?php foreach ($anh_phong as $index => $anh_url): ?>
-      <a href="<?php echo esc_url($anh_url); ?>"
-         data-fancybox="<?php echo esc_attr($ten_phong_slug); ?>"
-         <?php if ($index !== 0): ?> style="display:none;"<?php endif; ?>>
-         <?php if ($index === 0): ?>
-           <img src="<?php echo esc_url($anh_url); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
-         <?php endif; ?>
-      </a>
-    <?php endforeach; ?>
-  </div>
-<?php endif; ?>
+<pre>
+<?php print_r($anh_phong); ?>
+</pre>
