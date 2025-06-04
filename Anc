@@ -1,45 +1,35 @@
-<div class="hotel-featured-gallery">
-  <?php 
-  $gallery = get_field('anh_dai_dien');
-  if ($gallery && is_array($gallery)) : ?>
-    <div class="hotel-gallery-slider">
-      <?php foreach ($gallery as $image_url): ?>
-        <div class="hotel-gallery-slide">
-          <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn">
-        </div>
-      <?php endforeach; ?>
-    </div>
-  <?php else: ?>
-    <p style="color:red;">Chưa có ảnh đại diện.</p>
-  <?php endif; ?>
-</div>
+<?php 
+$anh_phong = get_sub_field('anh_phong');
+if ($anh_phong && is_array($anh_phong)) : 
+    $anh_dai_dien = $anh_phong[0]; // Lấy ảnh đầu tiên làm đại diện
+?>
+  <div class="room-image">
+    <a href="<?php echo esc_url($anh_dai_dien); ?>" data-fancybox="phong-<?php echo $ten_phong; ?>">
+      <img src="<?php echo esc_url($anh_dai_dien); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
+    </a>
+
+    <!-- Ẩn các ảnh còn lại nhưng để Fancybox hiển thị -->
+    <?php foreach(array_slice($anh_phong, 1) as $anh): ?>
+      <a href="<?php echo esc_url($anh); ?>" data-fancybox="phong-<?php echo $ten_phong; ?>" style="display:none;"></a>
+    <?php endforeach; ?>
+  </div>
+<?php endif; ?>
 
 
-.hotel-featured-gallery {
-  width: 100%;
-  overflow: hidden;
-  margin-bottom: 20px;
+function them_fancybox_vao_khachsan() {
+    if (is_singular('khach_san')) {
+        wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css');
+        wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js', array(), null, true);
+    }
 }
+add_action('wp_enqueue_scripts', 'them_fancybox_vao_khachsan');
 
-.hotel-gallery-slider {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  gap: 12px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
 
-.hotel-gallery-slide {
-  flex-shrink: 0;
-  width: 100%;
-  max-width: 100%;
-  scroll-snap-align: start;
-}
-
-.hotel-gallery-slide img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  object-fit: cover;
-}
+document.addEventListener("DOMContentLoaded", function () {
+  Fancybox.bind("[data-fancybox]", {
+    Thumbs: false,
+    Toolbar: {
+      display: ["close"],
+    },
+  });
+});
