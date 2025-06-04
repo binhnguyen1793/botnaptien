@@ -1,163 +1,48 @@
-<?php
-/**
- * Template for single hotel post type: single-khach_san.php (updated layout like BestPrice)
- */
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-get_header();
-$post_id = get_the_ID();
-$gia = get_field('gia_tour', $post_id);
-$diem = get_field('diem_danh_gia', $post_id);
-$so_danh_gia = get_field('so_danh_gia', $post_id);
-$tien_ich = get_field('tien_ich', $post_id);
-$noi_bat = get_field('noi_bat', $post_id);
-$dia_chi = get_field('dia_chi_1', $post_id);
-$gallery = get_field('anh_dai_dien');
-?>
-<div class="container">
-  <!-- Phan Header khach san -->
-  <section class="hotel-header-grid">
-    <div class="left-column">
-      <?php if ($gallery && is_array($gallery)): ?>
-        <div class="hotel-gallery-slider">
-          <?php foreach ($gallery as $image_url): ?>
-            <div class="hotel-gallery-slide">
-              <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn">
-            </div>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
-    </div>
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <div class="right-column">
-      <h1><?php the_title(); ?> <span class="star">&#11088;&#11088;&#11088;&#11088;</span></h1>
-      <p class="hotel-address">📍 <?php echo esc_html($dia_chi); ?></p>
 
-      <ul class="hotel-tabs">
-        <li><a href="#gioi-thieu">Giới thiệu</a></li>
-        <li><a href="#deal">Deal nổi bật</a></li>
-        <li><a href="#hang-phong">Hạng phòng</a></li>
-        <li><a href="#danh-gia">Đánh giá</a></li>
-        <li><a href="#hoi-dap">Hỏi đáp</a></li>
-      </ul>
 
-      <div class="rating-box">
-        <span class="score"><?php echo esc_html($diem); ?></span>
-        <span class="desc">Rất tốt - <?php echo esc_html($so_danh_gia); ?> đánh giá</span>
+<div class="swiper hotel-gallery-slider">
+  <div class="swiper-wrapper">
+    <?php foreach ($gallery as $image_url): ?>
+      <div class="swiper-slide">
+        <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn" />
       </div>
-
-      <?php if ($gia): ?>
-        <a href="<?php echo site_url('/thanh-toan?price=' . intval($gia)); ?>" class="cta-button">Xem giá phòng</a>
-      <?php endif; ?>
-    </div>
-  </section>
-
-  <!-- Tien ich -->
-  <section id="gioi-thieu">
-    <h2>Tiện ích khách sạn</h2>
-    <?php if ($tien_ich): ?>
-      <div id="short-facilities" class="facility-grid collapsed">
-        <?php foreach (array_slice($tien_ich, 0, 6) as $ti): ?>
-          <div class="facility-item">✔️ <?php echo esc_html($ti); ?></div>
-        <?php endforeach; ?>
-      </div>
-      <?php if (count($tien_ich) > 6): ?>
-        <div id="more-facilities" class="facility-grid" style="display:none;">
-          <?php foreach (array_slice($tien_ich, 6) as $ti): ?>
-            <div class="facility-item">✔️ <?php echo esc_html($ti); ?></div>
-          <?php endforeach; ?>
-        </div>
-        <button onclick="
-          document.getElementById('short-facilities').style.display='none';
-          document.getElementById('more-facilities').style.display='flex';
-          this.style.display='none';
-        " class="expand-btn">Xem tất cả tiện ích</button>
-      <?php endif; ?>
-    <?php endif; ?>
-  </section>
-
-  <!-- Giữ nguyên phần điểm nổi bật và các phần khác bên dưới như cũ -->
-  <?php // phần tiếp theo bạn đã làm đúng rồi, không cần sửa ?>
+    <?php endforeach; ?>
+  </div>
+  <!-- Nút điều hướng -->
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
 </div>
 
-<style>
-.hotel-header-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 20px;
-}
-.left-column {
-  flex: 2;
-}
-.right-column {
-  flex: 1;
-}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  new Swiper('.hotel-gallery-slider', {
+    loop: true,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    slidesPerView: 1,
+    spaceBetween: 10,
+  });
+});
+</script>
+
+
 .hotel-gallery-slider {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-}
-.hotel-gallery-slide img {
   width: 100%;
-  max-height: 300px;
+  height: auto;
+  position: relative;
+  margin-bottom: 20px;
+}
+.hotel-gallery-slider .swiper-slide img {
+  width: 100%;
+  height: auto;
   object-fit: cover;
-  border-radius: 8px;
 }
-.hotel-tabs {
-  display: flex;
-  list-style: none;
-  gap: 20px;
-  padding: 0;
-  margin: 16px 0;
-  border-bottom: 2px solid #eee;
-}
-.hotel-tabs li a {
-  text-decoration: none;
-  color: #222;
-  padding-bottom: 6px;
-  display: inline-block;
-}
-.rating-box {
-  background: #e6f2ff;
-  color: #007BFF;
-  font-weight: bold;
-  padding: 10px;
-  border-radius: 6px;
-  margin: 12px 0;
-}
-.cta-button {
-  background: #ff6600;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 6px;
-  display: inline-block;
-  font-weight: bold;
-  text-align: center;
-}
-.facility-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 10px;
-}
-.facility-item {
-  background: #f7f7f7;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #333;
-}
-.expand-btn {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: #e1703a;
-  cursor: pointer;
-  font-weight: bold;
-}
-@media (max-width: 768px) {
-  .hotel-header-grid {
-    flex-direction: column;
-  }
-}
-</style>
