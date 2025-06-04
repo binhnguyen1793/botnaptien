@@ -1,22 +1,33 @@
 <div class="room-image">
-  <?php if (!empty($anh_phong) && is_array($anh_phong)): ?>
-    <!-- Ảnh hiển thị tĩnh -->
-    <img src="<?php echo esc_url($anh_phong[0]); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
-  <?php endif; ?>
+  <img src="<?php echo esc_url($anh_phong[0]); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
 </div>
 
+<div class="room-info">
+  <h3><?php echo esc_html($ten_phong); ?></h3>
 
-<?php if (!empty($anh_phong)): ?>
-  <div class="room-detail-link">
-    <a href="<?php echo esc_url($anh_phong[0]); ?>"
-       data-fancybox="<?php echo esc_attr($ten_phong_slug); ?>">
-      Chi tiết phòng &nbsp;›
-    </a>
+  <?php if (!empty($anh_phong)): ?>
+    <div class="room-detail-link">
+      <a href="javascript:void(0);"
+         class="open-gallery"
+         data-gallery='<?php echo json_encode($anh_phong); ?>'>
+         Chi tiết phòng &nbsp;›
+      </a>
+    </div>
+  <?php endif; ?>
 
-    <?php foreach(array_slice($anh_phong, 1) as $anh): ?>
-      <a href="<?php echo esc_url($anh); ?>"
-         data-fancybox="<?php echo esc_attr($ten_phong_slug); ?>"
-         style="display:none;"></a>
-    <?php endforeach; ?>
-  </div>
-<?php endif; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".open-gallery").forEach(function (el) {
+      el.addEventListener("click", function () {
+        const images = JSON.parse(this.dataset.gallery || '[]');
+        if (images.length > 0 && typeof Fancybox !== "undefined") {
+          Fancybox.open(
+            images.map((url) => ({ src: url, type: "image" }))
+          );
+        }
+      });
+    });
+  });
+</script>
