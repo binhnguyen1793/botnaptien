@@ -1,3 +1,18 @@
-<pre>
-<?php print_r($anh_phong); ?>
-</pre>
+function them_fancybox_vao_khachsan() {
+  if (is_singular('khach_san')) {
+    wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css');
+    wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js', array(), null, true);
+  }
+}
+add_action('wp_enqueue_scripts', 'them_fancybox_vao_khachsan');
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof Fancybox !== 'undefined') {
+    Fancybox.bind("[data-fancybox]", {});
+  } else {
+    console.error("Fancybox chưa được load!");
+  }
+});
+</script>
