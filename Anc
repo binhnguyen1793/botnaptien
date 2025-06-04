@@ -1,48 +1,67 @@
-<!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<div class="hotel-default-policy">
 
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <h3><strong>Quy định nhận & trả phòng</strong></h3>
+  <p><strong>Thời gian nhận phòng:</strong> 14:00</p>
+  <p><strong>Thời gian trả phòng:</strong> 12:00</p>
 
+  <hr>
 
+  <p><strong>Quy định nhận phòng:</strong></p>
+  <ul>
+    <li>CCCD hoặc passport.</li>
+    <li>Phiếu xác nhận đặt phòng của hệ thống.</li>
+  </ul>
+  <p style="color: red;"><strong>*Lưu ý:</strong><br>
+    Theo quy định của pháp luật Việt Nam, khi 1 khách nước ngoài + 1 khách Việt Nam ở chung phòng thì yêu cầu phải có giấy đăng ký kết hôn.
+  </p>
 
-<div class="swiper hotel-gallery-slider">
-  <div class="swiper-wrapper">
-    <?php foreach ($gallery as $image_url): ?>
-      <div class="swiper-slide">
-        <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn" />
-      </div>
-    <?php endforeach; ?>
-  </div>
-  <!-- Nút điều hướng -->
-  <div class="swiper-button-next"></div>
-  <div class="swiper-button-prev"></div>
+  <hr>
+
+  <h3><strong>Quy định hủy/đổi đặt phòng</strong></h3>
+  <ul>
+    <li>Phí hủy/đổi = phí hủy của khách sạn + phí xử lý giao dịch.</li>
+    <li><strong>Phí hủy/đổi của khách sạn được quy định như sau:</strong></li>
+    <ul>
+      <li>Không hoàn phòng, nhưng được phép đổi đơn đặt phòng.</li>
+    </ul>
+    <li><strong>Phí xử lý giao dịch:</strong></li>
+    <ul>
+      <li>Dưới 3 triệu: 2% tổng giá trị (tối thiểu 30.000đ)</li>
+      <li>Trên 3 triệu: 1.5% tổng giá trị</li>
+    </ul>
+  </ul>
+
+  <hr>
+
+  <h3><strong>Trẻ em và giường phụ</strong></h3>
+  <ul>
+    <li><strong>Em bé (dưới 5 tuổi):</strong> Miễn phí nếu ngủ cùng bố mẹ.</li>
+    <li><strong>Trẻ em (5–10 tuổi):</strong> Thu theo quy định khách sạn.</li>
+  </ul>
+
 </div>
 
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  new Swiper('.hotel-gallery-slider', {
-    loop: true,
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    slidesPerView: 1,
-    spaceBetween: 10,
-  });
-});
-</script>
 
 
-.hotel-gallery-slider {
-  width: 100%;
-  height: auto;
-  position: relative;
-  margin-bottom: 20px;
+.hotel-default-policy {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 40px;
 }
-.hotel-gallery-slider .swiper-slide img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+
+.hotel-default-policy hr {
+  border: none;
+  border-top: 1px dashed #ccc;
+  margin: 25px 0;
+}
+
+.hotel-default-policy h3 {
+  font-size: 17px;
+  margin-top: 20px;
+}
+
+.hotel-default-policy ul {
+  margin-left: 20px;
+  padding-left: 0;
 }
