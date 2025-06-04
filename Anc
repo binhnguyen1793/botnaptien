@@ -1,39 +1,7 @@
-<div class="room-detail-link">
-    <a href="javascript:void(0);" class="open-fancybox" data-gallery="<?php echo esc_attr($ten_phong_slug); ?>">
-        Chi tiết phòng &nbsp;›
-    </a>
-
-    <?php foreach ($anh_phong as $anh): ?>
-        <a href="<?php echo esc_url($anh); ?>"
-           data-fancybox="<?php echo esc_attr($ten_phong_slug); ?>"
-           style="display:none;">
-        </a>
-    <?php endforeach; ?>
+<div class="hotel-gallery-slider">
+  <?php foreach ($gallery as $image_url): ?>
+    <div class="hotel-gallery-slide">
+      <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn">
+    </div>
+  <?php endforeach; ?>
 </div>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const buttons = document.querySelectorAll(".open-fancybox");
-
-  buttons.forEach(function (btn) {
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      const galleryName = btn.getAttribute("data-gallery");
-      const group = document.querySelectorAll('[data-fancybox="' + galleryName + '"]');
-
-      if (group.length > 0 && typeof Fancybox !== 'undefined') {
-        Fancybox.show(
-          Array.from(group).map(link => ({
-            src: link.getAttribute("href"),
-            type: "image"
-          })),
-          {
-            groupAll: true
-          }
-        );
-      }
-    });
-  });
-});
-</script>
