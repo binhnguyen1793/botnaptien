@@ -1,25 +1,17 @@
 <?php 
 $anh_phong = get_sub_field('anh_phong');
 if ($anh_phong && is_array($anh_phong)) : 
-    $ten_phong_slug = sanitize_title($ten_phong); // tạo group fancybox riêng cho mỗi phòng
-    $anh_dai_dien = $anh_phong[0];
+    $ten_phong_slug = 'phong-' . sanitize_title($ten_phong);
 ?>
   <div class="room-image">
-    <a data-fancybox="<?php echo $ten_phong_slug; ?>" href="<?php echo esc_url($anh_dai_dien); ?>">
-      <img src="<?php echo esc_url($anh_dai_dien); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
-    </a>
-
-    <?php foreach(array_slice($anh_phong, 1) as $anh): ?>
-      <a data-fancybox="<?php echo $ten_phong_slug; ?>" href="<?php echo esc_url($anh); ?>" style="display:none;"></a>
+    <?php foreach ($anh_phong as $index => $anh_url): ?>
+      <a href="<?php echo esc_url($anh_url); ?>"
+         data-fancybox="<?php echo esc_attr($ten_phong_slug); ?>"
+         <?php if ($index !== 0): ?> style="display:none;"<?php endif; ?>>
+         <?php if ($index === 0): ?>
+           <img src="<?php echo esc_url($anh_url); ?>" alt="<?php echo esc_attr($ten_phong); ?>">
+         <?php endif; ?>
+      </a>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
-
-
-function them_fancybox_vao_khachsan() {
-    if (is_singular('khach_san')) {
-        wp_enqueue_style('fancybox-css', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css');
-        wp_enqueue_script('fancybox-js', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js', array(), null, true);
-    }
-}
-add_action('wp_enqueue_scripts', 'them_fancybox_vao_khachsan');
