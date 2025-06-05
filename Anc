@@ -84,56 +84,77 @@
   color: #666;
 }
 
-.hotel-summary-right {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  min-width: 160px;
-}
-
-.hotel-rating-box {
+.hotel-info-summary-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 260px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #4caf50;
-  color: #fff;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 14px;
+  gap: 12px;
 }
 
-.rating-score {
+.info-box-top {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.info-rating {
+  text-align: center;
+}
+
+.score-box {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  line-height: 40px;
+  margin: 0 auto 4px;
+}
+
+.score-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.score-count {
+  font-size: 13px;
+  color: #777;
+}
+
+.info-price {
+  text-align: right;
+}
+
+.price-number {
   font-size: 18px;
   font-weight: bold;
+  color: #d32f2f;
 }
 
-.rating-text {
+.price-point {
   font-size: 13px;
-}
-
-.rating-count {
-  font-size: 13px;
-  color: #fff;
-}
-
-.hotel-summary-price {
-  font-size: 18px;
-  font-weight: bold;
-  color: #e53935;
+  color: #777;
 }
 
 .hotel-request-btn {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 6px;
+  display: block;
+  width: 100%;
   background: #e1703a;
   color: white;
+  text-align: center;
+  padding: 10px 0;
   font-weight: bold;
+  border-radius: 6px;
   text-decoration: none;
-  border: none;
-  transition: background 0.3s;
 }
 
 .hotel-request-btn:hover {
