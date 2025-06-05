@@ -1,34 +1,22 @@
-function updateHotelPrice() {
-    const nguoiLon = parseInt(document.getElementById('nguoi_lon').value || 0);
-    const treEm = parseInt(document.getElementById('tre_em').value || 0);
-    const paymentType = parseInt(document.getElementById('payment_type').value || 0);
-    const checkinEl = document.getElementById('checkin');
-    const checkoutEl = document.getElementById('checkout');
+<?php
+$gallery_urls_raw = get_field('anh_dai_dien_link', $post_id);
+$gallery_urls = array_filter(array_map('trim', explode("\n", $gallery_urls_raw)));
+?>
 
-    const checkin = new Date(checkinEl.value);
-    const checkout = new Date(checkoutEl.value);
-
-    if (checkin && checkout && checkout <= checkin) {
-        alert("Ngày trả phòng phải sau ngày nhận phòng.");
-        checkoutEl.value = ""; // Reset ngày trả
-        document.getElementById('final-price').innerText = '0 đ';
-        document.getElementById('listed-price').innerText = '0 đ';
-        return;
-    }
-
-    let days = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
-    if (isNaN(days) || days <= 0) days = 1;
-
-    const listedPrice = days * ((nguoiLon * basePrice) + (treEm * basePrice * 0.5));
-    let finalPrice = listedPrice;
-
-    if (paymentType === 100) {
-        finalPrice *= 0.8;
-    } else if (paymentType === 30) {
-        finalPrice *= 0.3;
-    }
-
-    calculatedAmount = Math.round(finalPrice);
-    document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
-    document.getElementById('listed-price').innerText = Math.round(listedPrice).toLocaleString('vi-VN') + ' đ';
-}
+<?php if (!empty($gallery_urls)): ?>
+<div class="hotel-featured-gallery">
+    <div class="swiper hotel-gallery-slider">
+        <div class="swiper-wrapper">
+            <?php foreach ($gallery_urls as $image_url): ?>
+                <div class="swiper-slide">
+                    <img src="<?php echo esc_url($image_url); ?>" alt="Ảnh khách sạn" />
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</div>
+<?php else: ?>
+    <p style="color:red;">Chưa có ảnh đại diện.</p>
+<?php endif; ?>
