@@ -1,28 +1,26 @@
 <div class="hotel-top-box">
   <div class="hotel-featured-gallery">
-    <!-- Giữ nguyên phần slider như cũ -->
+    <!-- Slider ảnh giữ nguyên -->
     <!-- ... -->
   </div>
 
   <div class="hotel-summary-box">
-    <!-- Bên trái: tiêu đề + địa chỉ -->
+    <!-- Trái: Tiêu đề + địa chỉ -->
     <div class="hotel-summary-left">
       <h1><?php the_title(); ?></h1>
-      <div style="color:#555;font-size:14px;">
-        <?php echo '📍🗺️ ' . esc_html($dia_chi); ?>
-      </div>
+      <div class="hotel-address"><?php echo '📍 ' . esc_html($dia_chi); ?></div>
     </div>
 
-    <!-- Bên phải: đánh giá, số đánh giá, giá và nút -->
+    <!-- Phải: Đánh giá, số đánh giá, giá và nút -->
     <div class="hotel-summary-right">
       <?php if ($diem): ?>
         <div class="hotel-rating-box">
-          <div class="hotel-rating-score"><?php echo esc_html($diem); ?></div>
-          <div class="hotel-rating-text">Rất tốt</div>
+          <div class="rating-score"><?php echo esc_html($diem); ?></div>
+          <div class="rating-text">Tuyệt vời</div>
+          <div class="rating-count"><?php echo esc_html($so_danh_gia); ?> đánh giá</div>
         </div>
-        <div class="hotel-rating-count"><?php echo esc_html($so_danh_gia); ?> đánh giá</div>
       <?php endif; ?>
-      
+
       <?php if ($gia): ?>
         <div class="hotel-summary-price"><?php echo number_format($gia, 0, ',', '.'); ?>đ</div>
         <a href="<?= site_url('/thanh-toan?price=' . intval($gia)) ?>" class="hotel-request-btn">Thanh toán</a>
@@ -36,11 +34,12 @@
 .hotel-summary-box {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 20px;
   background: #fff;
-  padding: 15px 20px;
+  padding: 20px;
   border-radius: 10px;
-  margin-top: 10px;
+  margin-top: 16px;
   flex-wrap: wrap;
 }
 
@@ -48,41 +47,48 @@
   flex: 1;
   min-width: 200px;
 }
-
 .hotel-summary-left h1 {
   margin: 0 0 8px;
   font-size: 22px;
   color: #222;
 }
+.hotel-address {
+  font-size: 14px;
+  color: #666;
+}
 
 .hotel-summary-right {
+  text-align: right;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 160px;
 }
 
 .hotel-rating-box {
-  background-color: #1769aa;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 4px;
-  text-align: center;
-  font-weight: bold;
-  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
 }
 
-.hotel-rating-score {
+.rating-score {
   font-size: 18px;
+  font-weight: bold;
 }
 
-.hotel-rating-text {
+.rating-text {
   font-size: 13px;
 }
 
-.hotel-rating-count {
-  font-size: 14px;
-  color: #444;
+.rating-count {
+  font-size: 13px;
+  color: #fff;
 }
 
 .hotel-summary-price {
@@ -91,18 +97,60 @@
   color: #e53935;
 }
 
+.hotel-request-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: #e1703a;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border: none;
+  transition: background 0.3s;
+}
 
+.hotel-request-btn:hover {
+  background: #c75a1e;
+}
+
+/* Mobile layout giống Ảnh 1 */
 @media (max-width: 768px) {
   .hotel-summary-box {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
 
   .hotel-summary-right {
-    flex-direction: column;
     align-items: flex-start;
+    text-align: left;
+  }
+
+  .hotel-summary-right .hotel-summary-price {
+    font-size: 17px;
+  }
+
+  .hotel-rating-box {
+    flex-direction: row;
+    justify-content: space-between;
     width: 100%;
-    gap: 8px;
-    margin-top: 10px;
+    padding: 6px 10px;
+    background: #4caf50;
+  }
+
+  .rating-score {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .rating-text,
+  .rating-count {
+    font-size: 13px;
+  }
+
+  .hotel-request-btn {
+    width: 100%;
+    text-align: center;
   }
 }
+
