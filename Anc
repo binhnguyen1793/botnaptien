@@ -1,156 +1,100 @@
-<div class="hotel-top-box">
-  <div class="hotel-featured-gallery">
-    <!-- Slider ảnh giữ nguyên -->
-    <!-- ... -->
-  </div>
-
-  <div class="hotel-summary-box">
-    <!-- Trái: Tiêu đề + địa chỉ -->
-    <div class="hotel-summary-left">
-      <h1><?php the_title(); ?></h1>
-      <div class="hotel-address"><?php echo '📍 ' . esc_html($dia_chi); ?></div>
+<div class="hotel-info-summary-box">
+  <div class="info-box-top">
+    <!-- Bên trái: điểm đánh giá -->
+    <div class="info-rating">
+      <div class="score-box"><?php echo esc_html($diem); ?></div>
+      <div class="score-text">Tuyệt vời</div>
+      <div class="score-count"><?php echo esc_html($so_danh_gia); ?> đánh giá</div>
     </div>
 
-    <!-- Phải: Đánh giá, số đánh giá, giá và nút -->
-    <div class="hotel-summary-right">
-      <?php if ($diem): ?>
-        <div class="hotel-rating-box">
-          <div class="rating-score"><?php echo esc_html($diem); ?></div>
-          <div class="rating-text">Tuyệt vời</div>
-          <div class="rating-count"><?php echo esc_html($so_danh_gia); ?> đánh giá</div>
-        </div>
-      <?php endif; ?>
-
-      <?php if ($gia): ?>
-        <div class="hotel-summary-price"><?php echo number_format($gia, 0, ',', '.'); ?>đ</div>
-        <a href="<?= site_url('/thanh-toan?price=' . intval($gia)) ?>" class="hotel-request-btn">Thanh toán</a>
-      <?php endif; ?>
+    <!-- Bên phải: giá tiền + điểm -->
+    <div class="info-price">
+      <div class="price-number"><?php echo number_format($gia, 0, ',', '.'); ?>đ</div>
+      <div class="price-point">+ <?php echo number_format(round($gia * 0.01), 0, ',', '.'); ?> điểm</div>
     </div>
   </div>
+
+  <!-- Nút thanh toán -->
+  <a href="<?= site_url('/thanh-toan?price=' . intval($gia)) ?>" class="hotel-request-btn">
+    Thanh toán
+  </a>
 </div>
 
 
 
-.hotel-summary-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
+.hotel-info-summary-box {
   background: #fff;
-  padding: 20px;
+  border: 1px solid #ddd;
   border-radius: 10px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.hotel-summary-left {
-  flex: 1;
-  min-width: 200px;
-}
-.hotel-summary-left h1 {
-  margin: 0 0 8px;
-  font-size: 22px;
-  color: #222;
-}
-.hotel-address {
-  font-size: 14px;
-  color: #666;
-}
-
-.hotel-summary-right {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  min-width: 160px;
-}
-
-.hotel-rating-box {
+  width: 100%;
+  max-width: 260px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #4caf50;
-  color: #fff;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 14px;
+  gap: 12px;
 }
 
-.rating-score {
+.info-box-top {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.info-rating {
+  text-align: center;
+}
+
+.score-box {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  line-height: 40px;
+  margin: 0 auto 4px;
+}
+
+.score-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.score-count {
+  font-size: 13px;
+  color: #777;
+}
+
+.info-price {
+  text-align: right;
+}
+
+.price-number {
   font-size: 18px;
   font-weight: bold;
+  color: #d32f2f;
 }
 
-.rating-text {
+.price-point {
   font-size: 13px;
-}
-
-.rating-count {
-  font-size: 13px;
-  color: #fff;
-}
-
-.hotel-summary-price {
-  font-size: 18px;
-  font-weight: bold;
-  color: #e53935;
+  color: #777;
 }
 
 .hotel-request-btn {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 6px;
+  display: block;
+  width: 100%;
   background: #e1703a;
   color: white;
+  text-align: center;
+  padding: 10px 0;
   font-weight: bold;
+  border-radius: 6px;
   text-decoration: none;
-  border: none;
-  transition: background 0.3s;
 }
 
 .hotel-request-btn:hover {
   background: #c75a1e;
 }
-
-/* Mobile layout giống Ảnh 1 */
-@media (max-width: 768px) {
-  .hotel-summary-box {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .hotel-summary-right {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .hotel-summary-right .hotel-summary-price {
-    font-size: 17px;
-  }
-
-  .hotel-rating-box {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    padding: 6px 10px;
-    background: #4caf50;
-  }
-
-  .rating-score {
-    font-size: 16px;
-    margin-right: 8px;
-  }
-
-  .rating-text,
-  .rating-count {
-    font-size: 13px;
-  }
-
-  .hotel-request-btn {
-    width: 100%;
-    text-align: center;
-  }
-}
-
