@@ -1,1 +1,16 @@
-<a href="<?= site_url('/thanh-toan-2?hotel_id=' . get_the_ID() . '&price=' . intval($gia) . '&room_index=' . $room_index) ?>" class="room-price-box">Đặt phòng ngay</a>
+$room_index = isset($_GET['room_index']) ? intval($_GET['room_index']) : 0;
+
+if (have_rows('loai_phong', $post_id)) {
+    $i = 0;
+    while (have_rows('loai_phong', $post_id)) {
+        the_row();
+        if ($i === $room_index) {
+            $ten_phong = get_sub_field('ten_phong') ?: 'Phòng tiêu chuẩn';
+            $dien_tich = get_sub_field('dien_tich_phong');
+            $so_nguoi = get_sub_field('so_nguoi');
+            $so_giuong = get_sub_field('so_giuong');
+            break;
+        }
+        $i++;
+    }
+}
