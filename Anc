@@ -1,13 +1,4 @@
-<a href="<?= site_url('/thanh-toan-2?price=' . intval($gia) . '&hotel_id=' . get_the_ID()) ?>" class="hotel-request-btn">Thanh toán</a>
-
-
-$post_id = $_GET['hotel_id'] ?? null;
-$gia_phong = $_GET['price'] ?? 0;
-
-if (!$post_id || !get_post($post_id) || get_post_type($post_id) !== 'hotel') {
-    return '<p style="color:red;">Không tìm thấy thông tin khách sạn.</p>';
-}
-
-$tieu_de = get_the_title($post_id);
-$dia_chi = get_field('dia_chi_1', $post_id);
-// ...
+<?php
+if (have_rows('loai_phong')) :
+  $room_index = 0; // <== thêm dòng này
+  while (have_rows('loai_phong')) : the_row();
