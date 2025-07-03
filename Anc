@@ -1,4 +1,4 @@
-global $post;
-    if (!$post || $post->post_type !== 'khach_san') {
-        return '<p style="color:red;">Không tìm thấy thông tin khách sạn.</p>';
-    }
+echo '<pre>';
+print_r($post->ID);
+print_r($post->post_type);
+echo '</pre>';
