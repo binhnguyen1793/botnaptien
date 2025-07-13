@@ -1,29 +1,45 @@
 let cachedQR = null;
 let qrTimestamp = null;
+let qrPromise = null;
 
 const now = Date.now();
 const qrValidDuration = 2 * 60 * 1000; // 2 phút
 
-if (cachedQR && qrTimestamp && now - qrTimestamp < qrValidDuration) {
-    // Nếu đã có QR trong 2 phút gần nhất → dùng lại
+function getQR(calculatedAmount) {
+    const qrPopup = document.getElementById('qrPopup');
+
     qrPopup.innerHTML = `
-        <div>
-            <p><strong>Mã QR thanh toán:</strong></p>
-            <img src="${cachedQR}" style="max-width:300px;"><br><br>
-            <label>Gửi ảnh xác nhận chuyển khoản:
-                <input type="file" id="upload-proof" accept="image/*">
-            </label><br>
-            <button onclick="confirmPayment()">Đã chuyển khoản</button>
-            <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
-                ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
-            </p>
+        <div style="text-align:center">
+            <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
+            <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
         </div>
     `;
-} else {
+
+    startCountdown(120);
+
+    const now = Date.now();
+
+    // Nếu đã có QR hợp lệ trong 2 phút
+    if (cachedQR && qrTimestamp && now - qrTimestamp < qrValidDuration) {
+        showQR(cachedQR);
+        return;
+    }
+
+    // Nếu QR đang được tạo → chờ Promise cũ
+    if (qrPromise) {
+        qrPromise.then(url => {
+            showQR(url);
+        }).catch(() => {
+            qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
+        });
+        return;
+    }
+
+    // QR chưa có và chưa đang tạo → gọi API
     const formData = new URLSearchParams();
     formData.append('price', calculatedAmount);
 
-    fetch("https://resolved-url-tapes-physically.trycloudflare.com/run-bot", {
+    qrPromise = fetch("https://resolved-url-tapes-physically.trycloudflare.com/run-bot", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString()
@@ -33,18 +49,44 @@ if (cachedQR && qrTimestamp && now - qrTimestamp < qrValidDuration) {
         const url = URL.createObjectURL(blob);
         cachedQR = url;
         qrTimestamp = Date.now();
-        qrPopup.innerHTML = `
-            <div>
-                <p><strong>Mã QR thanh toán:</strong></p>
-                <img src="${url}" style="max-width:300px;"><br><br>
-                <label>Gửi ảnh xác nhận chuyển khoản:
-                    <input type="file" id="upload-proof" accept="image/*">
-                </label><br>
-                <button onclick="confirmPayment()">Đã chuyển khoản</button>
-                <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
-                    ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
-                </p>
-            </div>
-        `;
+        qrPromise = null; // reset
+        showQR(url);
+        return url;
+    })
+    .catch(err => {
+        qrPromise = null;
+        qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
     });
+}
+
+function showQR(qrUrl) {
+    const qrPopup = document.getElementById('qrPopup');
+    qrPopup.innerHTML = `
+        <div style="text-align:center">
+            <strong>Mã QR thanh toán:</strong><br>
+            <img src="${qrUrl}" style="max-width:300px;"><br><br>
+            <label>Gửi ảnh xác nhận chuyển khoản:
+                <input type="file" id="upload-proof" accept="image/*">
+            </label><br><br>
+            <button onclick="confirmPayment()">Đã chuyển khoản</button>
+            <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+                ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+            </p>
+        </div>
+    `;
+}
+
+function startCountdown(duration) {
+    let timer = duration;
+    const countdown = document.getElementById('countdown');
+    const interval = setInterval(() => {
+        const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+        const seconds = String(timer % 60).padStart(2, '0');
+        countdown.innerText = `${minutes}:${seconds}`;
+        if (--timer < 0) clearInterval(interval);
+    }, 1000);
+}
+
+function confirmPayment() {
+    document.getElementById('confirm-message').innerText = "✅ Đã xác nhận chuyển khoản.";
 }
