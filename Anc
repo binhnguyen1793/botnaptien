@@ -1,16 +1,50 @@
-$room_index = isset($_GET['room_index']) ? intval($_GET['room_index']) : 0;
+let cachedQR = null;
+let qrTimestamp = null;
 
-if (have_rows('loai_phong', $post_id)) {
-    $i = 0;
-    while (have_rows('loai_phong', $post_id)) {
-        the_row();
-        if ($i === $room_index) {
-            $ten_phong = get_sub_field('ten_phong') ?: 'Phòng tiêu chuẩn';
-            $dien_tich = get_sub_field('dien_tich_phong');
-            $so_nguoi = get_sub_field('so_nguoi');
-            $so_giuong = get_sub_field('so_giuong');
-            break;
-        }
-        $i++;
-    }
+const now = Date.now();
+const qrValidDuration = 2 * 60 * 1000; // 2 phút
+
+if (cachedQR && qrTimestamp && now - qrTimestamp < qrValidDuration) {
+    // Nếu đã có QR trong 2 phút gần nhất → dùng lại
+    qrPopup.innerHTML = `
+        <div>
+            <p><strong>Mã QR thanh toán:</strong></p>
+            <img src="${cachedQR}" style="max-width:300px;"><br><br>
+            <label>Gửi ảnh xác nhận chuyển khoản:
+                <input type="file" id="upload-proof" accept="image/*">
+            </label><br>
+            <button onclick="confirmPayment()">Đã chuyển khoản</button>
+            <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+                ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+            </p>
+        </div>
+    `;
+} else {
+    const formData = new URLSearchParams();
+    formData.append('price', calculatedAmount);
+
+    fetch("https://resolved-url-tapes-physically.trycloudflare.com/run-bot", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString()
+    })
+    .then(res => res.blob())
+    .then(blob => {
+        const url = URL.createObjectURL(blob);
+        cachedQR = url;
+        qrTimestamp = Date.now();
+        qrPopup.innerHTML = `
+            <div>
+                <p><strong>Mã QR thanh toán:</strong></p>
+                <img src="${url}" style="max-width:300px;"><br><br>
+                <label>Gửi ảnh xác nhận chuyển khoản:
+                    <input type="file" id="upload-proof" accept="image/*">
+                </label><br>
+                <button onclick="confirmPayment()">Đã chuyển khoản</button>
+                <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+                    ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+                </p>
+            </div>
+        `;
+    });
 }
