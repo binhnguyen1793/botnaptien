@@ -1,92 +1,78 @@
-let cachedQR = null;
-let qrTimestamp = null;
-let qrPromise = null;
+from flask import Flask, request, send_file, after_this_request
+from flask_cors import CORS
+import subprocess
+import os
+import time
+import threading
 
-const now = Date.now();
-const qrValidDuration = 2 * 60 * 1000; // 2 phút
+app = Flask(__name__)
+CORS(app)
 
-function getQR(calculatedAmount) {
-    const qrPopup = document.getElementById('qrPopup');
-
-    qrPopup.innerHTML = `
-        <div style="text-align:center">
-            <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
-            <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
-        </div>
-    `;
-
-    startCountdown(120);
-
-    const now = Date.now();
-
-    // Nếu đã có QR hợp lệ trong 2 phút
-    if (cachedQR && qrTimestamp && now - qrTimestamp < qrValidDuration) {
-        showQR(cachedQR);
-        return;
-    }
-
-    // Nếu QR đang được tạo → chờ Promise cũ
-    if (qrPromise) {
-        qrPromise.then(url => {
-            showQR(url);
-        }).catch(() => {
-            qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
-        });
-        return;
-    }
-
-    // QR chưa có và chưa đang tạo → gọi API
-    const formData = new URLSearchParams();
-    formData.append('price', calculatedAmount);
-
-    qrPromise = fetch("https://resolved-url-tapes-physically.trycloudflare.com/run-bot", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData.toString()
-    })
-    .then(res => res.blob())
-    .then(blob => {
-        const url = URL.createObjectURL(blob);
-        cachedQR = url;
-        qrTimestamp = Date.now();
-        qrPromise = null; // reset
-        showQR(url);
-        return url;
-    })
-    .catch(err => {
-        qrPromise = null;
-        qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
-    });
+# Biến toàn cục để kiểm soát QR
+qr_state = {
+    "is_running": False,
+    "qr_path": os.path.join("static", "qr_code_detected.png"),
+    "full_path": os.path.join("static", "full_page.png"),
+    "timestamp": 0
 }
 
-function showQR(qrUrl) {
-    const qrPopup = document.getElementById('qrPopup');
-    qrPopup.innerHTML = `
-        <div style="text-align:center">
-            <strong>Mã QR thanh toán:</strong><br>
-            <img src="${qrUrl}" style="max-width:300px;"><br><br>
-            <label>Gửi ảnh xác nhận chuyển khoản:
-                <input type="file" id="upload-proof" accept="image/*">
-            </label><br><br>
-            <button onclick="confirmPayment()">Đã chuyển khoản</button>
-            <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
-                ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
-            </p>
-        </div>
-    `;
-}
+lock = threading.Lock()  # đảm bảo tránh race condition
 
-function startCountdown(duration) {
-    let timer = duration;
-    const countdown = document.getElementById('countdown');
-    const interval = setInterval(() => {
-        const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
-        const seconds = String(timer % 60).padStart(2, '0');
-        countdown.innerText = `${minutes}:${seconds}`;
-        if (--timer < 0) clearInterval(interval);
-    }, 1000);
-}
+@app.route("/run-bot", methods=["POST"])
+def run_bot():
+    with lock:
+        price = request.form.get("price", "no-price")
+        now = time.time()
 
-function confirmPayment() {
-    document.getElementById('confirm-message').innerText = "✅ Đã xác nhận chuyển khoản.";
-}
+        # Nếu có QR hợp lệ trong 2 phút → trả lại luôn
+        if os.path.exists(qr_state["qr_path"]) and now - qr_state["timestamp"] < 120:
+            print("🔁 Trả lại QR đã tạo trong vòng 2 phút")
+            return send_file(qr_state["qr_path"], mimetype="image/png")
+
+        # Nếu bot đang chạy → chờ đến khi xong rồi trả QR
+        if qr_state["is_running"]:
+            print("⌛ Bot đang chạy. Chờ hoàn tất...")
+            while qr_state["is_running"]:
+                time.sleep(1)
+            if os.path.exists(qr_state["qr_path"]):
+                return send_file(qr_state["qr_path"], mimetype="image/png")
+            else:
+                return "Bot chạy xong nhưng không tìm thấy QR", 500
+
+        # Nếu không có QR hoặc đã quá hạn → chạy bot mới
+        print(f"💰 Gọi bot mới với giá: {price}")
+        qr_state["is_running"] = True
+
+    # Gọi bot bên ngoài lock để không giữ hàng đợi
+    result = subprocess.run(["python3", "bot.py", price], capture_output=True, text=True)
+    print(result.stdout)
+    print(result.stderr)
+
+    # Cập nhật trạng thái
+    with lock:
+        qr_state["timestamp"] = time.time()
+        qr_state["is_running"] = False
+
+        if os.path.exists(qr_state["qr_path"]):
+            @after_this_request
+            def cleanup(response):
+                # Đợi người dùng khác nhận xong trong 2 phút thì mới xóa
+                threading.Thread(target=delayed_delete, args=(qr_state["qr_path"], qr_state["full_path"])).start()
+                return response
+
+            return send_file(qr_state["qr_path"], mimetype="image/png")
+        else:
+            return "Không tìm thấy ảnh QR đã cắt!", 500
+
+def delayed_delete(path1, path2):
+    time.sleep(130)  # Đợi 2 phút 10 giây rồi mới xoá
+    for path in [path1, path2]:
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+                print(f"🗑️ Đã xóa ảnh sau 2 phút: {path}")
+        except Exception as e:
+            print(f"❌ Lỗi khi xóa ảnh {path}: {e}")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
