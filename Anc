@@ -1,223 +1,171 @@
-<?php
 function hotel_booking_form_shortcode() {
     ob_start();
-    $post_id = $_GET['hotel_id'] ?? null;
-    $gia_phong = $_GET['price'] ?? 0;
-
-    if (!$post_id || !get_post($post_id) || get_post_type($post_id) !== 'hotel') {
-        return '<p style="color:red;">Không tìm thấy thông tin khách sạn.</p>';
-    }
-
-    $tieu_de = get_the_title($post_id);
-    $dia_chi = get_field('dia_chi_1', $post_id);
-
-    // Lấy thông tin loại phòng đầu tiên
-    $ten_phong = 'Phòng tiêu chuẩn';
-    $dien_tich = '';
-    $so_nguoi = '';
-    $so_giuong = '';
-    $gia_phong = 1000000;
-
-    $room_index = isset($_GET['room_index']) ? intval($_GET['room_index']) : 0;
-
-    if (have_rows('loai_phong', $post_id)) {
-        $i = 0;
-        while (have_rows('loai_phong', $post_id)) {
-            the_row();
-            if ($i === $room_index) {
-                $ten_phong = get_sub_field('ten_phong') ?: 'Phòng tiêu chuẩn';
-                $dien_tich = get_sub_field('dien_tich_phong');
-                $so_nguoi = get_sub_field('so_nguoi');
-                $so_giuong = get_sub_field('so_giuong');
-                $gia_phong = isset($_GET['price']) ? intval($_GET['price']) : 0;
-                break;
-            }
-            $i++;
-        }
-    }
     ?>
-    <div class="rules-note">
-    <strong>Chính sách huỷ phòng:</strong><br>
-    • Huỷ trước ngày nhận phòng <strong>tối thiểu 7 ngày</strong>: Hoàn 100%.<br>
-    • Huỷ sau đó: Hoàn tối đa 50% hoặc mất toàn bộ tuỳ theo điều kiện khách sạn.<br>
-    • Hoàn tiền trong <strong>3 ngày làm việc</strong> từ lúc tiếp nhận.
-    </div>
-    <div class="hotel-booking-box">
-        <h2>Chi tiết đặt phòng</h2>
-        <h3><?php echo esc_html($tieu_de); ?></h3>
-        <p>📍 <?php echo esc_html($dia_chi); ?></p>
+<div class="hotel-booking-box">
+  <h2>Chi tiết đặt phòng</h2>
+  <form id="hotel-booking-form">
+    <label>Họ và tên*</label>
+    <input type="text" id="user-name" required>
 
-        <div class="checkin-checkout-row">
-            <div class="date-group">
-                <label>Ngày nhận phòng:</label>
-                <input type="date" id="checkin" required>
-            </div>
-            <div class="date-group">
-                <label>Ngày trả phòng:</label>
-                <input type="date" id="checkout" required>
-            </div>
-        </div>
+    <label>Email*</label>
+    <input type="email" id="user-email" required>
 
-        <div class="room-quantity">
-            <label for="so-phong">Số phòng:</label>
-            <div class="qty-wrapper">
-                <button type="button" class="qty-btn" id="minus">−</button>
-                <input type="number" id="so-phong" value="1" min="1" step="1">
-                <button type="button" class="qty-btn plus" id="plus">+</button>
-            </div>
-        </div>
+    <label>Ngày nhận phòng*</label>
+    <input type="date" id="checkin" required>
 
-        <div class="booking-table">
-            <div class="booking-row header">
-                <div>Số đêm phòng</div>
-                <div>Loại 1 phòng</div>
-                <div>Điều kiện 1 phòng</div>
-                <div>Giường phụ</div>
-                <div>Giá phòng/đêm</div>
-            </div>
-            <div class="booking-row">
-                <div><span id="so-dem">1 phòng x 1 đêm</span></div>
-                <div>
-                    <?php echo esc_html($ten_phong); ?><br>
-                    Diện tích <?php echo esc_html($dien_tich); ?>m², <?php echo esc_html($so_giuong); ?> giường<br>
-                    <a href="#">Xem chi tiết</a>
-                </div>
-                <div>
-                    Phòng dành cho <?php echo esc_html($so_nguoi); ?> khách<br>
-                    <b>ĐÃ</b> bao gồm ăn sáng<br>
-                    <b>ĐÃ</b> bao gồm thuế VAT và phí dịch vụ<br>
-                    <span style="color:red">Không hoàn/hủy phòng</span>
-                </div>
-                <div>
-                    <select><option>0</option><option>1</option><option>2</option></select>
-                </div>
-                <div><b><?php echo number_format($gia_phong, 0, ',', '.'); ?>đ</b></div>
-            </div>
-        </div>
+    <label>Ngày trả phòng*</label>
+    <input type="date" id="checkout" required>
 
-        <div class="booking-summary">
-            <div class="summary-line">
-                <span id="room-summary">1 <?php echo esc_html($ten_phong); ?></span>
-                <span id="tien-phong"><?php echo number_format($gia_phong, 0, ',', '.'); ?>đ</span>
-            </div>
-            <div class="summary-line">
-                <span>Thuế & phí</span>
-                <span id="thue-phi">463.000đ</span>
-            </div>
-            <div class="discount-box">
-                <input type="text" placeholder="Nhập mã giảm giá">
-            </div>
-            <div class="summary-line total">
-                <span>Tổng tiền:</span>
-                <span style="color: red; font-weight: bold;" id="tong-tien">...</span>
-            </div>
-            <p><strong>+ <span id="diem-thuong">...</span> điểm</strong></p>
-        </div>
+    <label>Số phòng</label>
+    <input type="number" id="so-phong" min="1" value="1">
 
-        <hr style="margin: 30px 0;">
-        <div class="contact-info">
-            <h3>Thông tin Liên hệ</h3>
-            <form id="hotel-form" onsubmit="return false;">
-                <div class="gender-options">
-                    <label class="gender-label">Quý danh*:</label>
-                    <label><input type="radio" name="gender" required> Ông</label>
-                    <label><input type="radio" name="gender"> Bà</label>
-                    <label><input type="radio" name="gender"> Anh</label>
-                    <label><input type="radio" name="gender"> Chị</label>
-                </div>
+    <label>Giá phòng/đêm</label>
+    <input type="text" id="gia-phong" value="1000000" readonly>
 
-                <input type="text" id="hotel-name" placeholder="Họ và tên" required style="width: 100%; padding: 8px;"><br><br>
-                <input type="text" id="hotel-phone" placeholder="Số điện thoại*" required style="width: 48%; padding: 8px; display: inline-block; margin-right: 4%;">
-                <input type="email" id="hotel-email" placeholder="Email" style="width: 48%; padding: 8px; display: inline-block;"><br><br>
-                <textarea id="hotel-note" placeholder="Nội dung yêu cầu" style="width: 100%; height: 80px; padding: 8px;"></textarea><br><br>
-                <label><input type="checkbox"> Tôi muốn xuất hóa đơn đỏ.</label><br><br>
+    <label>Tổng tiền</label>
+    <div id="tong-tien" style="font-weight:bold; color:#cc0000">...</div>
 
-                <div id="qr-popup" style="text-align:center;"></div>
-                <button type="button" onclick="submitHotelBooking()" style="background-color: #660000; color: white; padding: 12px 25px; font-size: 16px; border: none; cursor: pointer;">Gửi yêu cầu đặt phòng</button>
-            </form>
-        </div>
-    </div>
+    <button type="button" id="confirm-button" onclick="submitPayment()">
+      Xác nhận thanh toán
+    </button>
+  </form>
+  <div id="qr-popup" style="margin-top: 20px;"></div>
+</div>
 
-    <script>
-    function submitHotelBooking() {
-        const name = document.getElementById('hotel-name').value.trim();
-        const email = document.getElementById('hotel-email').value.trim();
-        const qrPopup = document.getElementById("qr-popup");
-        const tongTien = document.getElementById("tong-tien").innerText.replace(/\D/g, "");
+<style>
+.hotel-booking-box {
+  max-width: 600px;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 20px;
+  font-family: Arial;
+  font-size: 14px;
+}
+.hotel-booking-box input[type="text"],
+.hotel-booking-box input[type="email"],
+.hotel-booking-box input[type="date"],
+.hotel-booking-box input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.hotel-booking-box button {
+  background-color: #660000;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+.hotel-booking-box button:disabled {
+  background-color: #999;
+}
+</style>
 
-        if (!name || !email || !tongTien) {
-            alert("Vui lòng nhập đủ Họ tên, Email và thông tin thanh toán.");
-            return;
-        }
+<script>
+let calculatedAmount = 0;
 
-        qrPopup.innerHTML = `
-            <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
-            <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
-        `;
+function updatePrice() {
+  const checkin = document.getElementById('checkin').value;
+  const checkout = document.getElementById('checkout').value;
+  const giaPhong = parseInt(document.getElementById('gia-phong').value) || 0;
+  const soPhong = parseInt(document.getElementById('so-phong').value) || 1;
+  if (!checkin || !checkout) return;
+  const inDate = new Date(checkin);
+  const outDate = new Date(checkout);
+  if (outDate <= inDate) return;
+  const soDem = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
+  calculatedAmount = soDem * soPhong * giaPhong + 463000;
+  document.getElementById('tong-tien').innerText = calculatedAmount.toLocaleString('vi-VN') + 'đ';
+}
 
-        startCountdown(120);
+function submitPayment() {
+  document.getElementById("confirm-button").disabled = true;
+  const name = document.getElementById('user-name').value.trim();
+  const email = document.getElementById('user-email').value.trim();
+  const qrPopup = document.getElementById("qr-popup");
+  if (!name || !email || calculatedAmount === 0) {
+    alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
+    document.getElementById("confirm-button").disabled = false;
+    return;
+  }
+  qrPopup.innerHTML = `
+    <div style="text-align:center">
+      <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
+      <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
+    </div>`;
+  startCountdown(120);
+  getQR();
+}
 
-        const formData = new URLSearchParams();
-        formData.append('price', tongTien);
+function getQR() {
+  const qrPopup = document.getElementById("qr-popup");
+  const formData = new URLSearchParams();
+  formData.append('price', calculatedAmount);
+  fetch("https://restoration-reasons-impose-mat.trycloudflare.com/run-bot", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: formData.toString()
+  })
+    .then(res => res.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      showQR(url);
+    })
+    .catch(() => {
+      qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
+    });
+}
 
-        fetch("/wp-json/qrbot/v1/run", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData.toString()
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("QR lỗi");
-            return res.blob();
-        })
-        .then(blob => {
-            const url = URL.createObjectURL(blob);
-            showQR(url);
-        })
-        .catch(() => {
-            qrPopup.innerHTML = `<p style='color:red'>Lỗi tạo mã QR. Vui lòng tải lại trang để thử lại.</p>`;
-        });
-    }
+function showQR(qrUrl) {
+  const qrPopup = document.getElementById("qr-popup");
+  qrPopup.innerHTML = `
+    <div style="text-align:center">
+      <strong>Mã QR thanh toán:</strong><br>
+      <img src="${qrUrl}" style="max-width:300px;"><br><br>
+      <label>Gửi ảnh xác nhận chuyển khoản:
+        <input type="file" id="upload-proof" accept="image/*">
+      </label><br><br>
+      <button onclick="confirmPayment()">Đã chuyển khoản</button>
+      <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+        ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+      </p>
+    </div>`;
+}
 
-    function startCountdown(duration) {
-        let timer = duration;
-        const countdown = document.getElementById('countdown');
-        const interval = setInterval(() => {
-            const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
-            const seconds = String(timer % 60).padStart(2, '0');
-            countdown.innerText = `${minutes}:${seconds}`;
-            if (--timer < 0) clearInterval(interval);
-        }, 1000);
-    }
+function startCountdown(duration) {
+  let timer = duration;
+  const countdown = document.getElementById('countdown');
+  const interval = setInterval(() => {
+    const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+    const seconds = String(timer % 60).padStart(2, '0');
+    countdown.innerText = `${minutes}:${seconds}`;
+    if (--timer < 0) clearInterval(interval);
+  }, 1000);
+}
 
-    function showQR(qrUrl) {
-        const qrPopup = document.getElementById("qr-popup");
-        qrPopup.innerHTML = `
-            <div style="text-align:center">
-                <strong>Mã QR thanh toán:</strong><br>
-                <img src="${qrUrl}" style="max-width:300px;"><br><br>
-                <label>Gửi ảnh xác nhận chuyển khoản:
-                    <input type="file" id="upload-proof" accept="image/*">
-                </label><br><br>
-                <button onclick="confirmHotelPayment()">Đã chuyển khoản</button>
-                <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
-                    ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
-                </p>
-            </div>
-        `;
-    }
+function confirmPayment() {
+  const fileInput = document.getElementById('upload-proof');
+  const msg = document.getElementById('confirm-message');
+  if (!fileInput || !fileInput.files.length) {
+    msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
+    msg.style.color = 'red';
+    return;
+  }
+  msg.style.color = 'green';
+  msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
+}
 
-    function confirmHotelPayment() {
-        const fileInput = document.getElementById('upload-proof');
-        const msg = document.getElementById('confirm-message');
-        if (!fileInput || !fileInput.files.length) {
-            msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
-            msg.style.color = 'red';
-            return;
-        }
-        msg.style.color = 'green';
-        msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
-    }
-    </script>
+window.addEventListener("DOMContentLoaded", () => {
+  updatePrice();
+  document.getElementById('checkin').addEventListener('change', updatePrice);
+  document.getElementById('checkout').addEventListener('change', updatePrice);
+  document.getElementById('so-phong').addEventListener('input', updatePrice);
+});
+</script>
     <?php
     return ob_get_clean();
 }
