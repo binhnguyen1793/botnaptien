@@ -1,20 +1,121 @@
-function getQR() {
+<script>
+let basePrice = <?= $gia_phong ?>;
+let calculatedAmount = basePrice;
+
+function updateHotelPrice() {
+    const nguoiLon = parseInt(document.getElementById('nguoi_lon').value || 0);
+    const treEm = parseInt(document.getElementById('tre_em').value || 0);
+    const paymentType = parseInt(document.getElementById('payment_type').value || 0);
+    const checkinEl = document.getElementById('checkin');
+    const checkoutEl = document.getElementById('checkout');
+
+    const checkin = new Date(checkinEl.value);
+    const checkout = new Date(checkoutEl.value);
+
+    if (checkin && checkout && checkout <= checkin) {
+        alert("Ngày trả phòng phải sau ngày nhận phòng.");
+        checkoutEl.value = "";
+        document.getElementById('final-price').innerText = '0 đ';
+        document.getElementById('listed-price').innerText = '0 đ';
+        calculatedAmount = 0;
+        return;
+    }
+
+    let days = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+    if (isNaN(days) || days <= 0) days = 1;
+
+    const listedPrice = days * ((nguoiLon * basePrice) + (treEm * basePrice * 0.5));
+    let finalPrice = listedPrice;
+
+    if (paymentType === 100) finalPrice *= 0.8;
+    else if (paymentType === 30) finalPrice *= 0.3;
+
+    calculatedAmount = Math.round(finalPrice);
+    document.getElementById('final-price').innerText = calculatedAmount.toLocaleString('vi-VN') + ' đ';
+    document.getElementById('listed-price').innerText = Math.round(listedPrice).toLocaleString('vi-VN') + ' đ';
+}
+
+function submitPayment() {
+    document.getElementById("confirm-button").disabled = true;
+    const name = document.getElementById('user-name').value.trim();
+    const email = document.getElementById('user-email').value.trim();
     const qrPopup = document.getElementById("qr-popup");
+
+    if (!name || !email || calculatedAmount === 0) {
+        alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
+        document.getElementById("confirm-button").disabled = false;
+        return;
+    }
+
+    qrPopup.innerHTML = `
+        <div style="text-align:center">
+            <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
+            <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
+        </div>
+    `;
+
+    startCountdown(120);
 
     const formData = new URLSearchParams();
     formData.append('price', calculatedAmount);
 
-    fetch("https://your-server-ip-or-domain:8080/run-bot", {
+    fetch("https://temporal-tend-maiden-truly.trycloudflare.com/run-bot", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString()
     })
-    .then(res => res.blob())
+    .then(res => {
+        if (!res.ok) throw new Error("QR lỗi");
+        return res.blob();
+    })
     .then(blob => {
         const url = URL.createObjectURL(blob);
         showQR(url);
     })
     .catch(() => {
-        qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
+        qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng tải lại trang để thử lại.</p>`;
     });
 }
+
+function showQR(qrUrl) {
+    const qrPopup = document.getElementById("qr-popup");
+    qrPopup.innerHTML = `
+        <div style="text-align:center">
+            <strong>Mã QR thanh toán:</strong><br>
+            <img src="${qrUrl}" style="max-width:300px;"><br><br>
+            <label>Gửi ảnh xác nhận chuyển khoản:
+                <input type="file" id="upload-proof" accept="image/*">
+            </label><br><br>
+            <button onclick="confirmPayment()">Đã chuyển khoản</button>
+            <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+                ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+            </p>
+        </div>
+    `;
+}
+
+function startCountdown(duration) {
+    let timer = duration;
+    const countdown = document.getElementById('countdown');
+    const interval = setInterval(() => {
+        const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+        const seconds = String(timer % 60).padStart(2, '0');
+        countdown.innerText = `${minutes}:${seconds}`;
+        if (--timer < 0) clearInterval(interval);
+    }, 1000);
+}
+
+function confirmPayment() {
+    const fileInput = document.getElementById('upload-proof');
+    const msg = document.getElementById('confirm-message');
+    if (!fileInput || !fileInput.files.length) {
+        msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
+        msg.style.color = 'red';
+        return;
+    }
+    msg.style.color = 'green';
+    msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
+}
+
+window.addEventListener("DOMContentLoaded", updateHotelPrice);
+</script>
