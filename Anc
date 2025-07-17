@@ -1,172 +1,92 @@
-function hotel_booking_form_shortcode() {
-    ob_start();
-    ?>
-<div class="hotel-booking-box">
-  <h2>Chi tiết đặt phòng</h2>
-  <form id="hotel-booking-form">
-    <label>Họ và tên*</label>
-    <input type="text" id="user-name" required>
-
-    <label>Email*</label>
-    <input type="email" id="user-email" required>
-
-    <label>Ngày nhận phòng*</label>
-    <input type="date" id="checkin" required>
-
-    <label>Ngày trả phòng*</label>
-    <input type="date" id="checkout" required>
-
-    <label>Số phòng</label>
-    <input type="number" id="so-phong" min="1" value="1">
-
-    <label>Giá phòng/đêm</label>
-    <input type="text" id="gia-phong" value="1000000" readonly>
-
-    <label>Tổng tiền</label>
-    <div id="tong-tien" style="font-weight:bold; color:#cc0000">...</div>
-
-    <button type="button" id="confirm-button" onclick="submitPayment()">
-      Xác nhận thanh toán
-    </button>
-  </form>
-  <div id="qr-popup" style="margin-top: 20px;"></div>
-</div>
-
-<style>
-.hotel-booking-box {
-  max-width: 600px;
-  margin: auto;
-  border: 1px solid #ccc;
-  padding: 20px;
-  font-family: Arial;
-  font-size: 14px;
-}
-.hotel-booking-box input[type="text"],
-.hotel-booking-box input[type="email"],
-.hotel-booking-box input[type="date"],
-.hotel-booking-box input[type="number"] {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.hotel-booking-box button {
-  background-color: #660000;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
-}
-.hotel-booking-box button:disabled {
-  background-color: #999;
-}
-</style>
-
 <script>
-let calculatedAmount = 0;
+document.addEventListener('DOMContentLoaded', function () {
+    const checkin = document.getElementById('checkin');
+    const checkout = document.getElementById('checkout');
+    const soPhongInput = document.getElementById('so-phong');
+    const btnMinus = document.getElementById('minus');
+    const btnPlus = document.getElementById('plus');
+    const giaPhong = <?php echo intval($gia_phong); ?>;
+    const thuePhi = 463000;
 
-function updatePrice() {
-  const checkin = document.getElementById('checkin').value;
-  const checkout = document.getElementById('checkout').value;
-  const giaPhong = parseInt(document.getElementById('gia-phong').value) || 0;
-  const soPhong = parseInt(document.getElementById('so-phong').value) || 1;
-  if (!checkin || !checkout) return;
-  const inDate = new Date(checkin);
-  const outDate = new Date(checkout);
-  if (outDate <= inDate) return;
-  const soDem = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
-  calculatedAmount = soDem * soPhong * giaPhong + 463000;
-  document.getElementById('tong-tien').innerText = calculatedAmount.toLocaleString('vi-VN') + 'đ';
-}
+    let calculatedAmount = 0;
 
-function submitPayment() {
-  document.getElementById("confirm-button").disabled = true;
-  const name = document.getElementById('user-name').value.trim();
-  const email = document.getElementById('user-email').value.trim();
-  const qrPopup = document.getElementById("qr-popup");
-  if (!name || !email || calculatedAmount === 0) {
-    alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
-    document.getElementById("confirm-button").disabled = false;
-    return;
-  }
-  qrPopup.innerHTML = `
-    <div style="text-align:center">
-      <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
-      <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
-    </div>`;
-  startCountdown(120);
-  getQR();
-}
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
 
-function getQR() {
-  const qrPopup = document.getElementById("qr-popup");
-  const formData = new URLSearchParams();
-  formData.append('price', calculatedAmount);
-  fetch("https://restoration-reasons-impose-mat.trycloudflare.com/run-bot", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: formData.toString()
-  })
-    .then(res => res.blob())
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      showQR(url);
-    })
-    .catch(() => {
-      qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
-    });
-}
+    const todayStr = today.toISOString().split('T')[0];
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-function showQR(qrUrl) {
-  const qrPopup = document.getElementById("qr-popup");
-  qrPopup.innerHTML = `
-    <div style="text-align:center">
-      <strong>Mã QR thanh toán:</strong><br>
-      <img src="${qrUrl}" style="max-width:300px;"><br><br>
-      <label>Gửi ảnh xác nhận chuyển khoản:
-        <input type="file" id="upload-proof" accept="image/*">
-      </label><br><br>
-      <button onclick="confirmPayment()">Đã chuyển khoản</button>
-      <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
-        ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
-      </p>
-    </div>`;
-}
+    checkin.value = todayStr;
+    checkout.value = tomorrowStr;
+    checkout.min = tomorrowStr;
 
-function startCountdown(duration) {
-  let timer = duration;
-  const countdown = document.getElementById('countdown');
-  const interval = setInterval(() => {
-    const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
-    const seconds = String(timer % 60).padStart(2, '0');
-    countdown.innerText = `${minutes}:${seconds}`;
-    if (--timer < 0) clearInterval(interval);
-  }, 1000);
-}
+    function updatePrice() {
+        const inDate = new Date(checkin.value);
+        const outDate = new Date(checkout.value);
+        const soPhong = parseInt(soPhongInput.value) || 1;
 
-function confirmPayment() {
-  const fileInput = document.getElementById('upload-proof');
-  const msg = document.getElementById('confirm-message');
-  if (!fileInput || !fileInput.files.length) {
-    msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
-    msg.style.color = 'red';
-    return;
-  }
-  msg.style.color = 'green';
-  msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
-}
+        if (!checkin.value || !checkout.value || outDate <= inDate) {
+            document.getElementById('so-dem').innerText = `${soPhong} phòng x ? đêm`;
+            document.getElementById('room-summary').innerText = `${soPhong} phòng`;
+            document.getElementById('tien-phong').innerText = '...';
+            document.getElementById('tong-tien').innerText = '...';
+            document.getElementById('diem-thuong').innerText = '...';
+            calculatedAmount = 0;
+            return;
+        }
 
-window.addEventListener("DOMContentLoaded", () => {
-  updatePrice();
-  document.getElementById('checkin').addEventListener('change', updatePrice);
-  document.getElementById('checkout').addEventListener('change', updatePrice);
-  document.getElementById('so-phong').addEventListener('input', updatePrice);
-});
-</script>
-    <?php
-    return ob_get_clean();
-}
-add_shortcode('hotel_booking_form', 'hotel_booking_form_shortcode');
+        const soDem = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
+        const tienPhong = giaPhong * soDem * soPhong;
+        const tong = tienPhong + thuePhi;
+        const diem = Math.round(tong * 0.01);
+        calculatedAmount = tong;
+
+        document.getElementById('so-dem').innerText = `${soPhong} phòng x ${soDem} đêm`;
+        document.getElementById('room-summary').innerText = `${soPhong} <?php echo esc_js($ten_phong); ?>`;
+        document.getElementById('tien-phong').innerText = tienPhong.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('tong-tien').innerText = tong.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('diem-thuong').innerText = diem.toLocaleString('vi-VN');
+    }
+
+    function submitPayment() {
+        document.getElementById("confirm-button").disabled = true;
+
+        const name = document.getElementById('user-name').value.trim();
+        const email = document.getElementById('user-email').value.trim();
+        const qrPopup = document.getElementById("qr-popup");
+
+        if (!name || !email || calculatedAmount === 0) {
+            alert('Vui lòng nhập đủ Họ tên, Email và chọn hình thức thanh toán.');
+            document.getElementById("confirm-button").disabled = false;
+            return;
+        }
+
+        qrPopup.innerHTML = `
+            <div style="text-align:center">
+                <p style="font-weight:bold; color:#cc0000;">Đang lấy mã QR tự động... Vui lòng chờ khoảng 2 phút</p>
+                <div id="countdown" style="font-size:24px; font-weight:bold; margin:10px;">02:00</div>
+            </div>
+        `;
+        startCountdown(120);
+        getQR();
+    }
+
+    function getQR() {
+        const qrPopup = document.getElementById("qr-popup");
+
+        const formData = new URLSearchParams();
+        formData.append('price', calculatedAmount);
+
+        fetch("https://restoration-reasons-impose-mat.trycloudflare.com/run-bot", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+        .then(res => res.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            showQR(url);
+        })
+        .catch(() => {
+            qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng
