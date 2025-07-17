@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tienPhong = giaPhong * soDem * soPhong;
         const tong = tienPhong + thuePhi;
         const diem = Math.round(tong * 0.01);
+
         calculatedAmount = tong;
 
         document.getElementById('so-dem').innerText = `${soPhong} phòng x ${soDem} đêm`;
@@ -49,7 +50,25 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('diem-thuong').innerText = diem.toLocaleString('vi-VN');
     }
 
-    function submitPayment() {
+    checkin.addEventListener('change', updatePrice);
+    checkout.addEventListener('change', updatePrice);
+    soPhongInput.addEventListener('change', updatePrice);
+    btnMinus.addEventListener('click', () => {
+        let val = parseInt(soPhongInput.value) || 1;
+        if (val > 1) {
+            soPhongInput.value = val - 1;
+            updatePrice();
+        }
+    });
+    btnPlus.addEventListener('click', () => {
+        let val = parseInt(soPhongInput.value) || 1;
+        soPhongInput.value = val + 1;
+        updatePrice();
+    });
+
+    updatePrice(); // khởi tạo ban đầu
+
+    window.submitPayment = function () {
         document.getElementById("confirm-button").disabled = true;
 
         const name = document.getElementById('user-name').value.trim();
@@ -70,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         startCountdown(120);
         getQR();
-    }
+    };
 
     function getQR() {
         const qrPopup = document.getElementById("qr-popup");
@@ -89,4 +108,48 @@ document.addEventListener('DOMContentLoaded', function () {
             showQR(url);
         })
         .catch(() => {
-            qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng
+            qrPopup.innerHTML = `<p style="color:red">Lỗi tạo mã QR. Vui lòng thử lại sau.</p>`;
+        });
+    }
+
+    function showQR(qrUrl) {
+        const qrPopup = document.getElementById("qr-popup");
+        qrPopup.innerHTML = `
+            <div style="text-align:center">
+                <strong>Mã QR thanh toán:</strong><br>
+                <img src="${qrUrl}" style="max-width:300px;"><br><br>
+                <label>Gửi ảnh xác nhận chuyển khoản:
+                    <input type="file" id="upload-proof" accept="image/*">
+                </label><br><br>
+                <button onclick="confirmPayment()">Đã chuyển khoản</button>
+                <p id="confirm-message" style="margin-top:10px; font-weight:bold; color:#cc0000">
+                    ⚠️ Nếu mã QR không hợp lệ hoặc đã được sử dụng, vui lòng tải lại trang để tạo mã mới.
+                </p>
+            </div>
+        `;
+    }
+
+    window.confirmPayment = function () {
+        const fileInput = document.getElementById('upload-proof');
+        const msg = document.getElementById('confirm-message');
+        if (!fileInput || !fileInput.files.length) {
+            msg.innerText = 'Vui lòng gửi ảnh xác nhận chuyển khoản trước khi xác nhận.';
+            msg.style.color = 'red';
+            return;
+        }
+        msg.style.color = 'green';
+        msg.innerText = 'Quý khách vui lòng kiểm tra email để xác nhận đặt thành công dịch vụ.';
+    };
+
+    function startCountdown(duration) {
+        let timer = duration;
+        const countdown = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+            const seconds = String(timer % 60).padStart(2, '0');
+            countdown.innerText = `${minutes}:${seconds}`;
+            if (--timer < 0) clearInterval(interval);
+        }, 1000);
+    }
+});
+</script>
