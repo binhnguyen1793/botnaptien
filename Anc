@@ -1,45 +1,45 @@
-<!-- Slider ảnh từ textarea anh_dai_dien_tour -->
+<!-- Slider ảnh đại diện từ textarea "anh_dai_dien" -->
 <?php
-$raw_links = get_field('anh_dai_dien_tour');
+$raw_links = get_field('anh_dai_dien');
 if (!empty($raw_links)):
-    $image_urls = array_filter(array_map('trim', explode("\n", $raw_links))); // Tách từng dòng
+    $image_urls = array_filter(array_map('trim', explode("\n", $raw_links))); // Mỗi dòng là 1 ảnh
     if (!empty($image_urls)):
 ?>
-    <div class="tour-gallery-slider swiper">
-        <div class="swiper-wrapper">
-            <?php foreach ($image_urls as $img_url): ?>
-                <div class="swiper-slide">
-                    <img src="<?php echo esc_url($img_url); ?>" alt="<?php the_title_attribute(); ?>" class="custom-tour-thumbnail" />
-                </div>
-            <?php endforeach; ?>
+<div class="tour-featured-img">
+  <div class="swiper tour-slider-swiper">
+    <div class="swiper-wrapper">
+      <?php foreach ($image_urls as $img_url): ?>
+        <div class="swiper-slide">
+          <img src="<?php echo esc_url($img_url); ?>" alt="<?php the_title_attribute(); ?>" class="custom-tour-thumbnail" style="width: 100%; height: auto;" />
         </div>
-
-        <!-- Navigation buttons -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-
-        <!-- Pagination -->
-        <div class="swiper-pagination"></div>
+      <?php endforeach; ?>
     </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+</div>
 
-    <!-- Swiper CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<!-- Swiper CSS & JS (chỉ cần nhúng 1 lần) -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
-    <script>
-      var swiper = new Swiper('.tour-gallery-slider', {
-        loop: true,
-        slidesPerView: 1,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-      });
-    </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new Swiper('.tour-slider-swiper', {
+      loop: true,
+      slidesPerView: 1,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+  });
+</script>
 <?php
     endif;
 endif;
